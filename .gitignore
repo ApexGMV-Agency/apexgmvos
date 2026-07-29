@@ -1,0 +1,39 @@
+node_modules
+dist
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+.vite
+
+.vercel
+tsconfig.tsbuildinfo
+
+.vercel
+
+# Supabase CLI artefacts
+supabase/.temp/
+supabase/.branches/
+
+# Pre-baseline SQL archive (15 schema files + 144 dated migrations). Superseded by
+# supabase/schema_baseline.sql and explicitly never run again — kept on disk for
+# local reference only. Untracked as of the ApexGMV rebrand; the last committed
+# copy is recoverable with:
+#   git checkout bbbb9d7 -- supabase/legacy
+supabase/legacy/
+
+# direnv — per-project CLI tokens (never commit)
+.envrc
+
+# Claude Code — local project context (never commit)
+CLAUDE.local.md
+
+# Claude Code — locally-installed skills (e.g. ui-ux-pro-max)
+.claude/skills/
+# npx skills installer artifacts (shared skill store + lockfile)
+.agents/
+skills-lock.json
+
+# Claude Code — MCP server config (contains API keys, never commit)
+.mcp.json
