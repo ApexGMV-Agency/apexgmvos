@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="light" data-bs-theme="light">
+<html lang="en" data-theme="dark" data-bs-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -8,11 +8,13 @@
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.webmanifest" />
-    <meta name="theme-color" content="#f5f6f8" />
+    <meta name="theme-color" content="#000000" />
 
     <!-- Apply the saved theme before first paint. Without this the document
-         renders light for a frame before React mounts, which reads as a white
-         flash for dark-mode users. Kept in sync with src/theme/ThemeContext. -->
+         renders with the default theme for a frame before React mounts, which
+         reads as a flash for anyone who picked the other one. The <html>
+         attributes above carry the default (dark); this only has to correct
+         them. Kept in sync with src/theme/ThemeContext. -->
     <script>
       (function () {
         try {
@@ -20,9 +22,9 @@
           if (t !== 'light' && t !== 'dark') return;
           document.documentElement.dataset.theme = t;
           document.documentElement.setAttribute('data-bs-theme', t);
-          if (t === 'dark') {
-            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#000000');
-          }
+          document
+            .querySelector('meta[name="theme-color"]')
+            .setAttribute('content', t === 'dark' ? '#000000' : '#f5f6f8');
         } catch (e) {}
       })();
     </script>

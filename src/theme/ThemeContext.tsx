@@ -5,7 +5,7 @@ export type Theme = 'light' | 'dark';
 /** Shared with the anti-flash bootstrap script in index.html — keep in sync. */
 export const THEME_STORAGE_KEY = 'ac_theme';
 
-const DEFAULT_THEME: Theme = 'light';
+const DEFAULT_THEME: Theme = 'dark';
 
 /** Matches the --ac-surface-base of each theme, so the mobile browser chrome
  *  and the PWA status bar track the page instead of staying black. */
