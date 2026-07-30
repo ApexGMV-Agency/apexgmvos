@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import { Card, Spinner, Alert, Form, Row, Col, Badge, Button, Tab, Nav, Offcanvas, Modal } from 'react-bootstrap';
 import { supabase } from '../lib/supabase';
+import { useTheme } from '../theme/ThemeContext';
 import { fnError } from '../lib/functionError';
 import { addDays, formatRange, formatHuman, formatWeekShort, fromISO } from '../lib/dates';
 import { WeeklyReportContent, normalizeContent } from '../lib/reportSchema';
@@ -1538,13 +1539,29 @@ function MonthQuickPicks({ month, setMonth, monthsWithData }: {
   );
 }
 function PublicShell({ children, clientName }: { children: React.ReactNode; clientName: string }) {
+  // Clients get the same toggle as staff: this page renders inside the app's
+  // ThemeProvider, so the choice persists to their own localStorage.
+  const { theme, toggleTheme } = useTheme();
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, var(--ac-accent-soft) 0%, var(--ac-accent-soft) 100%)', backgroundAttachment: 'fixed' }}>
-      <div style={{ background: 'var(--ac-surface-strong)', color: 'var(--ac-text-primary)', padding: '14px 24px' }}>
+      <div
+        className="d-flex align-items-center"
+        style={{ background: 'var(--ac-surface-strong)', color: 'var(--ac-text-primary)', padding: '14px 24px' }}
+      >
         <strong>ApexGMVOS</strong>
         <span className="opacity-75 mx-2">— Reporting</span>
         <span className="opacity-75">|</span>
         <span className="ms-2 fw-semibold">{clientName}</span>
+        <Button
+          variant="light"
+          size="sm"
+          onClick={toggleTheme}
+          aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+          title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+          className="ac-theme-toggle ms-auto"
+        >
+          <i className={`bi ${theme === 'dark' ? 'bi-sun' : 'bi-moon-stars'}`} />
+        </Button>
       </div>
       <div className="container-fluid py-4" style={{ maxWidth: 1400 }}>{children}</div>
     </div>
