@@ -767,6 +767,26 @@ hr { border-color: var(--ac-border); opacity: 1; }
   background: linear-gradient(135deg, var(--ac-surface-strong) 0%, var(--ac-surface-raised) 100%);
 }
 .ac-auth-card { width: 100%; max-width: 420px; border-radius: var(--ac-radius); }
+/* Brand lockup on the sign-in card — mirrors .ac-sidebar .brand. The mark is
+   the orange icon, so it carries on both themes without a per-theme swap. */
+.ac-auth-brand { display: flex; align-items: center; gap: 10px; }
+.ac-auth-brand img { object-fit: contain; flex-shrink: 0; }
+.ac-auth-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  font-family: var(--ac-font-heading);
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: -0.4px;
+  color: var(--ac-text-primary);
+}
+.ac-auth-brand-text small {
+  font-size: .7rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--ac-text-secondary);
+}
 
 /* =========================================================
    Third-party surfaces that ship light-only CSS

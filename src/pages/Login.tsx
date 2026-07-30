@@ -25,7 +25,15 @@ export default function Login() {
     <div className="ac-auth-wrap">
       <Card className="ac-auth-card shadow">
         <Card.Body className="p-4">
-          <h3 className="mb-1">ApexGMVOS</h3>
+          {/* Same mark + wordmark lockup the sidebar uses, so the sign-in
+              screen matches the chrome it hands off to. */}
+          <div className="ac-auth-brand mb-3">
+            <img src="/apex-mobile-logo.svg" alt="" width={38} height={35} />
+            <span className="ac-auth-brand-text">
+              ApexGMVOS
+              <small>by ApexGMV</small>
+            </span>
+          </div>
           <p className="text-muted mb-4">Sign in to your account</p>
           {err && <Alert variant="danger">{err}</Alert>}
           <Form onSubmit={onSubmit}>
