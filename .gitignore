@@ -31,6 +31,7 @@ CLAUDE.local.md
 
 # Claude Code — locally-installed skills (e.g. ui-ux-pro-max)
 .claude/skills/
+skills/
 # npx skills installer artifacts (shared skill store + lockfile)
 .agents/
 skills-lock.json

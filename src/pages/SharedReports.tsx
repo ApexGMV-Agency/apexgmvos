@@ -845,7 +845,7 @@ export default function SharedReports() {
                     <Col md={6} lg={4} key={r.id}>
                       <div
                         className="d-flex flex-column gap-2 p-3 rounded h-100"
-                        style={{ background: 'white', border: '1px solid #e5e7eb' }}
+                        style={{ background: 'var(--ac-surface-raised)', border: '1px solid var(--ac-border)' }}
                       >
                         <div className="d-flex align-items-center gap-3">
                           <div style={{
@@ -923,9 +923,9 @@ export default function SharedReports() {
                 className="border-0"
                 style={{
                   position: 'relative',
-                  background: active ? 'linear-gradient(135deg, #2563eb, #7c3aed)' : 'white',
-                  color: active ? 'white' : '#111827',
-                  border: active ? 'none' : '1px solid #e5e7eb',
+                  background: active ? 'linear-gradient(135deg, #60a5fa, #a78bfa)' : 'var(--ac-surface-raised)',
+                  color: active ? 'var(--ac-text-on-accent)' : 'var(--ac-text-primary)',
+                  border: active ? 'none' : '1px solid #292929',
                   borderRadius: 12,
                   padding: '12px 18px',
                   width: 248,
@@ -978,7 +978,7 @@ export default function SharedReports() {
                       <Badge bg="secondary">{approvalsForBrand.length}</Badge>
                       {pendingApprovalRows > 0 && (
                         <Badge bg="danger" pill title={`${pendingApprovalRows} report${pendingApprovalRows === 1 ? '' : 's'} awaiting your decision`}>
-                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff', display: 'inline-block', marginRight: 4, verticalAlign: 'middle' }} />
+                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--ac-surface-raised)', display: 'inline-block', marginRight: 4, verticalAlign: 'middle' }} />
                           {pendingApprovalRows}
                         </Badge>
                       )}
@@ -1022,9 +1022,9 @@ export default function SharedReports() {
                           <Col md={6} lg={4} key={r.id}>
                             <Card
                               className="h-100 shadow-sm report-card"
-                              style={{ cursor: 'pointer', borderLeft: '4px solid #2563eb', transition: 'transform .15s, box-shadow .15s' }}
+                              style={{ cursor: 'pointer', borderLeft: '4px solid var(--ac-info)', transition: 'transform .15s, box-shadow .15s' }}
                               onClick={() => setOpenId(r.id)}
-                              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(0,0,0,.08)'; }}
+                              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(0,0,0,.5)'; }}
                               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; (e.currentTarget as HTMLElement).style.boxShadow = ''; }}
                             >
                               <Card.Body>
@@ -1113,9 +1113,9 @@ export default function SharedReports() {
                                 <Col md={6} lg={4} key={r.id}>
                                   <Card
                                     className="h-100 shadow-sm report-card"
-                                    style={{ cursor: 'pointer', borderLeft: '4px solid #14b8a6', transition: 'transform .15s, box-shadow .15s' }}
+                                    style={{ cursor: 'pointer', borderLeft: '4px solid var(--ac-success)', transition: 'transform .15s, box-shadow .15s' }}
                                     onClick={() => setOpenMonthlyId(r.id)}
-                                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(0,0,0,.08)'; }}
+                                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(0,0,0,.5)'; }}
                                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; (e.currentTarget as HTMLElement).style.boxShadow = ''; }}
                                   >
                                     <Card.Body>
@@ -1190,7 +1190,7 @@ export default function SharedReports() {
                       {approvalsForBrand.map(({ decision: d, reportType, reportId, periodLabel, monthKey, approvalHtml }) => {
                         const state: 'pending' | 'approved' | 'changes' =
                           !d ? 'pending' : d.decision === 'approved' ? 'approved' : 'changes';
-                        const color = state === 'approved' ? '#198754' : state === 'changes' ? '#d97706' : '#dc3545';
+                        const color = state === 'approved' ? '#34d399' : state === 'changes' ? '#d97706' : '#f87171';
                         const icon = state === 'approved' ? 'bi-check-circle-fill'
                           : state === 'changes' ? 'bi-arrow-repeat' : 'bi-shield-exclamation';
                         return (
@@ -1201,7 +1201,7 @@ export default function SharedReports() {
                           title="Open this report"
                           className="d-flex align-items-center gap-3 p-3 rounded"
                           style={{
-                            background: 'white', border: '1px solid #e5e7eb',
+                            background: 'var(--ac-surface-raised)', border: '1px solid var(--ac-border)',
                             borderLeft: `4px solid ${color}`, cursor: 'pointer',
                             transition: 'transform .15s, box-shadow .15s',
                           }}
@@ -1212,7 +1212,7 @@ export default function SharedReports() {
                             window.scrollTo({ top: 0 });
                           }}
                           onKeyDown={e => { if (e.key === 'Enter') (e.currentTarget as HTMLElement).click(); }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(0,0,0,.08)'; }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(0,0,0,.5)'; }}
                           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; (e.currentTarget as HTMLElement).style.boxShadow = ''; }}
                         >
                           <div style={{
@@ -1229,7 +1229,7 @@ export default function SharedReports() {
                               </Badge>
                               {state === 'pending' && (
                                 <Badge bg="danger" pill>
-                                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff', display: 'inline-block', marginRight: 4, verticalAlign: 'middle' }} />
+                                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--ac-surface-raised)', display: 'inline-block', marginRight: 4, verticalAlign: 'middle' }} />
                                   Action required
                                 </Badge>
                               )}
@@ -1325,21 +1325,21 @@ export default function SharedReports() {
                             <div
                               className="d-flex flex-column gap-2 p-3 rounded h-100"
                               style={{
-                                background: 'white',
-                                border: '1px solid #e5e7eb',
+                                background: 'var(--ac-surface-raised)',
+                                border: '1px solid var(--ac-border)',
                                 transition: 'transform .15s, box-shadow .15s, border-color .15s',
                               }}
                               onMouseEnter={e => {
                                 const el = e.currentTarget as HTMLElement;
                                 el.style.transform = 'translateY(-2px)';
-                                el.style.boxShadow = '0 10px 25px rgba(0,0,0,.08)';
+                                el.style.boxShadow = '0 10px 25px rgba(0,0,0,.5)';
                                 el.style.borderColor = ic.color;
                               }}
                               onMouseLeave={e => {
                                 const el = e.currentTarget as HTMLElement;
                                 el.style.transform = '';
                                 el.style.boxShadow = '';
-                                el.style.borderColor = '#e5e7eb';
+                                el.style.borderColor = 'var(--ac-border)';
                               }}
                             >
                               <div className="d-flex align-items-center gap-3">
@@ -1522,7 +1522,7 @@ function MonthQuickPicks({ month, setMonth, monthsWithData }: {
           >
             <i className="bi bi-calendar3 me-1" />
             {fmtShort(ym)}
-            {has && <span className="ms-1" style={{ color: active ? '#fff' : '#198754' }}>●</span>}
+            {has && <span className="ms-1" style={{ color: active ? 'var(--ac-text-on-accent)' : '#34d399' }}>●</span>}
           </Button>
         );
       })}
@@ -1539,8 +1539,8 @@ function MonthQuickPicks({ month, setMonth, monthsWithData }: {
 }
 function PublicShell({ children, clientName }: { children: React.ReactNode; clientName: string }) {
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #fff8f5 0%, #fdeee2 100%)', backgroundAttachment: 'fixed' }}>
-      <div style={{ background: '#111827', color: 'white', padding: '14px 24px' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, var(--ac-accent-soft) 0%, var(--ac-accent-soft) 100%)', backgroundAttachment: 'fixed' }}>
+      <div style={{ background: 'var(--ac-surface-strong)', color: 'var(--ac-text-primary)', padding: '14px 24px' }}>
         <strong>ApexGMVOS</strong>
         <span className="opacity-75 mx-2">— Reporting</span>
         <span className="opacity-75">|</span>

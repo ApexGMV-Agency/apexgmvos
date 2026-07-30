@@ -12,12 +12,12 @@ export default function PrivacyPolicy() {
   usePageTitle('Privacy Policy');
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #f5f2ec 0%, #fff 36%, #f5f2ec 100%)' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, var(--ac-surface-strong) 0%, var(--ac-surface-raised) 36%, var(--ac-surface-strong) 100%)' }}>
       <Container className="py-5">
         <div className="mx-auto" style={{ maxWidth: 920 }}>
           <div className="mb-4 text-center">
             <img
-              src="/apex_logo_dark.svg"
+              src="/apex_logo.svg"
               alt="ApexGMV"
               style={{ height: 64, width: 'auto', objectFit: 'contain' }}
               className="mb-4"

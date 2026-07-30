@@ -24,7 +24,7 @@ export default function CanvasRenderer({ schema, metricBag, currency, print }: P
           width: schema.canvas.width,
           maxWidth: '100%',
           minHeight: 400,
-          background: schema.canvas.background ?? '#fff',
+          background: schema.canvas.background ?? 'var(--ac-surface-raised)',
           padding,
         }}
       >

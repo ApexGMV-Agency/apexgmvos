@@ -361,13 +361,13 @@ export default function ClientAccess() {
                     No general resources exist yet. Add some on the Resources page first.
                   </Alert>
                 ) : (
-                  <div style={{ maxHeight: 280, overflowY: 'auto', border: '1px solid #dee2e6', borderRadius: 6, padding: 10 }}>
+                  <div style={{ maxHeight: 280, overflowY: 'auto', border: '1px solid var(--ac-border)', borderRadius: 6, padding: 10 }}>
                     {generalResources.map(r => {
                       const ic = resourceIcon(r.url);
                       const checked = pickedResourceIds.includes(r.id);
                       return (
                         <div key={r.id} className="d-flex align-items-center py-1"
-                          style={{ background: checked ? 'rgba(232,134,46,.06)' : undefined, borderRadius: 6, padding: '4px 6px' }}>
+                          style={{ background: checked ? 'rgba(252, 98, 21,.06)' : undefined, borderRadius: 6, padding: '4px 6px' }}>
                           <Form.Check type="checkbox" id={`g-${r.id}`}
                             checked={checked}
                             onChange={() => togglePickedResource(r.id)}
@@ -406,7 +406,7 @@ export default function ClientAccess() {
                       None of this client's brands have sharing enabled. Open a brand → Reporting tab and switch on "Sharing enabled" first.
                     </Alert>
                   ) : (
-                    <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid #dee2e6', borderRadius: 6, padding: 10 }}>
+                    <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid var(--ac-border)', borderRadius: 6, padding: 10 }}>
                       {shareableForClient.map(b => (
                         <Form.Check key={b.id} type="checkbox" id={`b-${b.id}`} label={b.name}
                           checked={brandIds.includes(b.id)} onChange={() => toggle(b.id)} />
@@ -465,7 +465,7 @@ export default function ClientAccess() {
                         No resources are flagged "Share with clients" yet. Open the Resources page (or a brand's Resources tab) and turn on the share toggle for the items you want clients to see.
                       </Alert>
                     ) : (
-                      <div style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid #dee2e6', borderRadius: 6, padding: 10 }}>
+                      <div style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid var(--ac-border)', borderRadius: 6, padding: 10 }}>
                         {autoIncludedResources.map(r => {
                           const ic = resourceIcon(r.url);
                           return (
@@ -520,13 +520,13 @@ function ModePill({ active, onClick, icon, title, sub }: {
       className="border rounded text-start px-3 py-2"
       style={{
         flex: 1, minWidth: 200,
-        borderColor: active ? 'var(--ac-primary, #e8862e)' : '#dee2e6',
-        background: active ? 'rgba(232,134,46,.08)' : 'white',
+        borderColor: active ? 'var(--ac-primary, #fc6215)' : '#292929',
+        background: active ? 'var(--ac-accent-soft)' : 'var(--ac-surface-raised)',
         cursor: 'pointer',
         transition: 'all .15s',
       }}>
       <div className="d-flex align-items-center gap-2">
-        <i className={`bi ${icon}`} style={{ fontSize: '1.1rem', color: active ? 'var(--ac-primary, #e8862e)' : '#64748b' }} />
+        <i className={`bi ${icon}`} style={{ fontSize: '1.1rem', color: active ? 'var(--ac-primary, #fc6215)' : '#919191' }} />
         <strong>{title}</strong>
       </div>
       <div className="text-muted small mt-1">{sub}</div>

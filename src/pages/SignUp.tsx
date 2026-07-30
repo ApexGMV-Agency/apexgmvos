@@ -6,7 +6,7 @@ export default function SignUp() {
     <div className="ac-auth-wrap">
       <Card className="ac-auth-card shadow">
         <Card.Body className="p-4 text-center">
-          <div style={{ fontSize: '2.5rem', color: '#94a3b8' }}>
+          <div style={{ fontSize: '2.5rem', color: 'var(--ac-text-secondary)' }}>
             <i className="bi bi-lock" />
           </div>
           <h4 className="mt-2 mb-1">Sign-ups are closed</h4>

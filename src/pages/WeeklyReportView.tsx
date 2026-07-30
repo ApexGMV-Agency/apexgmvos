@@ -96,7 +96,7 @@ export default function WeeklyReportView() {
       const canvas = await html2canvas(el, {
         scale: 2,
         useCORS: true,
-        backgroundColor: '#ffffff',
+        backgroundColor: 'var(--ac-surface-raised)',
         windowWidth: captureWidth,
         width: captureWidth,
         scrollX: 0,

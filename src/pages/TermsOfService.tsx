@@ -12,7 +12,7 @@ export default function TermsOfService() {
   usePageTitle('Terms of Service');
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #141620 0%, #232638 26%, #f5f2ec 26%, #f5f2ec 100%)' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, var(--ac-surface-strong) 0%, var(--ac-surface-raised) 26%, var(--ac-surface-strong) 26%, var(--ac-surface-strong) 100%)' }}>
       <Container className="py-5">
         <div className="mx-auto" style={{ maxWidth: 920 }}>
           <div className="mb-4 text-center text-white" style={{ marginTop: '2rem' }}>

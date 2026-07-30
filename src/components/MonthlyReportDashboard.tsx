@@ -93,9 +93,9 @@ export default function MonthlyReportDashboard({
           size="sm"
           className="ms-2 fw-semibold"
           style={{
-            backgroundColor: '#fff',
-            color: '#0d6efd',
-            borderColor: '#0d6efd',
+            backgroundColor: 'var(--ac-surface-raised)',
+            color: 'var(--ac-info)',
+            borderColor: 'var(--ac-info)',
             whiteSpace: 'nowrap',
           }}
           onClick={() => setFeedbackSection(section)}
@@ -217,8 +217,8 @@ export default function MonthlyReportDashboard({
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="This Month" fill="#e8862e" radius={[6,6,0,0]} />
-                  <Bar dataKey="Last Month" fill="#6e6e80" radius={[6,6,0,0]} />
+                  <Bar dataKey="This Month" fill="var(--ac-accent-base)" radius={[6,6,0,0]} />
+                  <Bar dataKey="Last Month" fill="var(--ac-text-secondary)" radius={[6,6,0,0]} />
                 </BarChart>
               </ResponsiveContainer>
             </Card.Body>
@@ -255,8 +255,8 @@ export default function MonthlyReportDashboard({
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="Total Sales"   stroke="#e8862e" strokeWidth={3} dot={{ r: 4 }} />
-                <Line type="monotone" dataKey="Affiliate GMV" stroke="#ffbe76" strokeWidth={3} dot={{ r: 4 }} />
+                <Line type="monotone" dataKey="Total Sales"   stroke="var(--ac-accent-base)" strokeWidth={3} dot={{ r: 4 }} />
+                <Line type="monotone" dataKey="Affiliate GMV" stroke="var(--ac-accent-hover)" strokeWidth={3} dot={{ r: 4 }} />
               </LineChart>
             </ResponsiveContainer>
           </Card.Body>
@@ -380,7 +380,7 @@ export default function MonthlyReportDashboard({
             <MiniStat label="Potential New Customers" tl={c.customers.potential_new_customers} integer />
             <MiniStat label="Converted Customers"     tl={c.customers.converted_customers}     integer />
             <Col md={3}>
-              <div className="p-3 rounded h-100" style={{ background: '#f8fafc', border: '1px solid #e5e7eb' }}>
+              <div className="p-3 rounded h-100" style={{ background: 'var(--ac-surface-strong)', border: '1px solid var(--ac-border)' }}>
                 <div className="ac-label">CRM Messages Sent</div>
                 <div className="fs-5 fw-semibold mt-1">{c.customers.crm_messages_sent_this || '—'}</div>
                 {c.customers.crm_messages_sent_last && (
@@ -418,7 +418,7 @@ export default function MonthlyReportDashboard({
         const expired = !!expiresAt && new Date(expiresAt).getTime() < Date.now();
         return (
         <Card className="mb-3" data-section="approval" border="warning">
-          <Card.Header className="d-flex justify-content-between align-items-center" style={{ background: '#fff8ef' }}>
+          <Card.Header className="d-flex justify-content-between align-items-center" style={{ background: 'var(--ac-accent-soft)' }}>
             <span className="fw-semibold">
               <i className="bi bi-shield-check me-2 text-warning" />
               Approval Needed / Action Items
@@ -493,7 +493,7 @@ export default function MonthlyReportDashboard({
 function ImageBlock({ url, alt }: { url: string; alt: string }) {
   return (
     <a href={url} target="_blank" rel="noreferrer" className="d-inline-block">
-      <img src={url} alt={alt} style={{ maxWidth: '100%', maxHeight: 480, borderRadius: 8, border: '1px solid #e5e7eb' }} />
+      <img src={url} alt={alt} style={{ maxWidth: '100%', maxHeight: 480, borderRadius: 8, border: '1px solid var(--ac-border)' }} />
     </a>
   );
 }
@@ -549,7 +549,7 @@ function KpiCard({ label, value, prev, cur, money, dec, sub }: {
 }) {
   return (
     <Col xs={6} md={4} xl={2}>
-      <Card className="h-100 shadow-sm" style={{ borderLeft: '4px solid #e8862e' }}>
+      <Card className="h-100 shadow-sm" style={{ borderLeft: '4px solid var(--ac-accent-base)' }}>
         <Card.Body className="py-3">
           <div className="ac-label">{label}</div>
           <div className="fs-4 fw-bold mt-1">{value}</div>
@@ -571,7 +571,7 @@ function MiniStat({ label, tl, money, integer, suffix }: {
     : n.toLocaleString();
   return (
     <Col md={3}>
-      <div className="p-3 rounded h-100" style={{ background: '#f8fafc', border: '1px solid #e5e7eb' }}>
+      <div className="p-3 rounded h-100" style={{ background: 'var(--ac-surface-strong)', border: '1px solid var(--ac-border)' }}>
         <div className="ac-label">{label}</div>
         <div className="fs-5 fw-semibold mt-1">{fmt(tl.this)}</div>
         <Delta cur={tl.this} prev={tl.last} money={money} />
@@ -652,7 +652,7 @@ function PublicApprovalForm({ action }: { action: ApprovalActionConfig }) {
           </div>
           {myDecision.comment && (
             <blockquote className="mb-0 mt-2 small ps-2"
-                        style={{ borderLeft: '3px solid rgba(0,0,0,.15)', whiteSpace: 'pre-wrap' }}>
+                        style={{ borderLeft: '3px solid var(--ac-border)', whiteSpace: 'pre-wrap' }}>
               {myDecision.comment}
             </blockquote>
           )}

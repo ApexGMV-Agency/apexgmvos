@@ -45,7 +45,7 @@ function CanvasProps({ schema, onChange }: { schema: CanvasSchema; onChange: (s:
         <Form.Group className="mb-2">
           <Form.Label className="small fw-bold">Background</Form.Label>
           <Form.Control type="color"
-            value={schema.canvas.background ?? '#ffffff'}
+            value={schema.canvas.background ?? '#1a1919'}
             onChange={(e) => set('background', e.target.value)} />
         </Form.Group>
       </div>
@@ -89,7 +89,7 @@ function BlockProps({ block, onChange, onDelete }: { block: Block; onChange: (b:
               </Form.Select>
             </Field>
             <AlignField value={p.align ?? 'left'} onChange={(v) => setProp('align', v)} />
-            <ColorField label="Color" value={p.color ?? '#111827'} onChange={(v) => setProp('color', v)} />
+            <ColorField label="Color" value={p.color ?? '#eaeaea'} onChange={(v) => setProp('color', v)} />
           </>
         )}
 
@@ -107,7 +107,7 @@ function BlockProps({ block, onChange, onDelete }: { block: Block; onChange: (b:
 
         {block.type === 'divider' && (
           <>
-            <ColorField label="Color" value={p.color ?? '#e5e7eb'} onChange={(v) => setProp('color', v)} />
+            <ColorField label="Color" value={p.color ?? '#292929'} onChange={(v) => setProp('color', v)} />
             <Field label="Thickness (px)">
               <Form.Control type="number" min={1} max={8} value={p.thickness ?? 1}
                 onChange={(e) => setProp('thickness', Number(e.target.value) || 1)} />
@@ -147,8 +147,8 @@ function BlockProps({ block, onChange, onDelete }: { block: Block; onChange: (b:
               <Form.Control value={p.sub ?? ''} onChange={(e) => setProp('sub', e.target.value)} />
             </Field>
             <MetricField value={p.metric_key ?? ''} onChange={(v) => setProp('metric_key', v)} />
-            <ColorField label="Accent" value={p.color ?? '#e8862e'} onChange={(v) => setProp('color', v)} />
-            <ColorField label="Background" value={(p.bg as string) ?? 'rgba(232,134,46,.08)'} onChange={(v) => setProp('bg', v)} />
+            <ColorField label="Accent" value={p.color ?? '#fc6215'} onChange={(v) => setProp('color', v)} />
+            <ColorField label="Background" value={(p.bg as string) ?? 'rgba(252, 98, 21,.08)'} onChange={(v) => setProp('bg', v)} />
           </>
         )}
 

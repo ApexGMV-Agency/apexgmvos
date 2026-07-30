@@ -160,7 +160,7 @@ export default function ApprovalsModal({ show, pending, defaultName, existingDec
                    dangerouslySetInnerHTML={{ __html: safeHtml }} />
 
               {locked ? (
-                <div className="border rounded p-3" style={{ backgroundColor: '#f8f9fa' }}>
+                <div className="border rounded p-3" style={{ backgroundColor: 'var(--ac-surface-strong)' }}>
                   <div className="d-flex align-items-center gap-2 mb-2 small text-muted">
                     <i className="bi bi-lock-fill" />
                     <span>
@@ -170,7 +170,7 @@ export default function ApprovalsModal({ show, pending, defaultName, existingDec
                   </div>
                   {existing!.comment && (
                     <blockquote className="mb-2 small ps-2 ms-1"
-                                style={{ borderLeft: '3px solid #dee2e6', whiteSpace: 'pre-wrap' }}>
+                                style={{ borderLeft: '3px solid var(--ac-border)', whiteSpace: 'pre-wrap' }}>
                       {existing!.comment}
                     </blockquote>
                   )}

@@ -45,7 +45,7 @@ export interface ApprovalActionConfig {
   onSubmit: (decision: 'approved' | 'changes_requested', comment: string, name: string) => Promise<void>;
 }
 
-const PIE_COLORS = ['#e8862e', '#0d6efd', '#198754', '#6f42c1', '#dc3545'];
+const PIE_COLORS = ['#fc6215', '#60a5fa', '#34d399', '#a78bfa', '#f87171'];
 
 // §14 sub-section comment keys -> label (for the per-section feedback threads).
 const S14_LABELS: Record<string, string> = {
@@ -144,7 +144,7 @@ export default function ReportDashboard({
     if (isPublicApproval) {
       return (
         <Button size="sm" className="ms-2 fw-semibold"
-          style={{ backgroundColor: '#fff', color: '#0d6efd', borderColor: '#0d6efd', whiteSpace: 'nowrap' }}
+          style={{ backgroundColor: 'var(--ac-surface-raised)', color: 'var(--ac-info)', borderColor: 'var(--ac-info)', whiteSpace: 'nowrap' }}
           onClick={() => setFeedbackSection(section)} title="Open the conversation thread">
           <i className="bi bi-chat-left-text me-1" />{n > 0 ? `Thread (${n})` : 'Open thread'}
         </Button>
@@ -196,7 +196,7 @@ export default function ReportDashboard({
       return (
         <div data-section="snapshot" className="s14-section">
           <div className="s14-title">
-            <span className="s14-title-accent" style={{ background: '#e8862e' }} />
+            <span className="s14-title-accent" style={{ background: 'var(--ac-accent-base)' }} />
             <div className="flex-grow-1">
               <div className="s14-title-text">Executive Snapshot</div>
               <div className="s14-title-sub">{isClient ? 'This week at a glance — vs the previous week' : 'Headline scorecard · auto-calculated'}</div>
@@ -214,7 +214,7 @@ export default function ReportDashboard({
               <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                 <div className="s14-kpi-label">GMV by week · last {trendData.length} weeks</div>
                 <div className="d-flex gap-3">
-                  <span className="ac-legend-dot" style={{ '--c': '#e8862e' } as any}>GMV</span>
+                  <span className="ac-legend-dot" style={{ '--c': '#fc6215' } as any}>GMV</span>
                   <span className="ac-legend-dot" style={{ '--c': '#f5b06a' } as any}>Affiliate GMV</span>
                 </div>
               </div>
@@ -223,17 +223,17 @@ export default function ReportDashboard({
                   <BarChart data={trendData} margin={{ top: 10, right: 12, bottom: 4, left: 4 }} barGap={8} barCategoryGap="32%">
                     <defs>
                       <linearGradient id="gmvBar" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#f2a35a" /><stop offset="100%" stopColor="#e8862e" />
+                        <stop offset="0%" stopColor="var(--ac-accent-hover)" /><stop offset="100%" stopColor="var(--ac-accent-base)" />
                       </linearGradient>
                       <linearGradient id="affBar" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#ffd6ac" /><stop offset="100%" stopColor="#f5b06a" />
+                        <stop offset="0%" stopColor="var(--ac-accent-hover)" /><stop offset="100%" stopColor="var(--ac-accent-hover)" />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#f1f5f9" />
-                    <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#8a93a6' }} tickLine={false} axisLine={{ stroke: '#eadfd6' }} />
-                    <YAxis tick={{ fontSize: 12, fill: '#8a93a6' }} tickLine={false} axisLine={false} width={58} tickFormatter={(v: number) => formatValue('currency', v, { compact: true })} />
-                    <Tooltip cursor={{ fill: 'rgba(232,134,46,.07)', radius: 8 }}
-                      contentStyle={{ borderRadius: 12, border: '1px solid #eef0f4', boxShadow: '0 10px 28px rgba(16,24,40,.12)', fontSize: 13 }}
+                    <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="var(--ac-border)" />
+                    <XAxis dataKey="label" tick={{ fontSize: 12, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={{ stroke: 'var(--ac-border)' }} />
+                    <YAxis tick={{ fontSize: 12, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false} width={58} tickFormatter={(v: number) => formatValue('currency', v, { compact: true })} />
+                    <Tooltip cursor={{ fill: 'rgba(252,98,21,.07)', radius: 8 }}
+                      contentStyle={{ borderRadius: 12, border: '1px solid var(--ac-border)', boxShadow: '0 10px 28px rgba(0,0,0,.55)', fontSize: 13 }}
                       formatter={(v: any, n: any) => [formatValue('currency', Number(v)), n]} />
                     <Bar dataKey="GMV" fill="url(#gmvBar)" radius={[8, 8, 0, 0]} maxBarSize={56} />
                     <Bar dataKey="Affiliate GMV" fill="url(#affBar)" radius={[8, 8, 0, 0]} maxBarSize={56} />
@@ -308,8 +308,8 @@ export default function ReportDashboard({
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                   <XAxis type="number" /><YAxis type="category" dataKey="stage" width={90} />
                   <Tooltip /><Legend />
-                  <Bar dataKey="This Week" fill="#e8862e" radius={[0, 6, 6, 0]} />
-                  <Bar dataKey="Last Week" fill="#6e6e80" radius={[0, 6, 6, 0]} />
+                  <Bar dataKey="This Week" fill="var(--ac-accent-base)" radius={[0, 6, 6, 0]} />
+                  <Bar dataKey="Last Week" fill="var(--ac-text-secondary)" radius={[0, 6, 6, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -439,7 +439,7 @@ export default function ReportDashboard({
         const expired = !!expiresAt && new Date(expiresAt).getTime() < Date.now();
         return (
           <Card className="mb-3" data-section="approval" border="warning">
-            <Card.Header className="d-flex justify-content-between align-items-center" style={{ background: '#fff8ef' }}>
+            <Card.Header className="d-flex justify-content-between align-items-center" style={{ background: 'var(--ac-accent-soft)' }}>
               <span className="fw-semibold">
                 <i className="bi bi-shield-check me-2 text-warning" />Approval Needed / Action Items
                 {expired && <Badge bg="secondary" className="ms-2"><i className="bi bi-clock-history me-1" />Auto-popup expired</Badge>}
@@ -679,7 +679,7 @@ function ApprovalActionInline({ action }: { action: ApprovalActionConfig }) {
           </div>
           <div className="small">Recorded by <strong>{myDecision.decided_by_name}</strong> on {new Date(myDecision.decided_at).toLocaleString()}.</div>
           {myDecision.comment && (
-            <blockquote className="mb-0 mt-2 small ps-2" style={{ borderLeft: '3px solid rgba(0,0,0,.15)', whiteSpace: 'pre-wrap' }}>{myDecision.comment}</blockquote>
+            <blockquote className="mb-0 mt-2 small ps-2" style={{ borderLeft: '3px solid var(--ac-border)', whiteSpace: 'pre-wrap' }}>{myDecision.comment}</blockquote>
           )}
         </Alert>
         <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 small">

@@ -37,14 +37,14 @@ function shortMonthLabel(yyyymm: string) {
 
 // Deterministic colored avatar palette.
 const AVATAR_COLORS = [
-  { bg: '#fee4cc', text: '#c5640f' },
-  { bg: '#ddebfe', text: '#1e40af' },
-  { bg: '#dcfce7', text: '#15803d' },
-  { bg: '#fce7f3', text: '#a21caf' },
-  { bg: '#fee2e2', text: '#b91c1c' },
-  { bg: '#f3e8ff', text: '#7e22ce' },
-  { bg: '#fef3c7', text: '#a16207' },
-  { bg: '#cffafe', text: '#0e7490' },
+  { bg: 'var(--ac-accent-soft)', text: 'var(--ac-accent-base)' },
+  { bg: 'var(--ac-info-soft)', text: 'var(--ac-info)' },
+  { bg: 'var(--ac-success-soft)', text: 'var(--ac-success)' },
+  { bg: 'rgba(244,114,182,.14)', text: '#a78bfa' },
+  { bg: 'var(--ac-danger-soft)', text: 'var(--ac-danger)' },
+  { bg: 'rgba(167,139,250,.14)', text: '#a78bfa' },
+  { bg: 'var(--ac-warning-soft)', text: 'var(--ac-warning)' },
+  { bg: 'rgba(34,211,238,.14)', text: '#22d3ee' },
 ];
 function avatarFor(name: string) {
   let h = 0;
@@ -383,7 +383,7 @@ export default function MonthlyReports() {
           {tabCounts.approvalsPending > 0 && (
             <span
               title={`${tabCounts.approvalsPending} report${tabCounts.approvalsPending === 1 ? '' : 's'} awaiting the client's decision`}
-              style={{ width: 8, height: 8, borderRadius: '50%', background: '#dc3545', display: 'inline-block', marginLeft: 6, verticalAlign: 'middle' }}
+              style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--ac-danger)', display: 'inline-block', marginLeft: 6, verticalAlign: 'middle' }}
             />
           )}
         </button>
@@ -461,7 +461,7 @@ export default function MonthlyReports() {
                       )
                     ) : approvalRequested(r) && (
                       <Badge bg="danger" title="Approval requested — the client hasn't decided yet">
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff', display: 'inline-block', marginRight: 4, verticalAlign: 'middle' }} />
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--ac-surface-raised)', display: 'inline-block', marginRight: 4, verticalAlign: 'middle' }} />
                         Approval pending
                       </Badge>
                     )}

@@ -189,8 +189,8 @@ function CommentNode(p: NodeProps) {
         ref={cardRef}
         className="p-3 rounded"
         style={{
-          background: flash ? '#fef3c7' : 'white',
-          border: `1px solid ${flash ? '#f59e0b' : '#e5e7eb'}`,
+          background: flash ? 'var(--ac-warning-soft)' : 'var(--ac-surface-raised)',
+          border: `1px solid ${flash ? '#fbbf24' : '#292929'}`,
           boxShadow: flash ? '0 0 0 3px rgba(245,158,11,.25)' : undefined,
           transition: 'background .25s ease, border-color .25s ease, box-shadow .25s ease',
         }}
@@ -241,7 +241,7 @@ function CommentNode(p: NodeProps) {
       )}
 
       {children.length > 0 && (
-        <div className="mt-2" style={{ marginLeft: Math.min(depth + 1, 3) * 16, borderLeft: '2px solid #e2e8f0', paddingLeft: 12 }}>
+        <div className="mt-2" style={{ marginLeft: Math.min(depth + 1, 3) * 16, borderLeft: '2px solid var(--ac-border)', paddingLeft: 12 }}>
           {children.map(child => (
             <CommentNode key={child.id} {...p} comment={child} depth={depth + 1} />
           ))}

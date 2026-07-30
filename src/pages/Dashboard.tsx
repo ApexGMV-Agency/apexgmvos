@@ -24,10 +24,10 @@ interface WeeklyReportRow {
 }
 
 const STATUS_META: Record<ClientStatus, { label: string; color: string; icon: string }> = {
-  onboarding:  { label: 'Onboarding',  color: '#0ea5e9', icon: 'bi-rocket-takeoff-fill' },
-  in_progress: { label: 'In Progress', color: '#198754', icon: 'bi-check-circle-fill' },
-  paused:      { label: 'Paused',      color: '#f59e0b', icon: 'bi-pause-circle-fill' },
-  closed:      { label: 'Closed',      color: '#6b7280', icon: 'bi-archive-fill' },
+  onboarding:  { label: 'Onboarding',  color: '#22d3ee', icon: 'bi-rocket-takeoff-fill' },
+  in_progress: { label: 'In Progress', color: 'var(--ac-success)', icon: 'bi-check-circle-fill' },
+  paused:      { label: 'Paused',      color: 'var(--ac-warning)', icon: 'bi-pause-circle-fill' },
+  closed:      { label: 'Closed',      color: 'var(--ac-text-secondary)', icon: 'bi-archive-fill' },
 };
 
 function isoNDaysAgo(n: number): string {
@@ -145,7 +145,7 @@ export default function Dashboard() {
                 </Link>
               )}
             </div>
-            <div className="fs-1 fw-bold mt-1" style={{ fontFamily: 'Sora, sans-serif' }}>
+            <div className="fs-1 fw-bold mt-1" style={{ fontFamily: 'var(--ac-font-primary)' }}>
               {loading ? <Spinner animation="border" size="sm" /> : counts.total}
             </div>
             {!loading && (
@@ -174,7 +174,7 @@ export default function Dashboard() {
             <div className="text-muted small text-uppercase fw-semibold" style={{ letterSpacing: '.5px' }}>
               <i className="bi bi-cash-coin me-1 text-success" />GMV (Last 30 Days)
             </div>
-            <div className="fs-1 fw-bold mt-1" style={{ color: '#198754', fontFamily: 'Sora, sans-serif' }}>
+            <div className="fs-1 fw-bold mt-1" style={{ color: 'var(--ac-success)', fontFamily: 'var(--ac-font-primary)' }}>
               {loading ? <Spinner animation="border" size="sm" /> : fmtMoney(gmv30d)}
             </div>
             {!loading && (
@@ -193,7 +193,7 @@ export default function Dashboard() {
           <Card body className="h-100 shadow-sm">
             <div className="d-flex align-items-center justify-content-between">
               <div className="text-muted small text-uppercase fw-semibold" style={{ letterSpacing: '.5px' }}>
-                <i className="bi bi-people-fill me-1" style={{ color: '#6610f2' }} />Clients
+                <i className="bi bi-people-fill me-1" style={{ color: '#a78bfa' }} />Clients
               </div>
               {!loading && (
                 <Link to="/clients" className="small text-decoration-none">
@@ -201,7 +201,7 @@ export default function Dashboard() {
                 </Link>
               )}
             </div>
-            <div className="fs-1 fw-bold mt-1" style={{ color: '#6610f2', fontFamily: 'Sora, sans-serif' }}>
+            <div className="fs-1 fw-bold mt-1" style={{ color: '#a78bfa', fontFamily: 'var(--ac-font-primary)' }}>
               {loading ? <Spinner animation="border" size="sm" /> : clients.length}
             </div>
             {!loading && (

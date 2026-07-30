@@ -272,7 +272,7 @@ export default function FolderExplorer({
       {/* Multi-select toolbar (sticky banner) */}
       {selected.size > 0 && (
         <div className="d-flex align-items-center gap-2 p-2 mb-2 rounded"
-          style={{ background: 'rgba(232,134,46,.08)', border: '1px solid rgba(232,134,46,.35)' }}>
+          style={{ background: 'var(--ac-accent-soft)', border: '1px solid rgba(252,98,21,.35)' }}>
           <strong className="me-2">
             <i className="bi bi-check2-square me-1" />{selected.size} selected
           </strong>
@@ -429,7 +429,7 @@ export default function FolderExplorer({
       <DragOverlay>
         {dragging && (
           <div className="px-3 py-2 bg-white rounded shadow"
-            style={{ border: '2px solid #e8862e', maxWidth: 260 }}>
+            style={{ border: '2px solid var(--ac-accent-base)', maxWidth: 260 }}>
             <i className={`bi ${dragging.kind === 'folder' ? 'bi-folder-fill' : 'bi-file-earmark'} me-2 text-primary`} />
             <strong>{dragging.name}</strong>
             {dragging.kind === 'resource' && selected.size > 1 && selected.has(dragging.id) && (
@@ -482,19 +482,19 @@ function FolderCard({
         style={{
           cursor: canEdit ? 'grab' : 'pointer',
           opacity: drag.isDragging ? .4 : 1,
-          borderColor: drop.isOver ? '#e8862e' : undefined,
-          boxShadow: drop.isOver ? '0 0 0 2px #e8862e' : undefined,
-          background: drop.isOver ? 'rgba(232,134,46,.05)' : undefined,
+          borderColor: drop.isOver ? '#fc6215' : undefined,
+          boxShadow: drop.isOver ? '0 0 0 2px #fc6215' : undefined,
+          background: drop.isOver ? 'rgba(252, 98, 21,.05)' : undefined,
           transition: 'transform .12s, box-shadow .12s',
         }}
       >
         <div className="card-body d-flex align-items-center gap-3" onClick={onOpen} role="button">
           <div style={{
             width: 48, height: 40, borderRadius: 8,
-            background: '#fff7ed', color: '#e8862e',
+            background: 'var(--ac-accent-soft)', color: 'var(--ac-accent-base)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexShrink: 0, fontSize: '1.4rem',
-            border: '1px solid rgba(232,134,46,.25)',
+            border: '1px solid rgba(252,98,21,.25)',
           }}>
             <i className={`bi ${pinned ? 'bi-folder-fill' : 'bi-folder2'}`} />
           </div>
@@ -567,9 +567,9 @@ function ResourceCard({
           cursor: canEdit ? 'grab' : 'default',
           opacity: drag.isDragging ? .4 : 1,
           borderLeft: `4px solid ${ic.color}`,
-          outline: selected ? '2px solid #e8862e' : undefined,
+          outline: selected ? '2px solid #fc6215' : undefined,
           outlineOffset: '-2px',
-          background: selected ? 'rgba(232,134,46,.04)' : undefined,
+          background: selected ? 'rgba(252, 98, 21,.04)' : undefined,
         }}
       >
         <div className="card-body">
@@ -733,9 +733,9 @@ function RootDrop({
   return (
     <span ref={drop.setNodeRef}
       style={{
-        background: drop.isOver ? 'rgba(232,134,46,.1)' : undefined,
+        background: drop.isOver ? 'rgba(252, 98, 21,.1)' : undefined,
         borderRadius: 6,
-        outline: drop.isOver ? '1px dashed #e8862e' : undefined,
+        outline: drop.isOver ? '1px dashed #fc6215' : undefined,
       }}>
       {children}
       {active && drop.isOver && <i className="bi bi-arrow-down-circle text-warning ms-1" />}

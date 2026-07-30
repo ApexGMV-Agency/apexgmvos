@@ -98,7 +98,7 @@ export default function CompanyBudget() {
   // Category modal
   const [catModalOpen, setCatModalOpen] = useState(false);
   const [newCatName, setNewCatName] = useState('');
-  const [newCatColor, setNewCatColor] = useState('#475569');
+  const [newCatColor, setNewCatColor] = useState('#919191');
   const [newCatIcon, setNewCatIcon] = useState('bi-tag');
   const [catSaving, setCatSaving] = useState(false);
 
@@ -324,7 +324,7 @@ export default function CompanyBudget() {
     }).select('*').single();
     if (error) { alert(error.message); setCatSaving(false); return; }
     setCategories(prev => [...prev, data as Category]);
-    setNewCatName(''); setNewCatColor('#475569'); setNewCatIcon('bi-tag');
+    setNewCatName(''); setNewCatColor('#919191'); setNewCatIcon('bi-tag');
     setCatSaving(false);
   };
 
@@ -609,9 +609,9 @@ export default function CompanyBudget() {
                 const total = list.reduce((s, x) => s + x.amount, 0);
                 return (
                   <div key={catId ?? 'none'} className="cb-expense-group">
-                    <div className="cb-expense-group-head" style={{ borderLeftColor: cat?.color ?? '#475569' }}>
+                    <div className="cb-expense-group-head" style={{ borderLeftColor: cat?.color ?? '#919191' }}>
                       <div className="fw-semibold">
-                        <i className={`bi ${cat?.icon ?? 'bi-three-dots'} me-1`} style={{ color: cat?.color ?? '#475569' }} />
+                        <i className={`bi ${cat?.icon ?? 'bi-three-dots'} me-1`} style={{ color: cat?.color ?? '#919191' }} />
                         {cat?.name ?? 'Uncategorized'}
                       </div>
                       <div className="cb-expense-group-total">{fmtMoney(total)}</div>

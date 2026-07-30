@@ -299,7 +299,7 @@ export default function ReportingCanvasEditor() {
 
       {/* Body */}
       {preview ? (
-        <div className="flex-grow-1 overflow-auto py-4 px-3" style={{ background: '#f3f4f6' }}>
+        <div className="flex-grow-1 overflow-auto py-4 px-3" style={{ background: 'var(--ac-surface-strong)' }}>
           <div className="text-center mb-3">
             <Badge bg="info">
               <i className="bi bi-eye-fill me-1" />Preview — sample data

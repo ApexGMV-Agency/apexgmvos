@@ -48,7 +48,7 @@ export default function ImageInput({ value, onChange, brandId, reportType = 'mon
       />
       {value ? (
         <div className="d-flex align-items-start gap-2">
-          <img src={value} alt="Section image" style={{ maxWidth: 280, maxHeight: 180, borderRadius: 8, border: '1px solid #e5e7eb' }} />
+          <img src={value} alt="Section image" style={{ maxWidth: 280, maxHeight: 180, borderRadius: 8, border: '1px solid var(--ac-border)' }} />
           <div className="d-flex flex-column gap-1">
             <Button size="sm" variant="outline-primary" disabled={uploading} onClick={() => inputRef.current?.click()}>
               <i className="bi bi-arrow-repeat me-1" /> Replace

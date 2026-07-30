@@ -39,22 +39,22 @@ export default function InstallPrompt() {
   const wrap: React.CSSProperties = {
     position: 'fixed', left: '50%', bottom: 18, transform: 'translateX(-50%)', zIndex: 1090,
     display: 'flex', alignItems: 'center', gap: 12, width: 'calc(100% - 24px)', maxWidth: 440,
-    background: '#fff', border: '1px solid #eef0f4', borderRadius: 14, padding: '12px 14px',
-    boxShadow: '0 14px 38px rgba(16,24,40,.20)',
+    background: 'var(--ac-surface-raised)', border: '1px solid var(--ac-border)', borderRadius: 14, padding: '12px 14px',
+    boxShadow: '0 14px 38px rgba(0,0,0,.65)',
   };
 
   return (
     <div style={wrap} role="dialog" aria-label="Install ApexGMVOS">
       <img src="/web-app-manifest-192x192.png" alt="" width={44} height={44} style={{ borderRadius: 11, flexShrink: 0 }} />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontWeight: 700, fontSize: '.95rem', color: '#1f2430' }}>Install ApexGMVOS</div>
-        <div style={{ fontSize: '.82rem', color: '#6b7280' }}>Add it to your device for quick, app-like access.</div>
+        <div style={{ fontWeight: 700, fontSize: '.95rem', color: 'var(--ac-text-primary)' }}>Install ApexGMVOS</div>
+        <div style={{ fontSize: '.82rem', color: 'var(--ac-text-secondary)' }}>Add it to your device for quick, app-like access.</div>
       </div>
       <button className="btn btn-primary btn-sm" onClick={install} style={{ whiteSpace: 'nowrap' }}>
         <i className="bi bi-download me-1" />Install
       </button>
       <button onClick={dismiss} aria-label="Dismiss"
-        style={{ border: 0, background: 'transparent', color: '#94a3b8', fontSize: '.9rem', padding: 4, cursor: 'pointer' }}>
+        style={{ border: 0, background: 'transparent', color: 'var(--ac-text-secondary)', fontSize: '.9rem', padding: 4, cursor: 'pointer' }}>
         <i className="bi bi-x-lg" />
       </button>
     </div>

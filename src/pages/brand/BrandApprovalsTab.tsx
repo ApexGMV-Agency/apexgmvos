@@ -161,7 +161,7 @@ export default function BrandApprovalsTab({ brandId, brandName }: { brandId: str
           {rows.map(({ reportType, reportId, periodLabel, decision: d, approvalHtml }) => {
             const state: 'pending' | 'approved' | 'changes' =
               !d ? 'pending' : d.decision === 'approved' ? 'approved' : 'changes';
-            const color = state === 'approved' ? '#198754' : state === 'changes' ? '#d97706' : '#dc3545';
+            const color = state === 'approved' ? '#34d399' : state === 'changes' ? '#d97706' : '#f87171';
             const icon = state === 'approved' ? 'bi-check-circle-fill'
               : state === 'changes' ? 'bi-arrow-repeat' : 'bi-shield-exclamation';
             const cmtCount = commentCounts.get(reportId) ?? 0;
@@ -173,13 +173,13 @@ export default function BrandApprovalsTab({ brandId, brandName }: { brandId: str
                 title="Open this report"
                 className="d-flex align-items-center gap-3 p-3 rounded"
                 style={{
-                  background: 'white', border: '1px solid #e5e7eb',
+                  background: 'var(--ac-surface-raised)', border: '1px solid var(--ac-border)',
                   borderLeft: `4px solid ${color}`, cursor: 'pointer',
                   transition: 'transform .15s, box-shadow .15s',
                 }}
                 onClick={() => nav(`/reporting/${reportType}/${reportId}`)}
                 onKeyDown={e => { if (e.key === 'Enter') (e.currentTarget as HTMLElement).click(); }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(0,0,0,.08)'; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(0,0,0,.5)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; (e.currentTarget as HTMLElement).style.boxShadow = ''; }}
               >
                 <div style={{
@@ -196,7 +196,7 @@ export default function BrandApprovalsTab({ brandId, brandName }: { brandId: str
                     </Badge>
                     {state === 'pending' && (
                       <Badge bg="danger" pill>
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff', display: 'inline-block', marginRight: 4, verticalAlign: 'middle' }} />
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--ac-surface-raised)', display: 'inline-block', marginRight: 4, verticalAlign: 'middle' }} />
                         Awaiting client
                       </Badge>
                     )}

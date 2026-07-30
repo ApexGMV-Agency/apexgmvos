@@ -516,16 +516,16 @@ export default function BrandSamplesTab({ brandId, canEdit, currency }: { brandI
               <GoalProgressTile approved={totalApproved} goal={periodGoal} pct={goalPct} />
             </Col>
             <Col md={6} xl={2}>
-              <KpiTile icon="bi-camera-video" color="#0d6efd" label="New Videos" value={totalNewVideos.toLocaleString()} />
+              <KpiTile icon="bi-camera-video" color="var(--ac-info)" label="New Videos" value={totalNewVideos.toLocaleString()} />
             </Col>
             <Col md={6} xl={2}>
-              <KpiTile icon="bi-broadcast" color="#d63384" label="LIVE" value={totalLiveSessions.toLocaleString()} />
+              <KpiTile icon="bi-broadcast" color="#f472b6" label="LIVE" value={totalLiveSessions.toLocaleString()} />
             </Col>
             <Col md={6} xl={2}>
-              <KpiTile icon="bi-graph-up" color="#20c997" label="Avg SPS" value={avgSps == null ? '—' : avgSps.toFixed(2)} />
+              <KpiTile icon="bi-graph-up" color="var(--ac-success)" label="Avg SPS" value={avgSps == null ? '—' : avgSps.toFixed(2)} />
             </Col>
             <Col md={6} xl={2}>
-              <KpiTile icon="bi-calendar-check" color="#6610f2" label="Days Entered" value={`${daysWithEntry} / ${allDates.length}`} />
+              <KpiTile icon="bi-calendar-check" color="#a78bfa" label="Days Entered" value={`${daysWithEntry} / ${allDates.length}`} />
             </Col>
           </Row>
         </Card.Body>
@@ -638,7 +638,7 @@ export default function BrandSamplesTab({ brandId, canEdit, currency }: { brandI
                   <tr key={date}
                       style={{
                         cursor: canEdit ? 'pointer' : 'default',
-                        backgroundColor: weekend ? 'rgba(232, 134, 46, 0.05)' : undefined,
+                        backgroundColor: weekend ? 'rgba(252, 98, 21, 0.05)' : undefined,
                       }}>
                     <td className="fw-semibold" onClick={() => canEdit && openEditDay(date)}>
                       {new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' })}
@@ -653,7 +653,7 @@ export default function BrandSamplesTab({ brandId, canEdit, currency }: { brandI
                     </td>
                     {weekend ? (
                       <td colSpan={4} className="text-center text-muted fst-italic small"
-                          style={{ backgroundColor: 'rgba(0,0,0,0.02)' }}
+                          style={{ backgroundColor: 'var(--ac-surface-hover)' }}
                           onClick={() => canEdit && openEditDay(date)}>
                         No approvals on weekends
                       </td>
@@ -766,21 +766,21 @@ export default function BrandSamplesTab({ brandId, canEdit, currency }: { brandI
                 <AreaChart data={dailyChartData} margin={{ top: 10, right: 20, left: -8, bottom: 0 }}>
                   <defs>
                     <linearGradient id="approvedAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%"  stopColor="#e8862e" stopOpacity={0.55} />
-                      <stop offset="100%" stopColor="#e8862e" stopOpacity={0} />
+                      <stop offset="0%"  stopColor="var(--ac-accent-base)" stopOpacity={0.55} />
+                      <stop offset="100%" stopColor="var(--ac-accent-base)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#eef0f3" vertical={false} />
-                  <XAxis dataKey="label" stroke="#6c757d" fontSize={11} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#6c757d" fontSize={11} tickLine={false} axisLine={false} allowDecimals={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--ac-border)" vertical={false} />
+                  <XAxis dataKey="label" stroke="var(--ac-border)" fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis stroke="var(--ac-border)" fontSize={11} tickLine={false} axisLine={false} allowDecimals={false} />
                   <Tooltip
-                    cursor={{ stroke: '#e8862e', strokeWidth: 1, strokeOpacity: 0.3 }}
-                    contentStyle={{ borderRadius: 8, border: '1px solid #e9ecef' }}
+                    cursor={{ stroke: 'var(--ac-accent-base)', strokeWidth: 1, strokeOpacity: 0.3 }}
+                    contentStyle={{ borderRadius: 8, border: '1px solid var(--ac-border)' }}
                   />
                   <Area
-                    type="monotone" dataKey="Approved" stroke="#e8862e" strokeWidth={2.5}
-                    fill="url(#approvedAreaGrad)" dot={{ r: 3, fill: '#e8862e' }}
-                    activeDot={{ r: 5, fill: '#fff', stroke: '#e8862e', strokeWidth: 2 }}
+                    type="monotone" dataKey="Approved" stroke="var(--ac-accent-base)" strokeWidth={2.5}
+                    fill="url(#approvedAreaGrad)" dot={{ r: 3, fill: 'var(--ac-accent-base)' }}
+                    activeDot={{ r: 5, fill: 'var(--ac-text-primary)', stroke: 'var(--ac-accent-base)', strokeWidth: 2 }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -797,16 +797,16 @@ export default function BrandSamplesTab({ brandId, canEdit, currency }: { brandI
             <BarChart data={weeklyChartData} margin={{ top: 20, right: 20, left: -8, bottom: 0 }}>
               <defs>
                 <linearGradient id="weeklyBarGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"  stopColor="#e8862e" stopOpacity={1} />
-                  <stop offset="100%" stopColor="#f5a960" stopOpacity={0.8} />
+                  <stop offset="0%"  stopColor="var(--ac-accent-base)" stopOpacity={1} />
+                  <stop offset="100%" stopColor="var(--ac-accent-hover)" stopOpacity={0.8} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#eef0f3" vertical={false} />
-              <XAxis dataKey="label" stroke="#6c757d" fontSize={12} tickLine={false} axisLine={false} />
-              <YAxis stroke="#6c757d" fontSize={11} tickLine={false} axisLine={false} allowDecimals={false} />
-              <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #e9ecef' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--ac-border)" vertical={false} />
+              <XAxis dataKey="label" stroke="var(--ac-border)" fontSize={12} tickLine={false} axisLine={false} />
+              <YAxis stroke="var(--ac-border)" fontSize={11} tickLine={false} axisLine={false} allowDecimals={false} />
+              <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid var(--ac-border)' }} />
               <Bar dataKey="Approved" fill="url(#weeklyBarGrad)" radius={[8, 8, 0, 0]} barSize={48}>
-                <LabelList dataKey="Approved" position="top" fill="#2c2c2c" fontSize={12} fontWeight={600} />
+                <LabelList dataKey="Approved" position="top" fill="var(--ac-text-primary)" fontSize={12} fontWeight={600} />
               </Bar>
             </BarChart>
           </ResponsiveContainer>
@@ -836,21 +836,21 @@ export default function BrandSamplesTab({ brandId, canEdit, currency }: { brandI
               <AreaChart data={prevDailyChartData} margin={{ top: 10, right: 20, left: -8, bottom: 0 }}>
                 <defs>
                   <linearGradient id="prevApprovedAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%"  stopColor="#6c7796" stopOpacity={0.5} />
-                    <stop offset="100%" stopColor="#6c7796" stopOpacity={0} />
+                    <stop offset="0%"  stopColor="var(--ac-text-secondary)" stopOpacity={0.5} />
+                    <stop offset="100%" stopColor="var(--ac-text-secondary)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#eef0f3" vertical={false} />
-                <XAxis dataKey="label" stroke="#6c757d" fontSize={11} tickLine={false} axisLine={false} />
-                <YAxis stroke="#6c757d" fontSize={11} tickLine={false} axisLine={false} allowDecimals={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--ac-border)" vertical={false} />
+                <XAxis dataKey="label" stroke="var(--ac-border)" fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis stroke="var(--ac-border)" fontSize={11} tickLine={false} axisLine={false} allowDecimals={false} />
                 <Tooltip
-                  cursor={{ stroke: '#6c7796', strokeWidth: 1, strokeOpacity: 0.3 }}
-                  contentStyle={{ borderRadius: 8, border: '1px solid #e9ecef' }}
+                  cursor={{ stroke: 'var(--ac-border)', strokeWidth: 1, strokeOpacity: 0.3 }}
+                  contentStyle={{ borderRadius: 8, border: '1px solid var(--ac-border)' }}
                 />
                 <Area
-                  type="monotone" dataKey="Approved" stroke="#6c7796" strokeWidth={2.5}
-                  fill="url(#prevApprovedAreaGrad)" dot={{ r: 3, fill: '#6c7796' }}
-                  activeDot={{ r: 5, fill: '#fff', stroke: '#6c7796', strokeWidth: 2 }}
+                  type="monotone" dataKey="Approved" stroke="var(--ac-border)" strokeWidth={2.5}
+                  fill="url(#prevApprovedAreaGrad)" dot={{ r: 3, fill: 'var(--ac-text-secondary)' }}
+                  activeDot={{ r: 5, fill: 'var(--ac-text-primary)', stroke: 'var(--ac-border)', strokeWidth: 2 }}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -866,24 +866,24 @@ export default function BrandSamplesTab({ brandId, canEdit, currency }: { brandI
               <BarChart data={productChartData} margin={{ top: 20, right: 20, left: -8, bottom: 60 }}>
                 <defs>
                   <linearGradient id="prodApprovedGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%"  stopColor="#e8862e" stopOpacity={1} />
-                    <stop offset="100%" stopColor="#f5a960" stopOpacity={0.7} />
+                    <stop offset="0%"  stopColor="var(--ac-accent-base)" stopOpacity={1} />
+                    <stop offset="100%" stopColor="var(--ac-accent-hover)" stopOpacity={0.7} />
                   </linearGradient>
                   <linearGradient id="prodGoalGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%"  stopColor="#6c7796" stopOpacity={0.95} />
-                    <stop offset="100%" stopColor="#9aa4c2" stopOpacity={0.7} />
+                    <stop offset="0%"  stopColor="var(--ac-text-secondary)" stopOpacity={0.95} />
+                    <stop offset="100%" stopColor="var(--ac-text-secondary)" stopOpacity={0.7} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#eef0f3" vertical={false} />
-                <XAxis dataKey="name" interval={0} angle={-15} textAnchor="end" stroke="#6c757d" fontSize={11} tickLine={false} />
-                <YAxis stroke="#6c757d" fontSize={11} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #e9ecef' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--ac-border)" vertical={false} />
+                <XAxis dataKey="name" interval={0} angle={-15} textAnchor="end" stroke="var(--ac-border)" fontSize={11} tickLine={false} />
+                <YAxis stroke="var(--ac-border)" fontSize={11} tickLine={false} axisLine={false} />
+                <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid var(--ac-border)' }} />
                 <Legend />
                 <Bar dataKey="Approved" fill="url(#prodApprovedGrad)" radius={[8, 8, 0, 0]} barSize={28}>
-                  <LabelList dataKey="Approved" position="top" fill="#2c2c2c" fontSize={11} fontWeight={600} />
+                  <LabelList dataKey="Approved" position="top" fill="var(--ac-text-primary)" fontSize={11} fontWeight={600} />
                 </Bar>
                 <Bar dataKey="Goal" fill="url(#prodGoalGrad)" radius={[8, 8, 0, 0]} barSize={28}>
-                  <LabelList dataKey="Goal" position="top" fill="#2c2c2c" fontSize={11} fontWeight={600} />
+                  <LabelList dataKey="Goal" position="top" fill="var(--ac-text-primary)" fontSize={11} fontWeight={600} />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -1153,17 +1153,17 @@ e.g.
 // =====================================================================
 
 export function GoalProgressTile({ approved, goal, pct }: { approved: number; goal: number; pct: number }) {
-  const color = pct >= 100 ? '#198754' : pct >= 75 ? '#e8862e' : pct >= 40 ? '#fd7e14' : '#dc3545';
+  const color = pct >= 100 ? '#34d399' : pct >= 75 ? '#fc6215' : pct >= 40 ? '#fb923c' : '#f87171';
   return (
     <div className="p-3 rounded h-100 position-relative" style={{
-      background: 'linear-gradient(135deg, #fff5e6 0%, #ffe8c4 100%)',
-      border: '1px solid #f5d8a8',
+      background: 'linear-gradient(135deg, var(--ac-accent-soft) 0%, var(--ac-accent-soft) 100%)',
+      border: '1px solid var(--ac-warning)',
     }}>
       <div className="d-flex align-items-center justify-content-between">
         <div>
           <div className="small fw-semibold text-muted">Goal Progress</div>
           <div className="d-flex align-items-baseline gap-2 mt-1">
-            <span className="fw-bold" style={{ fontSize: '1.7rem', color: '#2c2c2c' }}>{approved.toLocaleString()}</span>
+            <span className="fw-bold" style={{ fontSize: '1.7rem', color: 'var(--ac-text-primary)' }}>{approved.toLocaleString()}</span>
             <span className="text-muted">/ {goal.toLocaleString() || '—'}</span>
           </div>
         </div>
@@ -1180,7 +1180,7 @@ export function GoalProgressTile({ approved, goal, pct }: { approved: number; go
           </div>
         </div>
       </div>
-      <div className="mt-3 position-relative" style={{ height: 14, borderRadius: 999, background: 'rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+      <div className="mt-3 position-relative" style={{ height: 14, borderRadius: 999, background: 'var(--ac-surface-hover)', overflow: 'hidden' }}>
         <div style={{
           width: `${pct}%`, height: '100%',
           background: `linear-gradient(90deg, ${color} 0%, ${color}cc 100%)`,
@@ -1209,7 +1209,7 @@ export function KpiTile({ icon, color, label, value }: { icon: string; color: st
       </div>
       <div className="min-w-0">
         <div className="small fw-semibold text-muted text-truncate">{label}</div>
-        <div className="fw-bold" style={{ fontSize: '1.15rem', color: '#2c2c2c' }}>{value}</div>
+        <div className="fw-bold" style={{ fontSize: '1.15rem', color: 'var(--ac-text-primary)' }}>{value}</div>
       </div>
     </div>
   );
@@ -1220,11 +1220,11 @@ export function KpiTile({ icon, color, label, value }: { icon: string; color: st
 // =====================================================================
 
 export function ProductProgressBar({ pct, approved, goal }: { pct: number; approved: number; goal: number }) {
-  const color = pct >= 100 ? '#198754' : pct >= 75 ? '#e8862e' : pct >= 40 ? '#fd7e14' : '#dc3545';
+  const color = pct >= 100 ? '#34d399' : pct >= 75 ? '#fc6215' : pct >= 40 ? '#fb923c' : '#f87171';
   return (
     <div className="d-flex align-items-center gap-2">
       <div className="position-relative flex-grow-1"
-        style={{ height: 14, borderRadius: 999, background: 'rgba(0,0,0,0.06)', overflow: 'hidden', minWidth: 120 }}>
+        style={{ height: 14, borderRadius: 999, background: 'var(--ac-surface-hover)', overflow: 'hidden', minWidth: 120 }}>
         <div style={{
           width: `${pct}%`, height: '100%',
           background: `linear-gradient(90deg, ${color} 0%, ${color}cc 100%)`,

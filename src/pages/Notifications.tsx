@@ -43,10 +43,10 @@ export default function NotificationsPage() {
 
   // Theme per tab.
   const accents: Record<TabKey, string> = {
-    unread: '#f97316',   // orange
-    weekly: '#0891b2',   // cyan
-    monthly: '#db2777',  // pink
-    all: '#2563eb',      // blue
+    unread: 'var(--ac-accent-base)',   // orange
+    weekly: '#22d3ee',   // cyan
+    monthly: '#f472b6',  // pink
+    all: 'var(--ac-info)',      // blue
   };
   const accent = accents[tab];
   const accentSoft = tab === 'unread' ? 'rgba(249,115,22,.06)'
@@ -123,7 +123,7 @@ export default function NotificationsPage() {
                 return (
                   <Card key={n.id} className="shadow-sm"
                     style={{
-                      borderLeft: unread ? `4px solid ${accent}` : '4px solid #e5e7eb',
+                      borderLeft: unread ? `4px solid ${accent}` : '4px solid #292929',
                       background: unread ? accentSoft : undefined,
                       cursor: n.link ? 'pointer' : 'default',
                     }}

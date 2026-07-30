@@ -67,7 +67,7 @@ export interface CanvasSchema {
 
 export const EMPTY_SCHEMA: CanvasSchema = {
   version: 1,
-  canvas: { width: 1200, background: '#ffffff', padding: 32 },
+  canvas: { width: 1200, background: 'var(--ac-surface-raised)', padding: 32 },
   blocks: [],
 };
 
@@ -159,17 +159,17 @@ export function defaultBlock(type: BlockType): Omit<CanvasBlock, 'id' | 'layout'
   switch (type) {
     case 'heading':
       return {
-        type, props: { text: 'New heading', level: 2, align: 'left', color: '#111827' },
+        type, props: { text: 'New heading', level: 2, align: 'left', color: 'var(--ac-text-primary)' },
         defaultSize: { w: 80, h: 56 },
       };
     case 'text':
       return {
-        type, props: { html: '<p>New text block — click to edit.</p>', align: 'left', color: '#374151', fontSize: 14 },
+        type, props: { html: '<p>New text block — click to edit.</p>', align: 'left', color: 'var(--ac-text-primary)', fontSize: 14 },
         defaultSize: { w: 80, h: 96 },
       };
     case 'divider':
       return {
-        type, props: { color: '#e5e7eb', thickness: 1 },
+        type, props: { color: 'var(--ac-text-secondary)', thickness: 1 },
         defaultSize: { w: 100, h: 16 },
       };
     case 'image':
@@ -186,7 +186,7 @@ export function defaultBlock(type: BlockType): Omit<CanvasBlock, 'id' | 'layout'
       return {
         type, props: {
           label: 'KPI label', value: '0', sub: '', metric_key: '',
-          color: '#e8862e', bg: 'rgba(232,134,46,.08)',
+          color: 'var(--ac-accent-base)', bg: 'var(--ac-accent-soft)',
         },
         defaultSize: { w: 30, h: 120 },
       };
@@ -200,7 +200,7 @@ export function defaultBlock(type: BlockType): Omit<CanvasBlock, 'id' | 'layout'
         type, props: {
           columns: ['Column 1', 'Column 2', 'Column 3'],
           rows: [['', '', ''], ['', '', '']],
-          headerBg: '#f3f4f6',
+          headerBg: 'var(--ac-surface-strong)',
         },
         defaultSize: { w: 100, h: 240 },
       };
@@ -212,7 +212,7 @@ export function defaultBlock(type: BlockType): Omit<CanvasBlock, 'id' | 'layout'
     case 'container':
     case 'grid':
       return {
-        type, props: { bg: '#ffffff', border: '#e5e7eb', padding: 16 },
+        type, props: { bg: 'var(--ac-surface-raised)', border: 'var(--ac-border)', padding: 16 },
         defaultSize: { w: 100, h: 200 },
         children: [],
       } as any;
@@ -352,17 +352,17 @@ export interface SectionPreset {
 const presetHeader = (xPct: number, y: number) => [
   {
     type: 'heading' as BlockType,
-    props: { text: 'Brand Weekly Report', level: 1, align: 'left', color: '#111827' },
+    props: { text: 'Brand Weekly Report', level: 1, align: 'left', color: 'var(--ac-text-primary)' },
     layout: { x: xPct, y, w: 80, h: 64 },
   },
   {
     type: 'text' as BlockType,
-    props: { html: '<p>Period summary — replace with your brand voice.</p>', align: 'left', color: '#6b7280', fontSize: 14 },
+    props: { html: '<p>Period summary — replace with your brand voice.</p>', align: 'left', color: 'var(--ac-text-secondary)', fontSize: 14 },
     layout: { x: xPct, y: y + 70, w: 80, h: 40 },
   },
   {
     type: 'divider' as BlockType,
-    props: { color: '#e5e7eb', thickness: 1 },
+    props: { color: 'var(--ac-text-secondary)', thickness: 1 },
     layout: { x: xPct, y: y + 120, w: 100 - xPct, h: 16 },
   },
 ];
@@ -370,22 +370,22 @@ const presetHeader = (xPct: number, y: number) => [
 const presetKpiGrid = (xPct: number, y: number) => [
   {
     type: 'kpi' as BlockType,
-    props: { label: 'Total GMV', value: '', metric_key: 'gmv', color: '#198754', bg: 'rgba(25,135,84,.08)' },
+    props: { label: 'Total GMV', value: '', metric_key: 'gmv', color: 'var(--ac-success)', bg: 'var(--ac-success-soft)' },
     layout: { x: xPct, y, w: 24, h: 110 },
   },
   {
     type: 'kpi' as BlockType,
-    props: { label: 'Affiliate GMV', value: '', metric_key: 'affiliate_gmv', color: '#0d6efd', bg: 'rgba(13,110,253,.08)' },
+    props: { label: 'Affiliate GMV', value: '', metric_key: 'affiliate_gmv', color: 'var(--ac-info)', bg: 'var(--ac-info-soft)' },
     layout: { x: xPct + 25, y, w: 24, h: 110 },
   },
   {
     type: 'kpi' as BlockType,
-    props: { label: 'Orders', value: '', metric_key: 'orders', color: '#e8862e', bg: 'rgba(232,134,46,.08)' },
+    props: { label: 'Orders', value: '', metric_key: 'orders', color: 'var(--ac-accent-base)', bg: 'var(--ac-accent-soft)' },
     layout: { x: xPct + 50, y, w: 24, h: 110 },
   },
   {
     type: 'kpi' as BlockType,
-    props: { label: 'Units sold', value: '', metric_key: 'units_sold', color: '#7e22ce', bg: 'rgba(126,34,206,.08)' },
+    props: { label: 'Units sold', value: '', metric_key: 'units_sold', color: '#a78bfa', bg: 'rgba(167,139,250,.14)' },
     layout: { x: xPct + 75 > 100 - 24 ? 100 - 24 : xPct + 75, y, w: 24, h: 110 },
   },
 ];
@@ -393,7 +393,7 @@ const presetKpiGrid = (xPct: number, y: number) => [
 const presetProductTable = (xPct: number, y: number) => [
   {
     type: 'heading' as BlockType,
-    props: { text: 'Product highlights', level: 2, align: 'left', color: '#111827' },
+    props: { text: 'Product highlights', level: 2, align: 'left', color: 'var(--ac-text-primary)' },
     layout: { x: xPct, y, w: 80, h: 40 },
   },
   {
@@ -401,7 +401,7 @@ const presetProductTable = (xPct: number, y: number) => [
     props: {
       columns: ['Product', 'GMV', 'Orders', 'Units sold', 'Affiliate GMV'],
       rows: [['', '', '', '', ''], ['', '', '', '', '']],
-      headerBg: '#fff7ed',
+      headerBg: 'var(--ac-accent-soft)',
     },
     layout: { x: xPct, y: y + 50, w: 100 - xPct, h: 200 },
   },
@@ -410,7 +410,7 @@ const presetProductTable = (xPct: number, y: number) => [
 const presetEngagement = (xPct: number, y: number) => [
   {
     type: 'heading' as BlockType,
-    props: { text: 'Engagement', level: 2, align: 'left', color: '#111827' },
+    props: { text: 'Engagement', level: 2, align: 'left', color: 'var(--ac-text-primary)' },
     layout: { x: xPct, y, w: 80, h: 40 },
   },
   {

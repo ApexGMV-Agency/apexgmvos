@@ -38,15 +38,15 @@ export function showToast(message: string) {
       el.setAttribute('aria-live', 'polite');
       Object.assign(el.style, {
         position: 'fixed', left: '50%', bottom: '28px', zIndex: '99999',
-        background: '#1f2430', color: '#fff', padding: '10px 18px', borderRadius: '999px',
+        background: 'var(--ac-surface-raised)', color: 'var(--ac-text-primary)', padding: '10px 18px', borderRadius: '999px',
         fontSize: '13px', fontWeight: '700', fontFamily: 'inherit',
-        boxShadow: '0 12px 36px rgba(0,0,0,.32)', display: 'inline-flex', alignItems: 'center',
+        boxShadow: '0 12px 36px rgba(0,0,0,.7)', display: 'inline-flex', alignItems: 'center',
         gap: '8px', pointerEvents: 'none', transition: 'opacity .18s ease, transform .18s ease',
       } as Partial<CSSStyleDeclaration>);
       document.body.appendChild(el);
     }
     el.innerHTML =
-      '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span></span>';
+      '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--ac-success)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span></span>';
     (el.querySelector('span') as HTMLElement).textContent = message;
     el.style.opacity = '0';
     el.style.transform = 'translateX(-50%) translateY(8px)';

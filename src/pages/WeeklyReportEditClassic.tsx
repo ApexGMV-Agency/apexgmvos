@@ -1174,7 +1174,7 @@ export default function WeeklyReportEditClassic() {
                     <div key={section} className="mb-3">
                       <h6 className="text-muted">{SECTION_LABELS[section]}</h6>
                       {sc.map(cm => (
-                        <div key={cm.id} className="p-2 mb-2 rounded small" style={{ background: '#f8fafc', border: '1px solid #e5e7eb' }}>
+                        <div key={cm.id} className="p-2 mb-2 rounded small" style={{ background: 'var(--ac-surface-strong)', border: '1px solid var(--ac-border)' }}>
                           <div className="d-flex align-items-center gap-2 mb-1">
                             <strong>{cm.author_name}</strong>
                             <Badge bg={cm.author_type === 'client' ? 'info' : cm.author_type === 'bob' ? 'warning' : 'success'} text={cm.author_type === 'bob' ? 'dark' : undefined}>

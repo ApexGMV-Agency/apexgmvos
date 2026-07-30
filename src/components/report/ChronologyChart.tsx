@@ -15,12 +15,12 @@ export interface ChronoPoint {
 }
 
 const METRICS: { key: keyof ChronoPoint; label: string; format: FieldFormat; color: string }[] = [
-  { key: 'total_gmv', label: 'Total GMV', format: 'currency', color: '#e8862e' },
-  { key: 'orders', label: 'Orders', format: 'number', color: '#0d6efd' },
-  { key: 'aov', label: 'AOV', format: 'currency', color: '#198754' },
-  { key: 'samples', label: 'Samples', format: 'number', color: '#8b5cf6' },
-  { key: 'videos', label: 'Videos', format: 'number', color: '#06b6d4' },
-  { key: 'lives', label: 'LIVEs', format: 'number', color: '#f59e0b' },
+  { key: 'total_gmv', label: 'Total GMV', format: 'currency', color: 'var(--ac-accent-base)' },
+  { key: 'orders', label: 'Orders', format: 'number', color: 'var(--ac-info)' },
+  { key: 'aov', label: 'AOV', format: 'currency', color: 'var(--ac-success)' },
+  { key: 'samples', label: 'Samples', format: 'number', color: '#a78bfa' },
+  { key: 'videos', label: 'Videos', format: 'number', color: '#22d3ee' },
+  { key: 'lives', label: 'LIVEs', format: 'number', color: 'var(--ac-warning)' },
 ];
 
 function fmtPct(p: number) {
@@ -56,8 +56,8 @@ export default function ChronologyChart({ data }: { data: ChronoPoint[] }) {
               <button key={m.key} type="button" className="chrono-chip"
                 onClick={() => setMetricKey(m.key)}
                 style={active
-                  ? { background: m.color, color: '#fff', borderColor: m.color }
-                  : { color: m.color, borderColor: '#e5e7eb' }}>
+                  ? { background: m.color, color: 'var(--ac-text-primary)', borderColor: m.color }
+                  : { color: m.color, borderColor: 'var(--ac-border)' }}>
                 {m.label}
               </button>
             );
@@ -83,15 +83,15 @@ export default function ChronologyChart({ data }: { data: ChronoPoint[] }) {
                   <stop offset="100%" stopColor={metric.color} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eef0f4" />
-              <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#8a93a6' }} tickLine={false} axisLine={{ stroke: '#e5e7eb' }} />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--ac-border)" />
+              <XAxis dataKey="label" tick={{ fontSize: 12, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={{ stroke: 'var(--ac-border)' }} />
               <YAxis
-                tick={{ fontSize: 12, fill: '#8a93a6' }} tickLine={false} axisLine={false} width={64}
+                tick={{ fontSize: 12, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false} width={64}
                 tickFormatter={(v: number) => formatValue(metric.format, v, { compact: true })}
               />
               <Tooltip
                 formatter={(v: any) => [formatValue(metric.format, Number(v)), metric.label]}
-                contentStyle={{ borderRadius: 10, border: '1px solid #eef0f4', boxShadow: '0 6px 18px rgba(16,24,40,.08)' }}
+                contentStyle={{ borderRadius: 10, border: '1px solid var(--ac-border)', boxShadow: '0 6px 18px rgba(0,0,0,.5)' }}
               />
               <Area
                 type="monotone" dataKey="value" stroke={metric.color} strokeWidth={3}
@@ -99,7 +99,7 @@ export default function ChronologyChart({ data }: { data: ChronoPoint[] }) {
                 dot={(props: any) => {
                   const isLast = props.index === series.length - 1;
                   return <Dot key={props.index} cx={props.cx} cy={props.cy} r={isLast ? 6 : 4}
-                    fill={isLast ? metric.color : '#fff'} stroke={metric.color} strokeWidth={2} />;
+                    fill={isLast ? metric.color : 'var(--ac-text-primary)'} stroke={metric.color} strokeWidth={2} />;
                 }}
                 activeDot={{ r: 6 }}
               />

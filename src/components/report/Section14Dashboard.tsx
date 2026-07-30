@@ -42,7 +42,7 @@ function KpiTile({ k }: { k: Kpi; accent?: string }) {
 }
 
 /** Clean section header — colored accent bar, title, optional comment button. */
-function SectionTitle({ title, sub, color = '#e8862e', fb }: { title: string; sub?: string; color?: string; fb?: ReactNode }) {
+function SectionTitle({ title, sub, color = 'var(--ac-accent-base)', fb }: { title: string; sub?: string; color?: string; fb?: ReactNode }) {
   return (
     <div className="s14-title">
       <span className="s14-title-accent" style={{ background: color }} />
@@ -56,16 +56,16 @@ function SectionTitle({ title, sub, color = '#e8862e', fb }: { title: string; su
 }
 
 function spsColor(v: number) {
-  if (v >= 4.5) return '#10b981';
-  if (v >= 3.5) return '#e8862e';
-  return '#ef4444';
+  if (v >= 4.5) return '#34d399';
+  if (v >= 3.5) return '#fc6215';
+  return '#f87171';
 }
 
 const RAG_META: Record<RagStatus, { bg: string; fg: string; icon: string; label: string }> = {
-  green: { bg: 'rgba(16,185,129,.12)', fg: '#0f766e', icon: 'bi-check-circle-fill', label: 'Healthy' },
-  amber: { bg: 'rgba(245,158,11,.14)', fg: '#b45309', icon: 'bi-exclamation-triangle-fill', label: 'Watch' },
-  red: { bg: 'rgba(239,68,68,.12)', fg: '#b91c1c', icon: 'bi-exclamation-octagon-fill', label: 'Act now' },
-  na: { bg: 'rgba(148,163,184,.12)', fg: '#64748b', icon: 'bi-dash-circle', label: 'No data' },
+  green: { bg: 'var(--ac-success-soft)', fg: 'var(--ac-success)', icon: 'bi-check-circle-fill', label: 'Healthy' },
+  amber: { bg: 'var(--ac-warning-soft)', fg: 'var(--ac-warning)', icon: 'bi-exclamation-triangle-fill', label: 'Watch' },
+  red: { bg: 'var(--ac-danger-soft)', fg: 'var(--ac-danger)', icon: 'bi-exclamation-octagon-fill', label: 'Act now' },
+  na: { bg: 'var(--ac-surface-hover)', fg: 'var(--ac-text-secondary)', icon: 'bi-dash-circle', label: 'No data' },
 };
 
 function RagCard({ s }: { s: RagSignal }) {
@@ -104,17 +104,17 @@ export default function Section14Dashboard({ data, targets, renderFeedback, clie
     <div className="s14-root">
       {/* North-Star & Efficiency */}
       <section className="s14-section" data-section="14.1">
-        <SectionTitle title="North-Star & Efficiency" sub="The numbers that define the week" color="#e8862e" fb={fb('14.1')} />
+        <SectionTitle title="North-Star & Efficiency" sub="The numbers that define the week" color="var(--ac-accent-base)" fb={fb('14.1')} />
         <div className="row g-3">
           {northStar.map(k => (
-            <div className="col-6 col-lg" key={k.key}><KpiTile k={k} accent="#e8862e" /></div>
+            <div className="col-6 col-lg" key={k.key}><KpiTile k={k} accent="var(--ac-accent-base)" /></div>
           ))}
         </div>
       </section>
 
       {/* Channel & Source Mix */}
       <section className="s14-section" data-section="14.2">
-        <SectionTitle title="Channel & Source Mix" sub="Where GMV comes from" color="#0d6efd" fb={fb('14.2')} />
+        <SectionTitle title="Channel & Source Mix" sub="Where GMV comes from" color="var(--ac-info)" fb={fb('14.2')} />
         <div className="row g-3 align-items-stretch">
           <div className="col-lg-5">
             <div className="s14-card h-100 d-flex flex-column">
@@ -164,7 +164,7 @@ export default function Section14Dashboard({ data, targets, renderFeedback, clie
 
       {/* Conversion Funnel */}
       <section className="s14-section" data-section="14.3">
-        <SectionTitle title="Conversion Funnel" sub="Impressions → Clicks → Cart → Orders" color="#06b6d4" fb={fb('14.3')} />
+        <SectionTitle title="Conversion Funnel" sub="Impressions → Clicks → Cart → Orders" color="#22d3ee" fb={fb('14.3')} />
         <div className="row g-3">
           <div className="col-lg-7">
             <div className="s14-card h-100">
@@ -189,7 +189,7 @@ export default function Section14Dashboard({ data, targets, renderFeedback, clie
           <div className="col-lg-5">
             <div className="row g-3 h-100">
               {funnel.rates.map(k => (
-                <div className="col-6" key={k.key}><KpiTile k={k} accent="#0d6efd" /></div>
+                <div className="col-6" key={k.key}><KpiTile k={k} accent="var(--ac-info)" /></div>
               ))}
             </div>
           </div>
@@ -198,10 +198,10 @@ export default function Section14Dashboard({ data, targets, renderFeedback, clie
 
       {/* Productivity & Marketing */}
       <section className="s14-section" data-section="14.4">
-        <SectionTitle title="Productivity & Marketing" color="#198754" fb={fb('14.4')} />
+        <SectionTitle title="Productivity & Marketing" color="var(--ac-success)" fb={fb('14.4')} />
         <div className="row g-3 align-items-stretch">
           {productivity.map(k => (
-            <div className="col-6 col-lg-3" key={k.key}><KpiTile k={k} accent="#198754" /></div>
+            <div className="col-6 col-lg-3" key={k.key}><KpiTile k={k} accent="var(--ac-success)" /></div>
           ))}
           <div className="col-6 col-lg-3">
             <div className="s14-card h-100 d-flex flex-column align-items-center justify-content-center" style={{ position: 'relative' }}>
@@ -217,7 +217,7 @@ export default function Section14Dashboard({ data, targets, renderFeedback, clie
                     </RadialBarChart>
                   </ResponsiveContainer>
                   <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 800, fontFamily: 'Sora, sans-serif' }}>{sps.toFixed(1)}</div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 800, fontFamily: 'var(--ac-font-primary)' }}>{sps.toFixed(1)}</div>
                     <div className="text-muted" style={{ fontSize: '.7rem' }}>out of 5.0</div>
                   </div>
                 </div>
@@ -229,10 +229,10 @@ export default function Section14Dashboard({ data, targets, renderFeedback, clie
 
       {/* Paid Media Efficiency */}
       <section className="s14-section" data-section="14.5">
-        <SectionTitle title="Paid Media Efficiency" color="#8b5cf6" fb={fb('14.5')} />
+        <SectionTitle title="Paid Media Efficiency" color="#a78bfa" fb={fb('14.5')} />
         <div className="row g-3">
           {paid.map(k => (
-            <div className="col-6 col-lg-2" key={k.key}><KpiTile k={k} accent="#8b5cf6" /></div>
+            <div className="col-6 col-lg-2" key={k.key}><KpiTile k={k} accent="#a78bfa" /></div>
           ))}
         </div>
       </section>
@@ -240,7 +240,7 @@ export default function Section14Dashboard({ data, targets, renderFeedback, clie
       {/* Health & Risk Signals — internal only, hidden from the client view */}
       {!clientMode && (
         <section className="s14-section" data-section="14.6">
-          <SectionTitle title="Health & Risk Signals" sub="Internal · Red = act now · Amber = watch · Green = healthy" color="#ef4444" fb={fb('14.6')} />
+          <SectionTitle title="Health & Risk Signals" sub="Internal · Red = act now · Amber = watch · Green = healthy" color="var(--ac-danger)" fb={fb('14.6')} />
           <div className="s14-rag-grid">
             {signals.map(s => <RagCard key={s.key} s={s} />)}
           </div>
@@ -250,7 +250,7 @@ export default function Section14Dashboard({ data, targets, renderFeedback, clie
       {/* Weekly Targets & Action Items — internal only, hidden from the client */}
       {!clientMode && realTargets.length > 0 && (
         <section className="s14-section" data-section="14.7">
-          <SectionTitle title="Weekly Targets & Action Items" color="#0ea5e9" fb={fb('14.7')} />
+          <SectionTitle title="Weekly Targets & Action Items" color="#22d3ee" fb={fb('14.7')} />
           <div className="s14-card">
             <div className="d-flex flex-column gap-3">
               {realTargets.map((t, i) => <TargetRowView key={i} t={t} />)}
@@ -269,12 +269,12 @@ function CreatorSellerBar({ creator, seller }: { creator: number | null; seller:
   return (
     <>
       <div className="s14-split-track">
-        <div style={{ width: `${cp}%`, background: '#e8862e' }} />
-        <div style={{ width: `${100 - cp}%`, background: '#0d6efd' }} />
+        <div style={{ width: `${cp}%`, background: 'var(--ac-accent-base)' }} />
+        <div style={{ width: `${100 - cp}%`, background: 'var(--ac-info)' }} />
       </div>
       <div className="d-flex justify-content-between mt-1 small">
-        <span><span className="s14-dot" style={{ background: '#e8862e' }} />Creator {formatValue('currency', creator)} ({cp.toFixed(0)}%)</span>
-        <span><span className="s14-dot" style={{ background: '#0d6efd' }} />Seller {formatValue('currency', seller)} ({(100 - cp).toFixed(0)}%)</span>
+        <span><span className="s14-dot" style={{ background: 'var(--ac-accent-base)' }} />Creator {formatValue('currency', creator)} ({cp.toFixed(0)}%)</span>
+        <span><span className="s14-dot" style={{ background: 'var(--ac-info)' }} />Seller {formatValue('currency', seller)} ({(100 - cp).toFixed(0)}%)</span>
       </div>
     </>
   );

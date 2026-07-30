@@ -37,10 +37,10 @@ const STATUS_LABEL: Record<ClientStatus, string> = {
 };
 
 const STATUS_META: Record<ClientStatus, { bg: string; color: string; icon: string }> = {
-  onboarding:  { bg: 'rgba(37,99,235,.12)',   color: '#1d4ed8', icon: 'bi-rocket-takeoff-fill' },
-  in_progress: { bg: 'rgba(16,185,129,.12)',  color: '#047857', icon: 'bi-check-circle-fill' },
-  paused:      { bg: 'rgba(245,158,11,.16)',  color: '#b45309', icon: 'bi-pause-circle-fill' },
-  closed:      { bg: 'rgba(110,110,128,.14)', color: '#475569', icon: 'bi-x-circle-fill' },
+  onboarding:  { bg: 'var(--ac-info-soft)',   color: 'var(--ac-info)', icon: 'bi-rocket-takeoff-fill' },
+  in_progress: { bg: 'var(--ac-success-soft)',  color: 'var(--ac-success)', icon: 'bi-check-circle-fill' },
+  paused:      { bg: 'var(--ac-warning-soft)',  color: 'var(--ac-warning)', icon: 'bi-pause-circle-fill' },
+  closed:      { bg: 'var(--ac-surface-hover)', color: 'var(--ac-text-primary)', icon: 'bi-x-circle-fill' },
 };
 
 const empty = {
@@ -330,7 +330,7 @@ export default function Brands() {
             onClick={() => setStatusFilter('all')}
             title="Show all brands"
           >
-            <span className="ac-stat-num" style={statusFilter === 'all' ? { color: '#fff' } : undefined}>{brands.length}</span>
+            <span className="ac-stat-num" style={statusFilter === 'all' ? { color: 'var(--ac-text-primary)' } : undefined}>{brands.length}</span>
             <span className="ac-stat-label">brand{brands.length === 1 ? '' : 's'}</span>
           </button>
           {STATUS_ORDER.map(s => {
@@ -343,7 +343,7 @@ export default function Brands() {
                 onClick={() => setStatusFilter(s)}
                 title={`Show ${STATUS_LABEL[s].toLowerCase()} brands`}
               >
-                <span className="ac-stat-num" style={{ color: active ? '#fff' : STATUS_META[s].color }}>{counts[s]}</span>
+                <span className="ac-stat-num" style={{ color: active ? 'var(--ac-text-on-accent)' : STATUS_META[s].color }}>{counts[s]}</span>
                 <span className="ac-stat-label">{STATUS_LABEL[s].toLowerCase()}</span>
               </button>
             );
@@ -451,7 +451,7 @@ export default function Brands() {
                 className="h-100 shadow-sm"
                 role="button"
                 onClick={() => nav(`/brands/${b.id}`)}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(0,0,0,.08)'; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(0,0,0,.5)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; (e.currentTarget as HTMLElement).style.boxShadow = ''; }}
                 style={{ cursor: 'pointer', transition: 'transform .15s, box-shadow .15s' }}
               >
@@ -647,7 +647,7 @@ export default function Brands() {
                         style={{
                           cursor: 'pointer',
                           opacity: on ? 1 : .85,
-                          background: on ? undefined : '#fff',
+                          background: on ? undefined : 'var(--ac-surface-raised)',
                         }}
                       >
                         <i className={`bi ${on ? 'bi-check2' : o.icon}`} /> {o.label}

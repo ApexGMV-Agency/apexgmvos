@@ -4,14 +4,14 @@ import { useNotifications } from './NotificationsContext';
 
 // Per-type look: icon + accent colour + short label.
 const TYPE_META: Record<string, { icon: string; color: string; label: string }> = {
-  chat:            { icon: 'bi-chat-dots-fill',      color: '#0d6efd', label: 'Message' },
-  staff_comment:   { icon: 'bi-chat-left-text-fill', color: '#e8862e', label: 'Team reply' },
-  client_comment:  { icon: 'bi-chat-left-text-fill', color: '#198754', label: 'Client comment' },
-  announcement:    { icon: 'bi-megaphone-fill',      color: '#8b5cf6', label: 'Announcement' },
-  task:            { icon: 'bi-check2-square',        color: '#0ea5e9', label: 'Task' },
-  report_review:   { icon: 'bi-clipboard-check-fill', color: '#0ea5e9', label: 'Report' },
+  chat:            { icon: 'bi-chat-dots-fill',      color: 'var(--ac-info)', label: 'Message' },
+  staff_comment:   { icon: 'bi-chat-left-text-fill', color: 'var(--ac-accent-base)', label: 'Team reply' },
+  client_comment:  { icon: 'bi-chat-left-text-fill', color: 'var(--ac-success)', label: 'Client comment' },
+  announcement:    { icon: 'bi-megaphone-fill',      color: '#a78bfa', label: 'Announcement' },
+  task:            { icon: 'bi-check2-square',        color: '#22d3ee', label: 'Task' },
+  report_review:   { icon: 'bi-clipboard-check-fill', color: '#22d3ee', label: 'Report' },
 };
-const DEFAULT_META = { icon: 'bi-bell-fill', color: '#64748b', label: 'Notification' };
+const DEFAULT_META = { icon: 'bi-bell-fill', color: 'var(--ac-text-secondary)', label: 'Notification' };
 const metaFor = (t: string) => TYPE_META[t] ?? DEFAULT_META;
 
 function timeAgo(iso: string): string {

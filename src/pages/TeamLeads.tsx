@@ -367,7 +367,7 @@ export default function TeamLeads() {
                   {brands.length === 0 ? (
                     <p className="text-muted small mb-0">No brands exist yet. Create some first.</p>
                   ) : (
-                    <div style={{ maxHeight: 220, overflowY: 'auto', border: '1px solid #dee2e6', borderRadius: 6, padding: 10 }}>
+                    <div style={{ maxHeight: 220, overflowY: 'auto', border: '1px solid var(--ac-border)', borderRadius: 6, padding: 10 }}>
                       {brands.map(b => {
                         const owner = brandOwner.get(b.id);
                         const takenByOther = owner && owner.id !== editLead?.id;
@@ -405,7 +405,7 @@ export default function TeamLeads() {
                   {allApcs.length === 0 ? (
                     <p className="text-muted small mb-0">No APCs exist yet.</p>
                   ) : (
-                    <div style={{ maxHeight: 220, overflowY: 'auto', border: '1px solid #dee2e6', borderRadius: 6, padding: 10 }}>
+                    <div style={{ maxHeight: 220, overflowY: 'auto', border: '1px solid var(--ac-border)', borderRadius: 6, padding: 10 }}>
                       {allApcs.map(a => {
                         const otherLead = a.team_lead_id && a.team_lead_id !== editLead?.id;
                         return (

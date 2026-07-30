@@ -26,7 +26,7 @@ const CLIENT_HIDE = new Set<string>([]);
 // numv() coerces to 0 for sums / chart values where a real number is required.
 const num = (v: any): number | null => { if (v == null || v === '') return null; const n = Number(v); return Number.isFinite(n) ? n : null; };
 const numv = (v: any): number => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
-const PIE = ['#e8862e', '#0d6efd', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444'];
+const PIE = ['#fc6215', '#60a5fa', '#34d399', '#a78bfa', '#fbbf24', '#f87171'];
 
 function fmtPct(p: number): string {
   const a = Math.abs(p);
@@ -92,7 +92,7 @@ function WeekMtdTile({ label, f, data, prev, mtd }: {
   );
 }
 
-function SectionTitle({ title, sub, color = '#e8862e', fb }: { title: string; sub?: string; color?: string; fb?: ReactNode }) {
+function SectionTitle({ title, sub, color = 'var(--ac-accent-base)', fb }: { title: string; sub?: string; color?: string; fb?: ReactNode }) {
   return (
     <div className="s14-title">
       <span className="s14-title-accent" style={{ background: color }} />
@@ -120,7 +120,7 @@ function TileGrid({ def, data, prev, skip, col }: {
 }
 
 // ---- ss2 · Shop Health semicircle gauge ------------------------------------
-function spsColor(v: number) { return v >= 4.5 ? '#10b981' : v >= 3.5 ? '#e8862e' : '#ef4444'; }
+function spsColor(v: number) { return v >= 4.5 ? '#34d399' : v >= 3.5 ? '#fc6215' : '#f87171'; }
 function spsLabel(v: number) { return v >= 4.5 ? 'Excellent' : v >= 3.5 ? 'Healthy' : 'Needs attention'; }
 
 function ShopHealthGauge({ score, ranking, prevRanking }: {
@@ -128,7 +128,7 @@ function ShopHealthGauge({ score, ranking, prevRanking }: {
 }) {
   const s = score;
   const arc = s == null ? [{ v: 0 }, { v: 5 }] : [{ v: s }, { v: Math.max(0, 5 - s) }];
-  const color = s == null ? '#cbd5e1' : spsColor(s);
+  const color = s == null ? '#919191' : spsColor(s);
   const rankDelta = (ranking != null && prevRanking != null) ? prevRanking - ranking : null; // rank up = improvement
   return (
     <div className="s14-card h-100 v3-gauge-card">
@@ -138,7 +138,7 @@ function ShopHealthGauge({ score, ranking, prevRanking }: {
           <PieChart>
             <Pie data={arc} dataKey="v" startAngle={180} endAngle={0} innerRadius="66%" outerRadius="100%"
               cornerRadius={8} stroke="none" isAnimationActive={false}>
-              <Cell fill={color} /><Cell fill="#eceff4" />
+              <Cell fill={color} /><Cell fill="var(--ac-text-secondary)" />
             </Pie>
           </PieChart>
         </ResponsiveContainer>
@@ -163,7 +163,7 @@ function ShopHealthGauge({ score, ranking, prevRanking }: {
 
 // Shared "live" accent for the current (latest) week — a vivid green that pops
 // against the orange/blue series lines so "this week" is unmistakable.
-const LIVE = '#16c784';
+const LIVE = 'var(--ac-success)';
 // Dot renderer: plain series-coloured dots, but the latest point (the report
 // being viewed) gets a big blinking green "live" marker — expanding halo +
 // pulsing inner dot + white ring, so no hover is needed to spot the current week.
@@ -180,7 +180,7 @@ function makeDot(lastIdx: number, baseColor: string, opts?: { small?: boolean })
             <animate attributeName="r" values={`${h0};${h1};${h0}`} dur="1.4s" repeatCount="indefinite" />
             <animate attributeName="opacity" values="0.35;0;0.35" dur="1.4s" repeatCount="indefinite" />
           </circle>
-          <circle cx={cx} cy={cy} r={inner} fill={LIVE} stroke="#fff" strokeWidth={ring}>
+          <circle cx={cx} cy={cy} r={inner} fill={LIVE} stroke="var(--ac-border-strong)" strokeWidth={ring}>
             <animate attributeName="fill-opacity" values="1;0.5;1" dur="1.4s" repeatCount="indefinite" />
           </circle>
         </g>
@@ -201,27 +201,27 @@ function WowCombo({ data }: { data: WowPoint[] }) {
         <div className="s14-kpi-label">GMV &amp; Orders · last {data.length} weeks</div>
         <div className="d-flex gap-3 align-items-center">
           <span className="ac-legend-dot" style={{ '--c': '#c9ced9' } as any}>Orders</span>
-          <span className="ac-legend-dot" style={{ '--c': '#e8862e' } as any}>GMV</span>
+          <span className="ac-legend-dot" style={{ '--c': '#fc6215' } as any}>GMV</span>
           <span className="v3-live-legend"><span className="v3-live-pulse" />This week</span>
         </div>
       </div>
       <div style={{ height: 290 }}>
         <ResponsiveContainer>
           <ComposedChart data={data} margin={{ top: 26, right: 14, bottom: 4, left: 4 }}>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#f1f5f9" />
-            <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#8a93a6' }} tickLine={false} axisLine={{ stroke: '#eadfd6' }} />
-            <YAxis yAxisId="o" tick={{ fontSize: 11, fill: '#b3bac6' }} tickLine={false} axisLine={false} width={40} />
-            <YAxis yAxisId="g" orientation="right" tick={{ fontSize: 11, fill: '#b3bac6' }} tickLine={false} axisLine={false}
+            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="var(--ac-border)" />
+            <XAxis dataKey="label" tick={{ fontSize: 12, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={{ stroke: 'var(--ac-border)' }} />
+            <YAxis yAxisId="o" tick={{ fontSize: 11, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false} width={40} />
+            <YAxis yAxisId="g" orientation="right" tick={{ fontSize: 11, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false}
               width={52} tickFormatter={(v: number) => formatValue('currency', v, { compact: true })} />
-            <Tooltip cursor={{ fill: 'rgba(232,134,46,.06)' }}
-              contentStyle={{ borderRadius: 12, border: '1px solid #eef0f4', boxShadow: '0 10px 28px rgba(16,24,40,.12)', fontSize: 13 }}
+            <Tooltip cursor={{ fill: 'rgba(252,98,21,.06)' }}
+              contentStyle={{ borderRadius: 12, border: '1px solid var(--ac-border)', boxShadow: '0 10px 28px rgba(0,0,0,.55)', fontSize: 13 }}
               formatter={(v: any, n: any) => n === 'GMV' ? [formatValue('currency', Number(v)), 'GMV'] : [formatValue('number', Number(v)), 'Orders']} />
-            <Bar yAxisId="o" dataKey="orders" name="Orders" fill="#dfe3ea" radius={[6, 6, 0, 0]} maxBarSize={44} />
-            <Line yAxisId="g" type="monotone" dataKey="gmv" name="GMV" stroke="#e8862e" strokeWidth={3}
-              dot={makeDot(data.length - 1, '#e8862e')} activeDot={{ r: 6 }} isAnimationActive={false}>
+            <Bar yAxisId="o" dataKey="orders" name="Orders" fill="var(--ac-text-secondary)" radius={[6, 6, 0, 0]} maxBarSize={44} />
+            <Line yAxisId="g" type="monotone" dataKey="gmv" name="GMV" stroke="var(--ac-accent-base)" strokeWidth={3}
+              dot={makeDot(data.length - 1, '#fc6215')} activeDot={{ r: 6 }} isAnimationActive={false}>
               <LabelList dataKey="gmv" position="top" offset={12}
                 formatter={(v: any) => Number(v) ? formatValue('currency', Number(v), { compact: true }) : ''}
-                style={{ fontSize: 11, fontWeight: 700, fill: '#5b6472' }} />
+                style={{ fontSize: 11, fontWeight: 700, fill: 'var(--ac-text-secondary)' }} />
             </Line>
           </ComposedChart>
         </ResponsiveContainer>
@@ -240,23 +240,23 @@ function SamplesLineChart({ data }: { data: { label: string; samples: number | n
       <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
         <div className="s14-kpi-label">Samples &amp; videos · last {data.length} weeks</div>
         <div className="d-flex gap-3 align-items-center">
-          <span className="ac-legend-dot" style={{ '--c': '#e8862e' } as any}>Samples</span>
-          <span className="ac-legend-dot" style={{ '--c': '#0d6efd' } as any}>Videos</span>
+          <span className="ac-legend-dot" style={{ '--c': '#fc6215' } as any}>Samples</span>
+          <span className="ac-legend-dot" style={{ '--c': '#60a5fa' } as any}>Videos</span>
           <span className="v3-live-legend"><span className="v3-live-pulse" />This week</span>
         </div>
       </div>
       <div style={{ height: 252 }}>
         <ResponsiveContainer>
           <ComposedChart data={data} margin={{ top: 24, right: 14, bottom: 16, left: 4 }}>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#f1f5f9" />
-            <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#8a93a6' }} tickLine={false} axisLine={{ stroke: '#eadfd6' }} />
-            <YAxis tick={{ fontSize: 11, fill: '#b3bac6' }} tickLine={false} axisLine={false} width={36} allowDecimals={false} />
-            <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #eef0f4', boxShadow: '0 10px 28px rgba(16,24,40,.12)', fontSize: 13 }} />
-            <Line type="monotone" dataKey="samples" name="Samples" stroke="#e8862e" strokeWidth={3} dot={makeDot(lastIdx, '#e8862e')} activeDot={{ r: 6 }} isAnimationActive={false} connectNulls>
-              <LabelList dataKey="samples" position="top" offset={12} formatter={numLabel} style={{ fontSize: 11, fontWeight: 700, fill: '#c2691f' }} />
+            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="var(--ac-border)" />
+            <XAxis dataKey="label" tick={{ fontSize: 12, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={{ stroke: 'var(--ac-border)' }} />
+            <YAxis tick={{ fontSize: 11, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false} width={36} allowDecimals={false} />
+            <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid var(--ac-border)', boxShadow: '0 10px 28px rgba(0,0,0,.55)', fontSize: 13 }} />
+            <Line type="monotone" dataKey="samples" name="Samples" stroke="var(--ac-accent-base)" strokeWidth={3} dot={makeDot(lastIdx, '#fc6215')} activeDot={{ r: 6 }} isAnimationActive={false} connectNulls>
+              <LabelList dataKey="samples" position="top" offset={12} formatter={numLabel} style={{ fontSize: 11, fontWeight: 700, fill: 'var(--ac-accent-base)' }} />
             </Line>
-            <Line type="monotone" dataKey="videos" name="Videos" stroke="#0d6efd" strokeWidth={3} dot={makeDot(lastIdx, '#0d6efd')} activeDot={{ r: 6 }} isAnimationActive={false} connectNulls>
-              <LabelList dataKey="videos" position="bottom" offset={12} formatter={numLabel} style={{ fontSize: 11, fontWeight: 700, fill: '#0b5ed7' }} />
+            <Line type="monotone" dataKey="videos" name="Videos" stroke="var(--ac-info)" strokeWidth={3} dot={makeDot(lastIdx, '#60a5fa')} activeDot={{ r: 6 }} isAnimationActive={false} connectNulls>
+              <LabelList dataKey="videos" position="bottom" offset={12} formatter={numLabel} style={{ fontSize: 11, fontWeight: 700, fill: 'var(--ac-info)' }} />
             </Line>
           </ComposedChart>
         </ResponsiveContainer>
@@ -272,9 +272,9 @@ function SamplesLineChart({ data }: { data: { label: string; samples: number | n
 //  and the latest week carries the green blinking "live" dot.
 export type AffPoint = { label: string; affiliate_gmv: number | null; live_sessions: number | null; contacted_creators: number | null };
 const AFF_LINES: { key: keyof AffPoint; name: string; color: string; axis: 'n' | 'g'; fmt: 'currency' | 'number'; pos: 'top' | 'bottom' }[] = [
-  { key: 'affiliate_gmv', name: 'Affiliate GMV', color: '#e8862e', axis: 'g', fmt: 'currency', pos: 'top' },
-  { key: 'contacted_creators', name: 'Contacted Creators', color: '#0ea5e9', axis: 'n', fmt: 'number', pos: 'top' },
-  { key: 'live_sessions', name: 'LIVE Sessions', color: '#8b5cf6', axis: 'n', fmt: 'number', pos: 'bottom' },
+  { key: 'affiliate_gmv', name: 'Affiliate GMV', color: 'var(--ac-accent-base)', axis: 'g', fmt: 'currency', pos: 'top' },
+  { key: 'contacted_creators', name: 'Contacted Creators', color: '#22d3ee', axis: 'n', fmt: 'number', pos: 'top' },
+  { key: 'live_sessions', name: 'LIVE Sessions', color: '#a78bfa', axis: 'n', fmt: 'number', pos: 'bottom' },
 ];
 function AffiliateTrend({ data }: { data: AffPoint[] }) {
   if (data.filter(d => AFF_LINES.some(l => d[l.key] != null)).length < 2) return null;
@@ -293,12 +293,12 @@ function AffiliateTrend({ data }: { data: AffPoint[] }) {
       <div style={{ height: 300 }}>
         <ResponsiveContainer>
           <ComposedChart data={data} margin={{ top: 24, right: 50, bottom: 16, left: 6 }}>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#f1f5f9" />
-            <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#8a93a6' }} tickLine={false} axisLine={{ stroke: '#eadfd6' }} />
-            <YAxis yAxisId="n" tick={{ fontSize: 11, fill: '#b3bac6' }} tickLine={false} axisLine={false} width={34} allowDecimals={false} />
-            <YAxis yAxisId="g" orientation="right" tick={{ fontSize: 11, fill: '#b3bac6' }} tickLine={false} axisLine={false}
+            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="var(--ac-border)" />
+            <XAxis dataKey="label" tick={{ fontSize: 12, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={{ stroke: 'var(--ac-border)' }} />
+            <YAxis yAxisId="n" tick={{ fontSize: 11, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false} width={34} allowDecimals={false} />
+            <YAxis yAxisId="g" orientation="right" tick={{ fontSize: 11, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false}
               width={50} tickFormatter={(v: number) => formatValue('currency', v, { compact: true })} />
-            <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #eef0f4', boxShadow: '0 10px 28px rgba(16,24,40,.12)', fontSize: 13 }}
+            <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid var(--ac-border)', boxShadow: '0 10px 28px rgba(0,0,0,.55)', fontSize: 13 }}
               formatter={(v: any, n: any) => { const l = AFF_LINES.find(x => x.name === n); return [formatValue(l?.fmt ?? 'number', Number(v)), n]; }} />
             {AFF_LINES.map(l => (
               <Line key={String(l.key)} yAxisId={l.axis} type="monotone" dataKey={l.key as string} name={l.name} stroke={l.color} strokeWidth={3}
@@ -319,9 +319,9 @@ function AffiliateTrend({ data }: { data: AffPoint[] }) {
 //  axis. Direct labels (no hover) + green live dot on the latest week.
 export type OffPoint = { label: string; offsite_gmv: number | null; tiktok_shop_gmv: number | null; offsite_effect: number | null };
 const OFF_LINES: { key: keyof OffPoint; name: string; color: string; axis: 'g' | 'p'; fmt: 'currency' | 'percent'; pos: 'top' | 'bottom' }[] = [
-  { key: 'tiktok_shop_gmv', name: 'TikTok Shop GMV', color: '#0d6efd', axis: 'g', fmt: 'currency', pos: 'top' },
-  { key: 'offsite_gmv', name: 'Offsite GMV', color: '#e8862e', axis: 'g', fmt: 'currency', pos: 'bottom' },
-  { key: 'offsite_effect', name: 'Offsite Effect', color: '#16c784', axis: 'p', fmt: 'percent', pos: 'top' },
+  { key: 'tiktok_shop_gmv', name: 'TikTok Shop GMV', color: 'var(--ac-info)', axis: 'g', fmt: 'currency', pos: 'top' },
+  { key: 'offsite_gmv', name: 'Offsite GMV', color: 'var(--ac-accent-base)', axis: 'g', fmt: 'currency', pos: 'bottom' },
+  { key: 'offsite_effect', name: 'Offsite Effect', color: 'var(--ac-success)', axis: 'p', fmt: 'percent', pos: 'top' },
 ];
 function OffsiteTrend({ data }: { data: OffPoint[] }) {
   if (data.filter(d => OFF_LINES.some(l => d[l.key] != null)).length < 2) return null;
@@ -340,13 +340,13 @@ function OffsiteTrend({ data }: { data: OffPoint[] }) {
       <div style={{ height: 300 }}>
         <ResponsiveContainer>
           <ComposedChart data={data} margin={{ top: 24, right: 52, bottom: 16, left: 6 }}>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#f1f5f9" />
-            <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#8a93a6' }} tickLine={false} axisLine={{ stroke: '#eadfd6' }} />
-            <YAxis yAxisId="g" tick={{ fontSize: 11, fill: '#b3bac6' }} tickLine={false} axisLine={false}
+            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="var(--ac-border)" />
+            <XAxis dataKey="label" tick={{ fontSize: 12, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={{ stroke: 'var(--ac-border)' }} />
+            <YAxis yAxisId="g" tick={{ fontSize: 11, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false}
               width={50} tickFormatter={(v: number) => formatValue('currency', v, { compact: true })} />
-            <YAxis yAxisId="p" orientation="right" tick={{ fontSize: 11, fill: '#b3bac6' }} tickLine={false} axisLine={false}
+            <YAxis yAxisId="p" orientation="right" tick={{ fontSize: 11, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false}
               width={44} tickFormatter={(v: number) => formatValue('percent', v)} />
-            <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #eef0f4', boxShadow: '0 10px 28px rgba(16,24,40,.12)', fontSize: 13 }}
+            <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid var(--ac-border)', boxShadow: '0 10px 28px rgba(0,0,0,.55)', fontSize: 13 }}
               formatter={(v: any, n: any) => { const l = OFF_LINES.find(x => x.name === n); return [formatValue(l?.fmt ?? 'currency', Number(v)), n]; }} />
             {OFF_LINES.map(l => (
               <Line key={String(l.key)} yAxisId={l.axis} type="monotone" dataKey={l.key as string} name={l.name} stroke={l.color} strokeWidth={3}
@@ -410,8 +410,8 @@ function Donut({ slices, total, centerLabel }: { slices: Slice[]; total?: number
     const anchor = x >= e.cx ? 'start' : 'end';
     return (
       <text x={x} y={y} textAnchor={anchor} dominantBaseline="central">
-        <tspan x={x} dy="-0.35em" fontSize={10} fontWeight={600} fill="#94a3b8">{e.payload.label}</tspan>
-        <tspan x={x} dy="1.15em" fontSize={12.5} fontWeight={800} fill="#334155">{formatValue('currency', e.value, { compact: true })}</tspan>
+        <tspan x={x} dy="-0.35em" fontSize={10} fontWeight={600} fill="var(--ac-text-secondary)">{e.payload.label}</tspan>
+        <tspan x={x} dy="1.15em" fontSize={12.5} fontWeight={800} fill="var(--ac-text-primary)">{formatValue('currency', e.value, { compact: true })}</tspan>
       </text>
     );
   };
@@ -421,7 +421,7 @@ function Donut({ slices, total, centerLabel }: { slices: Slice[]; total?: number
         <PieChart margin={{ top: 16, right: 66, bottom: 16, left: 66 }}>
           <Pie data={data} dataKey="value" nameKey="label" innerRadius="58%" outerRadius="80%" paddingAngle={2}
             stroke="none" cornerRadius={4} isAnimationActive={false}
-            label={renderLabel} labelLine={{ stroke: '#d7dde5', strokeWidth: 1 }}>
+            label={renderLabel} labelLine={{ stroke: 'var(--ac-border)', strokeWidth: 1 }}>
             {data.map((s, i) => <Cell key={i} fill={s.color ?? PIE[i % PIE.length]} />)}
           </Pie>
         </PieChart>
@@ -572,9 +572,9 @@ function DeltaInline({ f, cur, prev }: { f: SectionField; cur: number | null; pr
 }
 
 // ---- top creators / videos / lives -----------------------------------------
-const MEDAL = ['#f59e0b', '#94a3b8', '#cd7f32'];
+const MEDAL = ['#fbbf24', '#919191', '#cd7f32'];
 // Rank presentation: just the numeral on a gold/silver/bronze pill (grey for 4+).
-const rankColor = (i: number) => MEDAL[i] ?? '#cbd5e1';
+const rankColor = (i: number) => MEDAL[i] ?? '#919191';
 function rankInner(i: number) {
   return <span className="tp-rank-n">{i + 1}</span>;
 }
@@ -684,14 +684,14 @@ function ChannelPair({ def, rows, prevRows }: { def: SectionDefV3; rows: RowData
   const metricFields = def.fields.filter(f => f.key !== 'channel');
   const find = (arr: RowData[], ch: string) => arr.find(r => String(r.channel) === ch) ?? {};
   const META: Record<string, { icon: string; color: string; sub: string }> = {
-    Video: { icon: 'bi-play-btn-fill', color: '#0d6efd', sub: 'Short-form video' },
-    LIVE: { icon: 'bi-broadcast', color: '#e11d63', sub: 'LIVE selling' },
+    Video: { icon: 'bi-play-btn-fill', color: 'var(--ac-info)', sub: 'Short-form video' },
+    LIVE: { icon: 'bi-broadcast', color: '#f472b6', sub: 'LIVE selling' },
   };
   return (
     <div className="row g-3">
       {(def.fixedRows ?? []).map(ch => {
         const row = find(rows, ch); const prev = find(prevRows, ch);
-        const m = META[ch] ?? { icon: 'bi-graph-up', color: '#e8862e', sub: '' };
+        const m = META[ch] ?? { icon: 'bi-graph-up', color: 'var(--ac-accent-base)', sub: '' };
         return (
           <div className="col-md-6" key={ch}>
             <div className="s14-card h-100 v3-channel" style={{ ['--ch' as any]: m.color }}>
@@ -715,10 +715,10 @@ function ChannelPair({ def, rows, prevRows }: { def: SectionDefV3; rows: RowData
 // ---- §12 · GMV Max dashboard ------------------------------------------------
 export type GmvMaxPoint = { label: string; ad_spend: number | null; revenue: number | null; roas: number | null; cpo: number | null };
 const GMX_METRICS: { key: keyof Omit<GmvMaxPoint, 'label'>; label: string; color: string; kind: 'currency' | 'roas' | 'cpo' }[] = [
-  { key: 'revenue', label: 'Gross Revenue', color: '#10b981', kind: 'currency' },
-  { key: 'ad_spend', label: 'Ad Spend', color: '#94a3b8', kind: 'currency' },
-  { key: 'roas', label: 'Blended ROAS', color: '#e8862e', kind: 'roas' },
-  { key: 'cpo', label: 'Blended CPO', color: '#8b5cf6', kind: 'cpo' },
+  { key: 'revenue', label: 'Gross Revenue', color: 'var(--ac-success)', kind: 'currency' },
+  { key: 'ad_spend', label: 'Ad Spend', color: 'var(--ac-text-secondary)', kind: 'currency' },
+  { key: 'roas', label: 'Blended ROAS', color: 'var(--ac-accent-base)', kind: 'roas' },
+  { key: 'cpo', label: 'Blended CPO', color: '#a78bfa', kind: 'cpo' },
 ];
 function fmtGmx(kind: 'currency' | 'roas' | 'cpo', v: number | null, compact = false): string {
   if (v == null) return '—';
@@ -774,11 +774,11 @@ function GmvMaxViz({ rows, series }: { rows: RowData[]; series?: GmvMaxPoint[] }
           <div style={{ height: 280 }}>
             <ResponsiveContainer>
               <LineChart data={S} margin={{ top: 26, right: 18, bottom: 8, left: 6 }}>
-                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#8a93a6' }} tickLine={false} axisLine={{ stroke: '#eadfd6' }} />
-                <YAxis tick={{ fontSize: 11, fill: '#b3bac6' }} tickLine={false} axisLine={false} width={52}
+                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="var(--ac-border)" />
+                <XAxis dataKey="label" tick={{ fontSize: 12, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={{ stroke: 'var(--ac-border)' }} />
+                <YAxis tick={{ fontSize: 11, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false} width={52}
                   tickFormatter={(v: number) => fmtGmx(active.kind, v, true)} />
-                <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #eef0f4', boxShadow: '0 10px 28px rgba(16,24,40,.12)', fontSize: 13 }}
+                <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid var(--ac-border)', boxShadow: '0 10px 28px rgba(0,0,0,.55)', fontSize: 13 }}
                   formatter={(v: any) => [fmtGmx(active.kind, Number(v)), active.label]} />
                 <Line type="monotone" dataKey={active.key as string} name={active.label} stroke={active.color} strokeWidth={3}
                   dot={makeDot(lastIdx, active.color)} activeDot={{ r: 6 }} isAnimationActive={false} connectNulls>
@@ -796,18 +796,18 @@ function GmvMaxViz({ rows, series }: { rows: RowData[]; series?: GmvMaxPoint[] }
             <div className="s14-kpi-label">Ad spend vs gross revenue by product</div>
             <div className="d-flex gap-3">
               <span className="ac-legend-dot" style={{ '--c': '#c9ced9' } as any}>Cost</span>
-              <span className="ac-legend-dot" style={{ '--c': '#10b981' } as any}>Revenue</span>
+              <span className="ac-legend-dot" style={{ '--c': '#34d399' } as any}>Revenue</span>
             </div>
           </div>
           <div style={{ height: 240 }}>
             <ResponsiveContainer>
               <ComposedChart data={chart} margin={{ top: 8, right: 8, bottom: 4, left: 4 }} barGap={4}>
-                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#8a93a6' }} tickLine={false} interval={0} angle={-12} textAnchor="end" height={48} />
-                <YAxis tick={{ fontSize: 11, fill: '#b3bac6' }} tickLine={false} axisLine={false} width={52} tickFormatter={(v: number) => formatValue('currency', v, { compact: true })} />
+                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="var(--ac-border)" />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--ac-text-secondary)' }} tickLine={false} interval={0} angle={-12} textAnchor="end" height={48} />
+                <YAxis tick={{ fontSize: 11, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false} width={52} tickFormatter={(v: number) => formatValue('currency', v, { compact: true })} />
                 <Tooltip formatter={(v: any, n: any) => [formatValue('currency', Number(v)), n]} />
-                <Bar dataKey="Cost" fill="#dfe3ea" radius={[6, 6, 0, 0]} maxBarSize={34} />
-                <Bar dataKey="Revenue" fill="#10b981" radius={[6, 6, 0, 0]} maxBarSize={34} />
+                <Bar dataKey="Cost" fill="var(--ac-text-secondary)" radius={[6, 6, 0, 0]} maxBarSize={34} />
+                <Bar dataKey="Revenue" fill="var(--ac-success)" radius={[6, 6, 0, 0]} maxBarSize={34} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -824,9 +824,9 @@ const NAV_ICON: Record<string, string> = {
   top_videos: 'bi-play-btn-fill', top_lives: 'bi-broadcast', gmv_max: 'bi-cash-stack',
 };
 const SECTION_ACCENT: Record<string, string> = {
-  sampling: '#e8862e', overall: '#e8862e', product_analytics: '#0d6efd', product_traffic: '#06b6d4',
-  traffic_analysis: '#06b6d4', channel_analytics: '#8b5cf6', offsite: '#0ea5e9', affiliate: '#198754',
-  top_creators: '#e8862e', top_videos: '#0d6efd', top_lives: '#e11d63', gmv_max: '#8b5cf6',
+  sampling: 'var(--ac-accent-base)', overall: 'var(--ac-accent-base)', product_analytics: '#60a5fa', product_traffic: '#22d3ee',
+  traffic_analysis: '#22d3ee', channel_analytics: '#a78bfa', offsite: '#22d3ee', affiliate: 'var(--ac-success)',
+  top_creators: '#fc6215', top_videos: '#60a5fa', top_lives: '#f472b6', gmv_max: '#a78bfa',
 };
 
 export default function ReportDashboardV3({
@@ -928,7 +928,7 @@ export default function ReportDashboardV3({
     if (commentsConfig.mode === 'authed' && n === 0 && section !== 'approval') return null;
     if (commentsConfig.mode === 'public' && section === 'approval') {
       return (
-        <Button size="sm" className="ms-2 fw-semibold" style={{ backgroundColor: '#fff', color: '#0d6efd', borderColor: '#0d6efd', whiteSpace: 'nowrap' }}
+        <Button size="sm" className="ms-2 fw-semibold" style={{ backgroundColor: 'var(--ac-surface-raised)', color: 'var(--ac-info)', borderColor: 'var(--ac-info)', whiteSpace: 'nowrap' }}
           onClick={() => setFeedbackSection(section)} title="Open the conversation thread">
           <i className="bi bi-chat-left-text me-1" />{n > 0 ? `Thread (${n})` : 'Open thread'}
         </Button>
@@ -989,14 +989,14 @@ export default function ReportDashboardV3({
       case 'product_traffic': {
         const gmv = numv(data?.gmv);
         const attr: Slice[] = [
-          { label: 'Seller LIVE', value: numv(data?.seller_live_gmv), color: '#0d6efd' },
-          { label: 'Seller Video', value: numv(data?.seller_video_gmv), color: '#8b5cf6' },
-          { label: 'Creator', value: numv(data?.creator_gmv), color: '#10b981' },
+          { label: 'Seller LIVE', value: numv(data?.seller_live_gmv), color: 'var(--ac-info)' },
+          { label: 'Seller Video', value: numv(data?.seller_video_gmv), color: '#a78bfa' },
+          { label: 'Creator', value: numv(data?.creator_gmv), color: 'var(--ac-success)' },
         ];
         const sumAttr = attr.reduce((a, b) => a + b.value, 0);
         const other = Math.max(0, gmv - sumAttr);
         // "Other" fills the gap so the donut sums to Total GMV (center = Total GMV).
-        const slices: Slice[] = other > 0 ? [...attr, { label: 'Other', value: other, color: '#d3d9e2' }] : attr;
+        const slices: Slice[] = other > 0 ? [...attr, { label: 'Other', value: other, color: 'var(--ac-text-secondary)' }] : attr;
         return (
           <div className="s14-card">
             <div className="s14-kpi-label mb-2">GMV by traffic source</div>
@@ -1021,8 +1021,8 @@ export default function ReportDashboardV3({
         return <ChannelPair def={def} rows={rows} prevRows={prevRows} />;
       case 'offsite': {
         const slices: Slice[] = [
-          { label: 'TikTok Shop GMV', value: numv(data?.tiktok_shop_gmv), color: '#0d6efd' },
-          { label: 'Offsite GMV', value: numv(data?.offsite_gmv), color: '#e8862e' },
+          { label: 'TikTok Shop GMV', value: numv(data?.tiktok_shop_gmv), color: 'var(--ac-info)' },
+          { label: 'Offsite GMV', value: numv(data?.offsite_gmv), color: 'var(--ac-accent-base)' },
         ];
         const S = offsiteSeries ?? [];
         return (
@@ -1094,7 +1094,7 @@ export default function ReportDashboardV3({
 
         {insightsText && (
           <section className="s14-section" data-section="insights">
-            <SectionTitle title="Insights" sub="This week in words" color="#0ea5e9" fb={<FeedbackIcon section="insights" />} />
+            <SectionTitle title="Insights" sub="This week in words" color="#22d3ee" fb={<FeedbackIcon section="insights" />} />
             <div className="s14-card"><div className="ac-rte-view" dangerouslySetInnerHTML={{ __html: sanitizeRich(c.insights.summary) }} /></div>
           </section>
         )}
@@ -1102,7 +1102,7 @@ export default function ReportDashboardV3({
 
         {c.approval?.enabled && (
           <section className="s14-section" data-section="approval">
-            <SectionTitle title="Approval Needed / Action Items" color="#f59e0b" fb={<FeedbackIcon section="approval" />} />
+            <SectionTitle title="Approval Needed / Action Items" color="var(--ac-warning)" fb={<FeedbackIcon section="approval" />} />
             <div className="s14-card v3-approval">
               <div className="ac-rte-view ac-approval-content" dangerouslySetInnerHTML={{ __html: sanitizeRich(c.approval.content) }} />
               {commentsConfig?.mode === 'public' && approvalAction && <ApprovalActionInline action={approvalAction} />}

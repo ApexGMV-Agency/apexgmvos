@@ -454,7 +454,7 @@ export default function BrandGmvMaxTab({ brandId, canEdit, currency }: { brandId
                         </tr>
                         {open && (
                           <tr key={`${w.id}-detail`}>
-                            <td colSpan={colCount} className="p-0" style={{ background: '#f8fafc' }}>
+                            <td colSpan={colCount} className="p-0" style={{ background: 'var(--ac-surface-strong)' }}>
                               <div className="p-3">
                                 <div className="fw-semibold small text-uppercase text-muted mb-2" style={{ letterSpacing: '.4px' }}>
                                   Product breakdown · {formatRange(w.week_start, w.week_end)}
@@ -558,7 +558,7 @@ export default function BrandGmvMaxTab({ brandId, canEdit, currency }: { brandId
 
 function MiniStat({ label, value, variant }: { label: string; value: string; variant?: 'success' | 'danger' }) {
   return (
-    <div className="p-3 rounded h-100" style={{ background: '#f8fafc', border: '1px solid #e5e7eb' }}>
+    <div className="p-3 rounded h-100" style={{ background: 'var(--ac-surface-strong)', border: '1px solid var(--ac-border)' }}>
       <div className="text-muted fw-bold text-uppercase" style={{ letterSpacing: '.5px', fontSize: '.8rem' }}>{label}</div>
       <div className={`fs-5 fw-semibold mt-1 ${variant === 'danger' ? 'text-danger' : variant === 'success' ? 'text-success' : ''}`}>{value}</div>
     </div>
@@ -569,7 +569,7 @@ function MiniStat({ label, value, variant }: { label: string; value: string; var
 function RoiGoalTile({ target, achieved, pct, met }: { target: number; achieved: number; pct: number | null; met: boolean }) {
   const barPct = pct == null ? 0 : Math.max(0, Math.min(100, pct));
   return (
-    <div className="p-3 rounded h-100" style={{ background: '#f8fafc', border: '1px solid #e5e7eb' }}>
+    <div className="p-3 rounded h-100" style={{ background: 'var(--ac-surface-strong)', border: '1px solid var(--ac-border)' }}>
       <div className="d-flex justify-content-between align-items-baseline mb-1">
         <span className="text-muted fw-bold text-uppercase" style={{ letterSpacing: '.5px', fontSize: '.8rem' }}>ROI goal</span>
         {pct != null && (

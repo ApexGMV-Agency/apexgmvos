@@ -6,7 +6,7 @@ function tiktokLink(handle: string): string {
   return `https://www.tiktok.com/@${encodeURIComponent(clean)}`;
 }
 const num = (v: any): number | null => { const n = Number(v); return Number.isFinite(n) ? n : null; };
-const MEDAL = ['#f59e0b', '#94a3b8', '#cd7f32']; // gold / silver / bronze
+const MEDAL = ['#fbbf24', '#919191', '#cd7f32']; // gold / silver / bronze
 const AVATAR_BG = ['#fff1e9', '#eef2ff', '#ecfdf5'];
 const AVATAR_FG = ['#c5640f', '#4f46e5', '#0f766e'];
 function initials(name: string): string {
@@ -45,7 +45,7 @@ export default function TopPerformers({ creators, videos, renderFeedback }: {
     <div className="s14-root">
       {cs.length > 0 && (
         <section className="s14-section" data-section="top_creators">
-          <Title title="Top Creators" sub="Your highest-performing creators this week" color="#e8862e" fb={renderFeedback?.('top_creators')} />
+          <Title title="Top Creators" sub="Your highest-performing creators this week" color="var(--ac-accent-base)" fb={renderFeedback?.('top_creators')} />
           <div className="row g-3">
             {cs.map((c, i) => {
               const handle = String(c.username ?? '').trim();
@@ -61,7 +61,7 @@ export default function TopPerformers({ creators, videos, renderFeedback }: {
                           <a className="tp-name" href={tiktokLink(handle)} target="_blank" rel="noreferrer">@{handle}</a>
                         ) : <span className="tp-name text-muted">—</span>}
                       </div>
-                      <span className="tp-rank" style={{ background: MEDAL[i] ?? '#cbd5e1' }}>{i + 1}</span>
+                      <span className="tp-rank" style={{ background: MEDAL[i] ?? '#919191' }}>{i + 1}</span>
                     </div>
                     <div className="tp-gmv">{formatValue('currency', num(c.creator_gmv))}</div>
                     <div className="tp-sub">creator GMV</div>
@@ -79,7 +79,7 @@ export default function TopPerformers({ creators, videos, renderFeedback }: {
 
       {vs.length > 0 && (
         <section className="s14-section" data-section="top_videos">
-          <Title title="Top Videos" sub="The videos that drove the most sales" color="#0d6efd" fb={renderFeedback?.('top_videos')} />
+          <Title title="Top Videos" sub="The videos that drove the most sales" color="var(--ac-info)" fb={renderFeedback?.('top_videos')} />
           <div className="row g-3">
             {vs.map((v, i) => {
               const url = String(v.video_url ?? '').trim();
@@ -88,7 +88,7 @@ export default function TopPerformers({ creators, videos, renderFeedback }: {
                   <div className={`s14-card h-100 tp-video ${i === 0 ? 'tp-gold' : ''}`}>
                     <a className="tp-thumb" href={url || undefined} target="_blank" rel="noreferrer"
                        style={{ pointerEvents: url ? 'auto' : 'none' }}>
-                      <span className="tp-rank-badge" style={{ background: MEDAL[i] ?? '#cbd5e1' }}>#{i + 1}</span>
+                      <span className="tp-rank-badge" style={{ background: MEDAL[i] ?? '#919191' }}>#{i + 1}</span>
                       <i className="bi bi-play-circle-fill tp-play" />
                     </a>
                     <div className="tp-video-body">

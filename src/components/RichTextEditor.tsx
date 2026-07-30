@@ -21,7 +21,7 @@ export interface DividerOpts {
   color: string;       // hex
   width: number;       // % of container
 }
-const DEFAULT_DIV: DividerOpts = { style: 'solid', thickness: 2, color: '#e8862e', width: 100 };
+const DEFAULT_DIV: DividerOpts = { style: 'solid', thickness: 2, color: 'var(--ac-accent-base)', width: 100 };
 
 /** Apply the chosen divider options as inline style + class onto an <hr> node. */
 export function styleDividerNode(node: HTMLElement, o: DividerOpts) {
@@ -61,7 +61,7 @@ class AdvancedDividerBlot extends BlockEmbed {
     return {
       style: (node.getAttribute('data-style') as DividerOpts['style']) || 'solid',
       thickness: Number(node.getAttribute('data-thickness')) || 2,
-      color: node.getAttribute('data-color') || '#e8862e',
+      color: node.getAttribute('data-color') || '#fc6215',
       width: Number(node.getAttribute('data-width')) || 100,
     };
   }
@@ -93,14 +93,14 @@ const STYLE_OPTIONS: { key: DividerOpts['style']; label: string }[] = [
   { key: 'wavy', label: 'Wavy' },
   { key: 'ornament', label: 'Ornamental' },
 ];
-const SWATCHES = ['#e8862e', '#141620', '#0d6efd', '#198754', '#dc3545', '#6f42c1', '#94a3b8'];
+const SWATCHES = ['#fc6215', '#0f0f0f', '#60a5fa', '#34d399', '#f87171', '#a78bfa', '#919191'];
 
 // Ready-to-insert defaults so users don't rebuild a divider every time.
 type DividerPreset = { name: string; opts: DividerOpts };
 const BUILTIN_DIVIDERS: DividerPreset[] = [
-  { name: 'Brand rule', opts: { style: 'solid', thickness: 2, color: '#e8862e', width: 100 } },
-  { name: 'Subtle dotted', opts: { style: 'dotted', thickness: 2, color: '#94a3b8', width: 60 } },
-  { name: 'Ornamental', opts: { style: 'ornament', thickness: 3, color: '#e8862e', width: 40 } },
+  { name: 'Brand rule', opts: { style: 'solid', thickness: 2, color: 'var(--ac-accent-base)', width: 100 } },
+  { name: 'Subtle dotted', opts: { style: 'dotted', thickness: 2, color: 'var(--ac-text-secondary)', width: 60 } },
+  { name: 'Ornamental', opts: { style: 'ornament', thickness: 3, color: 'var(--ac-accent-base)', width: 40 } },
 ];
 // User-saved presets live per-browser (no DB needed for a personal shortcut list).
 const DIVIDER_LS_KEY = 'ac_divider_presets';
@@ -240,7 +240,7 @@ export default function RichTextEditor({ value, onChange, placeholder, minHeight
               onChange={e => setDiv(p => ({ ...p, width: Number(e.target.value) }))} />
           </div>
         </div>
-        <div className="px-2 py-2 mb-2 rounded" style={{ background: '#f8fafc', border: '1px solid #e5e7eb' }}>
+        <div className="px-2 py-2 mb-2 rounded" style={{ background: 'var(--ac-surface-strong)', border: '1px solid var(--ac-border)' }}>
           <hr className={`ac-divider ac-divider-${div.style}`} style={{ ...previewStyleFor(div), margin: '4px 0' }} />
         </div>
         <div className="d-flex justify-content-between align-items-center">

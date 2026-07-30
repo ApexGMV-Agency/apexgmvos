@@ -38,7 +38,7 @@ export interface Section14 {
   hasAnyData: boolean;
 }
 
-const MIX_COLORS = ['#e8862e', '#0d6efd', '#198754', '#8b5cf6', '#06b6d4'];
+const MIX_COLORS = ['#fc6215', '#60a5fa', '#34d399', '#a78bfa', '#22d3ee'];
 
 // ---- safe arithmetic -------------------------------------------------------
 function n(v: any): number | null {

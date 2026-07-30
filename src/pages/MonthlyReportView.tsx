@@ -68,7 +68,7 @@ export default function MonthlyReportView() {
     await new Promise<void>(r => requestAnimationFrame(() => requestAnimationFrame(() => r())));
     try {
       const canvas = await html2canvas(el, {
-        scale: 2, useCORS: true, backgroundColor: '#ffffff',
+        scale: 2, useCORS: true, backgroundColor: 'var(--ac-surface-raised)',
         windowWidth: captureWidth, width: captureWidth, scrollX: 0, scrollY: 0,
       });
       const PX_TO_MM = 25.4 / 96;

@@ -23,7 +23,7 @@ export default function CanvasArea({
   return (
     <div
       className="flex-grow-1 overflow-auto"
-      style={{ background: '#f3f4f6' }}
+      style={{ background: 'var(--ac-surface-strong)' }}
       onPointerDown={(e) => {
         // Deselect when clicking the workspace background.
         if (e.target === e.currentTarget) onSelect(null);
@@ -37,9 +37,9 @@ export default function CanvasArea({
           style={{
             width: schema.canvas.width,
             minHeight: 800,
-            background: schema.canvas.background ?? '#fff',
+            background: schema.canvas.background ?? 'var(--ac-surface-raised)',
             padding,
-            outline: isOver ? '2px dashed #e8862e' : 'none',
+            outline: isOver ? '2px dashed #fc6215' : 'none',
             outlineOffset: '-2px',
           }}
           onPointerDown={(e) => {

@@ -136,9 +136,9 @@ export default function ReportDashboard({
           size="sm"
           className="ms-2 fw-semibold"
           style={{
-            backgroundColor: '#fff',
-            color: '#0d6efd',
-            borderColor: '#0d6efd',
+            backgroundColor: 'var(--ac-surface-raised)',
+            color: 'var(--ac-info)',
+            borderColor: 'var(--ac-info)',
             whiteSpace: 'nowrap',
           }}
           onClick={() => setFeedbackSection(section)}
@@ -237,8 +237,8 @@ export default function ReportDashboard({
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="This Week" fill="#e8862e" radius={[6,6,0,0]} />
-                  <Bar dataKey="Last Week" fill="#6e6e80" radius={[6,6,0,0]} />
+                  <Bar dataKey="This Week" fill="var(--ac-accent-base)" radius={[6,6,0,0]} />
+                  <Bar dataKey="Last Week" fill="var(--ac-text-secondary)" radius={[6,6,0,0]} />
                 </BarChart>
               </ResponsiveContainer>
             </Card.Body>
@@ -285,8 +285,8 @@ export default function ReportDashboard({
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="GMV" stroke="#e8862e" strokeWidth={3} dot={{ r: 4 }} />
-                <Line type="monotone" dataKey="Affiliate GMV" stroke="#ffbe76" strokeWidth={3} dot={{ r: 4 }} />
+                <Line type="monotone" dataKey="GMV" stroke="var(--ac-accent-base)" strokeWidth={3} dot={{ r: 4 }} />
+                <Line type="monotone" dataKey="Affiliate GMV" stroke="var(--ac-accent-hover)" strokeWidth={3} dot={{ r: 4 }} />
               </LineChart>
             </ResponsiveContainer>
           </Card.Body>
@@ -469,7 +469,7 @@ export default function ReportDashboard({
         const expired = !!expiresAt && new Date(expiresAt).getTime() < Date.now();
         return (
         <Card className="mb-3" data-section="approval" border="warning">
-          <Card.Header className="d-flex justify-content-between align-items-center" style={{ background: '#fff8ef' }}>
+          <Card.Header className="d-flex justify-content-between align-items-center" style={{ background: 'var(--ac-accent-soft)' }}>
             <span className="fw-semibold">
               <i className="bi bi-shield-check me-2 text-warning" />
               Approval Needed / Action Items
@@ -601,7 +601,7 @@ function ApprovalActionInline({ action }: { action: ApprovalActionConfig }) {
           </div>
           {myDecision.comment && (
             <blockquote className="mb-0 mt-2 small ps-2"
-                        style={{ borderLeft: '3px solid rgba(0,0,0,.15)', whiteSpace: 'pre-wrap' }}>
+                        style={{ borderLeft: '3px solid var(--ac-border)', whiteSpace: 'pre-wrap' }}>
               {myDecision.comment}
             </blockquote>
           )}
@@ -778,10 +778,10 @@ function tiktokLink(handle: string): string {
 }
 
 function spsColor(v: number) {
-  if (v >= 4.5) return '#10b981';   // success
-  if (v >= 3.5) return '#e8862e';   // brand orange (apexgmvos.com)
-  if (v > 0)    return '#ef4444';   // warning
-  return '#cbd5e1';
+  if (v >= 4.5) return '#34d399';   // success
+  if (v >= 3.5) return '#fc6215';   // brand orange (apexgmvos.com)
+  if (v > 0)    return '#f87171';   // warning
+  return '#919191';
 }
 
 function KpiCard({ label, value, prev, cur, money, dec, sub }: {
@@ -790,7 +790,7 @@ function KpiCard({ label, value, prev, cur, money, dec, sub }: {
 }) {
   return (
     <Col xs={6} md={4} xl={2}>
-      <Card className="h-100 shadow-sm" style={{ borderLeft: '4px solid #e8862e' }}>
+      <Card className="h-100 shadow-sm" style={{ borderLeft: '4px solid var(--ac-accent-base)' }}>
         <Card.Body className="py-3">
           <div className="ac-label">{label}</div>
           <div className="fs-4 fw-bold mt-1">{value}</div>
@@ -814,7 +814,7 @@ function MiniStat({ label, cur, prev, money, dec, suffix, invert }: {
     : n.toLocaleString();
   return (
     <Col md={3}>
-      <div className="p-3 rounded" style={{ background: '#f8fafc', border: '1px solid #e5e7eb' }}>
+      <div className="p-3 rounded" style={{ background: 'var(--ac-surface-strong)', border: '1px solid var(--ac-border)' }}>
         <div className="ac-label">{label}</div>
         <div className="fs-5 fw-semibold mt-1">{fmt(cur)}</div>
         <Delta cur={cur} prev={prev} money={money} dec={dec} invert={invert} />
@@ -863,7 +863,7 @@ function QualityBadge({ q }: { q: ListingQuality }) {
 function RatingCell({ label, value }: { label: string; value: number | null }) {
   return (
     <Col md={3}>
-      <div className="p-3 rounded h-100" style={{ background: '#f8fafc', border: '1px solid #e5e7eb' }}>
+      <div className="p-3 rounded h-100" style={{ background: 'var(--ac-surface-strong)', border: '1px solid var(--ac-border)' }}>
         <div className="ac-mini-label">{label}</div>
         {value == null
           ? <div className="text-muted small mt-1">Not yet rated</div>
@@ -882,7 +882,7 @@ function StatusCell({ label, value }: { label: string; value: 'yes' | 'no' | 'no
   const m = map[value];
   return (
     <Col md={3}>
-      <div className="p-3 rounded h-100" style={{ background: '#f8fafc', border: '1px solid #e5e7eb' }}>
+      <div className="p-3 rounded h-100" style={{ background: 'var(--ac-surface-strong)', border: '1px solid var(--ac-border)' }}>
         <div className="ac-mini-label">{label}</div>
         <div className="mt-1">
           <Badge bg={m.bg} className="fs-6"><i className={`bi ${m.icon} me-1`} />{m.text}</Badge>
@@ -895,7 +895,7 @@ function StatusCell({ label, value }: { label: string; value: 'yes' | 'no' | 'no
 function FlagCell({ label, on }: { label: string; on: boolean }) {
   return (
     <Col md={3}>
-      <div className="p-3 rounded h-100" style={{ background: '#f8fafc', border: '1px solid #e5e7eb' }}>
+      <div className="p-3 rounded h-100" style={{ background: 'var(--ac-surface-strong)', border: '1px solid var(--ac-border)' }}>
         <div className="ac-mini-label">{label}</div>
         <div className="mt-1">
           <Badge bg={on ? 'danger' : 'success'} className="fs-6">

@@ -188,7 +188,7 @@ export default function Resources() {
   // For Bob, surface General + every brand.
   const scopeChips: { key: ScopeKey; label: string; sub?: string; color: string }[] = [];
   if (!isApcLike) {
-    scopeChips.push({ key: 'general', label: 'General', sub: 'Workspace-wide', color: '#64748b' });
+    scopeChips.push({ key: 'general', label: 'General', sub: 'Workspace-wide', color: 'var(--ac-text-secondary)' });
   }
   brands.forEach(b => {
     scopeChips.push({ key: `b:${b.id}`, label: b.name, sub: 'Brand-specific', color: brandColor(b.id) });
@@ -213,16 +213,16 @@ export default function Resources() {
                   onClick={() => setActiveScope(s.key)}
                   className="border-0 rounded d-inline-flex align-items-center gap-2 px-3 py-2"
                   style={{
-                    background: active ? 'rgba(232,134,46,.12)' : '#f8fafc',
-                    border: active ? '1px solid rgba(232,134,46,.55)' : '1px solid #e9ecef',
-                    boxShadow: active ? '0 0 0 1px rgba(232,134,46,.25)' : undefined,
+                    background: active ? 'rgba(252, 98, 21,.12)' : '#0f0f0f',
+                    border: active ? '1px solid rgba(252, 98, 21,.55)' : '1px solid #292929',
+                    boxShadow: active ? '0 0 0 1px rgba(252, 98, 21,.25)' : undefined,
                     transition: 'all .12s',
                   }}
                 >
                   <span
                     style={{
                       width: 28, height: 28, borderRadius: 6,
-                      background: s.color, color: '#fff',
+                      background: s.color, color: 'var(--ac-text-primary)',
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                       fontWeight: 700, fontSize: '.75rem',
                     }}

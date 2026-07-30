@@ -178,10 +178,10 @@ function BlockRenderer({ block, readOnly, onChange, metricBag, currency }: {
           onBlur={(e) => updateProp('text', e.currentTarget.innerText)}
           className="w-100 h-100 d-flex align-items-center"
           style={{
-            fontFamily: 'Sora, sans-serif',
+            fontFamily: 'var(--ac-font-primary)',
             fontWeight: 700,
             fontSize: sizes[level],
-            color: p.color ?? '#111827',
+            color: p.color ?? '#eaeaea',
             textAlign: p.align ?? 'left',
             justifyContent: p.align === 'center' ? 'center' : p.align === 'right' ? 'flex-end' : 'flex-start',
             outline: 'none',
@@ -208,7 +208,7 @@ function BlockRenderer({ block, readOnly, onChange, metricBag, currency }: {
     case 'divider': {
       return (
         <div className="w-100 h-100 d-flex align-items-center" style={{ padding: '0 4px' }}>
-          <div style={{ height: (p.thickness ?? 1) + 'px', background: p.color ?? '#e5e7eb', width: '100%' }} />
+          <div style={{ height: (p.thickness ?? 1) + 'px', background: p.color ?? '#292929', width: '100%' }} />
         </div>
       );
     }
@@ -248,14 +248,14 @@ function BlockRenderer({ block, readOnly, onChange, metricBag, currency }: {
         <div
           className="w-100 h-100 rounded p-3 d-flex flex-column justify-content-center"
           style={{
-            background: p.bg ?? 'rgba(232,134,46,.08)',
-            borderLeft: `4px solid ${p.color ?? '#e8862e'}`,
+            background: p.bg ?? 'rgba(252, 98, 21,.08)',
+            borderLeft: `4px solid ${p.color ?? '#fc6215'}`,
           }}
         >
           <div className="text-muted text-uppercase fw-bold" style={{ fontSize: '.7rem', letterSpacing: '.5px' }}>
             {p.label ?? metric?.label ?? 'KPI'}
           </div>
-          <div className="fw-bold mt-1" style={{ fontSize: '1.75rem', color: p.color ?? '#e8862e', fontFamily: 'Sora, sans-serif' }}>
+          <div className="fw-bold mt-1" style={{ fontSize: '1.75rem', color: p.color ?? '#fc6215', fontFamily: 'var(--ac-font-primary)' }}>
             {value}
           </div>
           {delta ? (
@@ -286,7 +286,7 @@ function BlockRenderer({ block, readOnly, onChange, metricBag, currency }: {
               {metric?.label ?? p.metric_key ?? 'Metric'}
             </div>
           )}
-          <div className="fw-bold" style={{ fontSize: '1.4rem', fontFamily: 'Sora, sans-serif' }}>
+          <div className="fw-bold" style={{ fontSize: '1.4rem', fontFamily: 'var(--ac-font-primary)' }}>
             {bound !== undefined ? formatMetric(bound, metric, currency) : <span className="text-muted">—</span>}
             {metric && bound === undefined && (
               <span className="text-muted small ms-2" style={{ fontSize: '.7rem' }}>

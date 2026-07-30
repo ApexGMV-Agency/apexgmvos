@@ -387,7 +387,7 @@ export default function APCs() {
                   {isTeamLead ? 'You have no brands assigned yet.' : 'No brands exist yet. Create some first.'}
                 </p>
               ) : (
-                <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid #dee2e6', borderRadius: 6, padding: 10 }}>
+                <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid var(--ac-border)', borderRadius: 6, padding: 10 }}>
                   {brands.map(b => {
                     const owner = brandOwner.get(b.id);
                     const takenByOther = owner && owner.id !== editApc?.id;
