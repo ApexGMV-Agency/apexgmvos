@@ -32,7 +32,7 @@ interface ApprovalDecisionRow {
   decided_at: string;
 }
 
-interface Brand { id: string; name: string; client: string | null; client_id: string | null; payment_popup_default?: 'auto' | 'force_hide' | 'force_show'; currency?: string | null; }
+interface Brand { id: string; name: string; client: string | null; client_id: string | null; currency?: string | null; }
 interface Report {
   id: string; brand_id: string; week_start: string; week_end: string;
   week_number: number; status: string; content: WeeklyReportContent;

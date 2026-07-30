@@ -72,13 +72,13 @@ serve(async (req) => {
 
     const [
       { data: client },
-      { data: allBrands },
-      { data: rawWeekly },
-      { data: rawMonthly },
+      { data: allBrands, error: brandsErr },
+      { data: rawWeekly, error: weeklyErr },
+      { data: rawMonthly, error: monthlyErr },
       { data: rawResources },
     ] = await Promise.all([
       admin.from('clients').select('id,name').eq('id', link.client_id).single(),
-      admin.from('brands').select('id,name,client,client_id,share_enabled,payment_popup_default,currency').in('id', brandIds),
+      admin.from('brands').select('id,name,client,client_id,share_enabled,currency').in('id', brandIds),
       includeReports
         ? admin.from('weekly_reports').select('*').in('brand_id', brandIds)
             .eq('is_shared', true)
@@ -93,6 +93,15 @@ serve(async (req) => {
         ? admin.from('resources').select('*').eq('is_shared', true)
         : Promise.resolve({ data: [] as any[] }),
     ]);
+
+    // Fail loudly. These three drive everything the client sees, and the
+    // filters below are all intersections — so a query that errors out reads
+    // downstream as "this link has no reports" instead of as a fault. That is
+    // exactly how a stale column in the brands select (payment_popup_default,
+    // dropped in the slim-down) silently emptied every share link.
+    if (brandsErr)  return json({ error: `brands: ${brandsErr.message}` }, 500);
+    if (weeklyErr)  return json({ error: `weekly_reports: ${weeklyErr.message}` }, 500);
+    if (monthlyErr) return json({ error: `monthly_reports: ${monthlyErr.message}` }, 500);
 
     // Defense in depth: drop brands whose master share toggle is off (admin may have disabled it after the link was created).
     const brands = (allBrands ?? []).filter((b: any) => b.share_enabled === true)
