@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import DOMPurify from 'dompurify';
-import { Card, Spinner, Alert, Form, Row, Col, Badge, Button, Tab, Nav, Offcanvas, Modal } from 'react-bootstrap';
+import { Card, Alert, Form, Row, Col, Badge, Button, Tab, Nav, Offcanvas, Modal } from 'react-bootstrap';
 import { supabase } from '../lib/supabase';
 import { useTheme } from '../theme/ThemeContext';
+import BrandLoader from '../components/BrandLoader';
 import { fnError } from '../lib/functionError';
 import { addDays, formatRange, formatHuman, formatWeekShort, fromISO } from '../lib/dates';
 import { WeeklyReportContent, normalizeContent } from '../lib/reportSchema';
@@ -473,7 +474,7 @@ export default function SharedReports() {
   const pendingApprovalRows = approvalsForBrand.filter(r => !r.decision).length;
 
   const clientName = client?.name ?? 'Client';
-  if (loading) return <PublicShell clientName={clientName}><div className="text-center py-5"><Spinner animation="border" /></div></PublicShell>;
+  if (loading) return <PublicShell clientName={clientName}><BrandLoader /></PublicShell>;
   if (err) return <PublicShell clientName={clientName}><Alert variant="danger">{err}</Alert></PublicShell>;
 
   // Low-level: post a comment to a specific (report, section). Used by both
@@ -1548,6 +1549,7 @@ function PublicShell({ children, clientName }: { children: React.ReactNode; clie
         className="d-flex align-items-center"
         style={{ background: 'var(--ac-surface-strong)', color: 'var(--ac-text-primary)', padding: '14px 24px' }}
       >
+        <img className="ac-brand-mark me-2" src="/apex-mobile-logo.svg" alt="" width={30} height={28} />
         <strong>ApexGMVOS</strong>
         <span className="opacity-75 mx-2">— Reporting</span>
         <span className="opacity-75">|</span>

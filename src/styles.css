@@ -592,6 +592,41 @@ hr { border-color: var(--ac-border); opacity: 1; }
   object-fit: contain;
   flex-shrink: 0;
 }
+/* ---- Branded loading state ----------------------------------------
+   The mark breathes and sits over a soft accent halo rather than spinning:
+   the logo is asymmetric, so rotating it reads as a glitch. */
+.ac-brand-loader-mark {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 84px;
+  height: 84px;
+  animation: ac-brand-breathe 1.6s var(--ac-ease) infinite;
+}
+.ac-brand-loader-mark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--ac-accent-soft);
+  animation: ac-brand-halo 1.6s var(--ac-ease) infinite;
+}
+.ac-brand-loader-mark img { position: relative; object-fit: contain; }
+@keyframes ac-brand-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.07); }
+}
+@keyframes ac-brand-halo {
+  0%, 100% { opacity: .45; transform: scale(.9); }
+  50%      { opacity: 1;   transform: scale(1.05); }
+}
+/* The animation is decorative — the mark must stay visible without it. */
+@media (prefers-reduced-motion: reduce) {
+  .ac-brand-loader-mark,
+  .ac-brand-loader-mark::before { animation: none; }
+}
+
 .ac-sidebar-toggle { border: 1px solid var(--ac-line-l); }
 .ac-sidebar-toggle .bi { font-size: 1.05rem; }
 /* Theme toggle sits with the bell; matches the sidebar toggle's chrome. */

@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { ReactNode } from 'react';
 import { useAuth, AppRole } from './AuthContext';
-import { Spinner } from 'react-bootstrap';
+import BrandLoader from '../components/BrandLoader';
 
 export function ProtectedRoute({
   children,
@@ -12,13 +12,7 @@ export function ProtectedRoute({
 }) {
   const { session, profile, loading } = useAuth();
 
-  if (loading) {
-    return (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
-        <Spinner animation="border" />
-      </div>
-    );
-  }
+  if (loading) return <BrandLoader full />;
   if (!session) return <Navigate to="/login" replace />;
   if (roles && profile && !roles.includes(profile.role)) {
     return (

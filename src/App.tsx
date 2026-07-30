@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Spinner } from 'react-bootstrap';
+import BrandLoader from './components/BrandLoader';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -37,13 +37,7 @@ function RoleHome() {
   const { profile, loading } = useAuth();
   // Wait for the profile before routing — otherwise a non-Bob role briefly falls
   // through to /dashboard and hits the role guard's denied page.
-  if (loading || !profile) {
-    return (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '40vh' }}>
-        <Spinner animation="border" />
-      </div>
-    );
-  }
+  if (loading || !profile) return <BrandLoader />;
   if (profile.role === 'apc' || profile.role === 'team_lead' || profile.role === 'ads_manager') return <Navigate to="/brands" replace />;
   return <Navigate to="/dashboard" replace />;
 }
