@@ -451,7 +451,7 @@ export default function CompanyBudget() {
         </div>
         <div className={`bm-tile ${net >= 0 ? 'bm-tile-success' : 'bm-tile-warning'}`}>
           <div className="bm-tile-label">Net {net >= 0 ? 'profit' : 'loss'}</div>
-          <div className="bm-tile-value" style={{ color: net >= 0 ? '#15803d' : '#b91c1c' }}>
+          <div className="bm-tile-value" style={{ color: net >= 0 ? 'var(--ac-success)' : 'var(--ac-danger)' }}>
             {net >= 0 ? '+' : ''}{fmtMoney(net)}
           </div>
           <div className="bm-tile-sub text-muted">income − expenses</div>

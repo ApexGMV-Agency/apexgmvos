@@ -26,42 +26,90 @@
   --ac-font-weight-base: 400;
   --ac-line-height-base: 1.25;
 
+  /* =================================================================
+     LIGHT THEME — the default. The dark counterpart of every token
+     below lives in the [data-theme="dark"] block further down; the two
+     blocks must stay key-for-key identical. Both target <html>, so the
+     legacy aliases and the Bootstrap bridge (which reference these by
+     var()) re-resolve automatically when the attribute flips.
+
+     The elevation ramp keeps the SAME direction in both themes —
+     base → strong → raised → overlay is increasing elevation — so no
+     existing rule inverts its hierarchy when the theme changes.
+     ================================================================= */
+
   /* ---- Surfaces ---------------------------------------------------- */
-  --ac-surface-base:    #000000;   /* page background            */
-  --ac-surface-strong:  #0f0f0f;   /* sunken wells, headers      */
-  --ac-surface-raised:  #1a1919;   /* cards, menus, inputs       */
-  --ac-surface-overlay: #232222;   /* modals, popovers, hover    */
-  --ac-surface-hover:   rgba(234, 234, 234, .06);
+  --ac-surface-base:    #f5f6f8;   /* page background            */
+  --ac-surface-strong:  #ffffff;   /* sunken wells, headers      */
+  --ac-surface-raised:  #ffffff;   /* cards, menus, inputs       */
+  --ac-surface-overlay: #ffffff;   /* modals, popovers, hover    */
+  --ac-surface-hover:   rgba(20, 22, 32, .055);
 
   /* ---- Text -------------------------------------------------------
-     tertiary (#333) is decorative only — it fails AA on every surface
-     here, so it must never carry body or label copy. */
-  --ac-text-primary:   #eaeaea;
-  --ac-text-secondary: #919191;
-  --ac-text-tertiary:  #333333;
+     tertiary is decorative only — it fails AA on every surface here,
+     so it must never carry body or label copy. */
+  --ac-text-primary:   #141620;
+  --ac-text-secondary: #5b6070;
+  --ac-text-tertiary:  #c9ccd4;
   --ac-text-on-accent: #0f0f0f;    /* #eaeaea on #fc6215 is 3.0:1 — fails AA */
 
   /* ---- Borders ----------------------------------------------------- */
-  --ac-border:         #292929;
-  --ac-border-strong:  #eaeaea;
+  --ac-border:         #e3e5ea;
+  --ac-border-strong:  #141620;
 
-  /* ---- Accent ------------------------------------------------------ */
+  /* ---- Accent ------------------------------------------------------
+     The brand orange is identical in both themes so fills stay on-brand.
+     accent-text is the AA-safe variant for small text and links: #fc6215
+     on white is 3.0:1 and fails, #b8460f is 4.8:1 and passes. */
   --ac-accent-base:  #fc6215;
-  --ac-accent-hover: #ff7d3b;
-  --ac-accent-press: #d94e08;
-  --ac-accent-soft:  rgba(252, 98, 21, .14);
-  --ac-accent-ring:  rgba(252, 98, 21, .38);
+  --ac-accent-hover: #e5540c;      /* hover DARKENS on a light surface */
+  --ac-accent-press: #c2450a;
+  --ac-accent-text:  #b8460f;
+  --ac-accent-soft:  rgba(252, 98, 21, .10);
+  --ac-accent-ring:  rgba(252, 98, 21, .40);
+
+  /* Channel triplets for the Bootstrap bridge, which needs bare "r, g, b"
+     to build its own rgba() values. Must track the hexes above. */
+  --ac-surface-base-rgb:  245, 246, 248;
+  --ac-text-primary-rgb:  20, 22, 32;
+  --ac-accent-text-rgb:   184, 70, 15;
+  --ac-accent-press-rgb:  194, 69, 10;
+
+  /* Hairline film for zebra striping — dark ink on a light surface. */
+  --ac-stripe:       rgba(20, 22, 32, .035);
+
+  /* Categorical hues (review status, LIVE badge, region chips). The pastels
+     the dark theme uses sit near 2.5:1 on white, so light mode takes the
+     saturated end of the same hues instead. */
+  --ac-violet:       #6d28d9;
+  --ac-pink:         #be185d;
+
+  /* Neutral chip (secondary badges) — needs to read as a filled pill against
+     a card, so it can't reuse a surface token: those are white here. */
+  --ac-chip-bg:      #e5e7ec;
+  --ac-chip-fg:      #3f4452;
 
   /* ---- Status ------------------------------------------------------
-     Tuned for AA against the dark surfaces, not the stock Bootstrap set. */
-  --ac-success:      #34d399;
-  --ac-success-soft: rgba(52, 211, 153, .14);
-  --ac-warning:      #fbbf24;
-  --ac-warning-soft: rgba(251, 191, 36, .14);
-  --ac-danger:       #f87171;
-  --ac-danger-soft:  rgba(248, 113, 113, .14);
-  --ac-info:         #60a5fa;
-  --ac-info-soft:    rgba(96, 165, 250, .14);
+     Tuned for AA against the light surfaces, not the stock Bootstrap set. */
+  --ac-success:      #15803d;
+  --ac-success-soft: rgba(21, 128, 61, .10);
+  --ac-warning:      #b45309;
+  --ac-warning-soft: rgba(180, 83, 9, .10);
+  --ac-danger:       #b91c1c;
+  --ac-danger-soft:  rgba(185, 28, 28, .10);
+  --ac-info:         #1d4ed8;
+  --ac-info-soft:    rgba(29, 78, 216, .10);
+  --ac-success-rgb:  21, 128, 61;
+  --ac-warning-rgb:  180, 83, 9;
+  --ac-danger-rgb:   185, 28, 28;
+  --ac-info-rgb:     29, 78, 216;
+  /* Status fills are DARK here and pastel in the dark theme, so the label
+     on top of them flips too — unlike text on the orange, which is always
+     near-black because the orange itself never changes. */
+  --ac-text-on-status: #ffffff;
+
+  /* ---- Scrims ------------------------------------------------------ */
+  --ac-backdrop:     rgba(20, 22, 32, .45);
 
   /* ---- Spacing ----------------------------------------------------- */
   --ac-space-1: 12px;
@@ -75,18 +123,18 @@
   --ac-radius-xs:   12px;
   --ac-radius-sm:   20px;
   --ac-radius-pill: 999px;
-  --ac-shadow-sm:   0 1px 2px rgba(0,0,0,0.8);
-  --ac-shadow-md:   0 8px 24px rgba(0,0,0,0.8);
-  --ac-shadow-lg:   0 24px 60px rgba(0,0,0,0.8);
+  --ac-shadow-sm:   0 1px 2px rgba(20,22,32,0.08);
+  --ac-shadow-md:   0 8px 24px rgba(20,22,32,0.10);
+  --ac-shadow-lg:   0 24px 60px rgba(20,22,32,0.14);
   --ac-duration-instant: 300ms;
   --ac-ease: cubic-bezier(.4, 0, .2, 1);
 
   /* ---- Legacy aliases ---------------------------------------------
      Older rules and inline styles still reference these names. They are
-     repointed at the tokens above so the whole app follows the theme;
-     the names read light-mode ("text-dark", "line-l") but the values
-     are the dark-theme equivalents. Prefer the semantic tokens in new
-     code — do not add new usages of these. */
+     repointed at the semantic tokens above, so they follow whichever
+     theme is active — they are defined once here and never restated in
+     the dark block. Prefer the semantic tokens in new code — do not add
+     new usages of these. */
   --ac-primary:      var(--ac-accent-base);
   --ac-primary-2:    var(--ac-accent-hover);
   --ac-primary-soft: var(--ac-accent-soft);
@@ -94,13 +142,12 @@
   --ac-bg-dark:      var(--ac-surface-base);
   --ac-bg-card:      var(--ac-surface-strong);
   --ac-bg-card-2:    var(--ac-surface-raised);
-  --ac-bg-light:     var(--ac-surface-strong);  /* was the cream page bg */
+  --ac-bg-light:     var(--ac-surface-strong);
   --ac-text:         var(--ac-text-primary);
-  --ac-text-dark:    var(--ac-text-primary);    /* was near-black body text */
+  --ac-text-dark:    var(--ac-text-primary);
   --ac-text-muted:   var(--ac-text-secondary);
   --ac-line-d:       var(--ac-border);
   --ac-line-l:       var(--ac-border);
-  --ac-danger:       #f87171;
   --ac-radius:       var(--ac-radius-xs);
   --ac-radius-md:    var(--ac-radius-xs);
   --ac-font-heading: var(--ac-font-primary);
@@ -111,6 +158,73 @@
   --ac-sidebar-fg:     var(--ac-text-secondary);
   --ac-sidebar-active: var(--ac-accent-base);
   --ac-sidebar-hover:  var(--ac-surface-hover);
+
+  color-scheme: light;
+}
+
+/* =========================================================
+   DARK THEME
+   Applied by ThemeContext setting <html data-theme="dark">.
+   Key-for-key the counterpart of the light block above; only
+   theme-dependent tokens are restated — typography, spacing,
+   radius, motion and the legacy aliases are inherited.
+   ========================================================= */
+[data-theme="dark"] {
+  --ac-surface-base:    #000000;
+  --ac-surface-strong:  #0f0f0f;
+  --ac-surface-raised:  #1a1919;
+  --ac-surface-overlay: #232222;
+  --ac-surface-hover:   rgba(234, 234, 234, .06);
+
+  --ac-text-primary:   #eaeaea;
+  --ac-text-secondary: #919191;
+  --ac-text-tertiary:  #333333;
+  --ac-text-on-accent: #0f0f0f;
+
+  --ac-border:         #292929;
+  --ac-border-strong:  #eaeaea;
+
+  /* On black the brand orange clears AA on its own, so accent-text is
+     just the hover tint — no darkened variant needed. */
+  --ac-accent-base:  #fc6215;
+  --ac-accent-hover: #ff7d3b;      /* hover LIGHTENS on a dark surface */
+  --ac-accent-press: #d94e08;
+  --ac-accent-text:  #ff7d3b;
+  --ac-accent-soft:  rgba(252, 98, 21, .14);
+  --ac-accent-ring:  rgba(252, 98, 21, .38);
+
+  --ac-surface-base-rgb:  0, 0, 0;
+  --ac-text-primary-rgb:  234, 234, 234;
+  --ac-accent-text-rgb:   255, 125, 59;
+  --ac-accent-press-rgb:  217, 78, 8;
+
+  --ac-stripe:       rgba(234, 234, 234, .04);
+
+  --ac-violet:       #a78bfa;
+  --ac-pink:         #f472b6;
+
+  --ac-chip-bg:      #2f2e2e;
+  --ac-chip-fg:      #cfcfcf;
+
+  --ac-success:      #34d399;
+  --ac-success-soft: rgba(52, 211, 153, .14);
+  --ac-warning:      #fbbf24;
+  --ac-warning-soft: rgba(251, 191, 36, .14);
+  --ac-danger:       #f87171;
+  --ac-danger-soft:  rgba(248, 113, 113, .14);
+  --ac-info:         #60a5fa;
+  --ac-info-soft:    rgba(96, 165, 250, .14);
+  --ac-success-rgb:  52, 211, 153;
+  --ac-warning-rgb:  251, 191, 36;
+  --ac-danger-rgb:   248, 113, 113;
+  --ac-info-rgb:     96, 165, 250;
+  --ac-text-on-status: #0f0f0f;
+
+  --ac-backdrop:     rgba(0, 0, 0, .75);
+
+  --ac-shadow-sm:    0 1px 2px rgba(0,0,0,0.8);
+  --ac-shadow-md:    0 8px 24px rgba(0,0,0,0.8);
+  --ac-shadow-lg:    0 24px 60px rgba(0,0,0,0.8);
 
   color-scheme: dark;
 }
@@ -174,16 +288,26 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 
 /* =========================================================
    Bootstrap 5.3 color-mode bridge
-   `<html data-bs-theme="dark">` puts every react-bootstrap component
-   (cards, modals, dropdowns, tables, offcanvas, forms, tabs…) into its
-   dark mode; these overrides repoint Bootstrap's own variables at the
-   ApexGMV tokens so there is exactly one palette in the app.
+   `data-bs-theme` on <html> puts every react-bootstrap component
+   (cards, modals, dropdowns, tables, offcanvas, forms, tabs…) into the
+   matching color mode — that attribute still has to track the theme,
+   because Bootstrap keys its own internals off it (select chevrons,
+   close-button filters). These overrides then repoint Bootstrap's
+   variables at the ApexGMV tokens so there is exactly one palette.
+
+   Deliberately NOT scoped to one mode: every value below resolves
+   through var(--ac-*), so the same block serves light and dark and the
+   two can never drift apart. The attribute selectors are listed only
+   to out-specify Bootstrap's own [data-bs-theme="dark"] block
+   regardless of stylesheet order.
    ========================================================= */
-[data-bs-theme="dark"] {
+:root,
+:root[data-bs-theme="light"],
+:root[data-bs-theme="dark"] {
   --bs-body-bg:              var(--ac-surface-base);
-  --bs-body-bg-rgb:          0, 0, 0;
+  --bs-body-bg-rgb:          var(--ac-surface-base-rgb);
   --bs-body-color:           var(--ac-text-primary);
-  --bs-body-color-rgb:       234, 234, 234;
+  --bs-body-color-rgb:       var(--ac-text-primary-rgb);
   --bs-emphasis-color:       var(--ac-text-primary);
   --bs-secondary-color:      var(--ac-text-secondary);
   --bs-secondary-bg:         var(--ac-surface-raised);
@@ -192,11 +316,13 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   --bs-border-color:         var(--ac-border);
   --bs-border-color-translucent: var(--ac-border);
   --bs-heading-color:        var(--ac-text-primary);
-  --bs-link-color:           var(--ac-accent-base);
-  --bs-link-color-rgb:       252, 98, 21;
-  --bs-link-hover-color:     var(--ac-accent-hover);
-  --bs-link-hover-color-rgb: 255, 125, 59;
-  --bs-code-color:           var(--ac-accent-hover);
+  /* Links are small text, so they take the AA-safe accent rather than the
+     raw brand orange (3.0:1 on white). */
+  --bs-link-color:           var(--ac-accent-text);
+  --bs-link-color-rgb:       var(--ac-accent-text-rgb);
+  --bs-link-hover-color:     var(--ac-accent-press);
+  --bs-link-hover-color-rgb: var(--ac-accent-press-rgb);
+  --bs-code-color:           var(--ac-accent-text);
   --bs-highlight-bg:         var(--ac-accent-soft);
 
   --bs-primary:              var(--ac-accent-base);
@@ -205,13 +331,13 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   --bs-primary-border-subtle: var(--ac-accent-ring);
   --bs-primary-text-emphasis: var(--ac-accent-hover);
   --bs-success:              var(--ac-success);
-  --bs-success-rgb:          52, 211, 153;
+  --bs-success-rgb:          var(--ac-success-rgb);
   --bs-danger:               var(--ac-danger);
-  --bs-danger-rgb:           248, 113, 113;
+  --bs-danger-rgb:           var(--ac-danger-rgb);
   --bs-warning:              var(--ac-warning);
-  --bs-warning-rgb:          251, 191, 36;
+  --bs-warning-rgb:          var(--ac-warning-rgb);
   --bs-info:                 var(--ac-info);
-  --bs-info-rgb:             96, 165, 250;
+  --bs-info-rgb:             var(--ac-info-rgb);
 
   --bs-card-bg:              var(--ac-surface-raised);
   --bs-card-border-color:    var(--ac-border);
@@ -222,12 +348,13 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   --bs-dropdown-link-color:  var(--ac-text-primary);
   --bs-dropdown-link-hover-bg: var(--ac-surface-hover);
   --bs-dropdown-link-active-bg: var(--ac-accent-base);
+  --bs-dropdown-link-active-color: var(--ac-text-on-accent);
   --bs-offcanvas-bg:         var(--ac-surface-raised);
   --bs-offcanvas-border-color: var(--ac-border);
   --bs-table-bg:             transparent;
   --bs-table-color:          var(--ac-text-primary);
   --bs-table-border-color:   var(--ac-border);
-  --bs-table-striped-bg:     rgba(234, 234, 234, .04);
+  --bs-table-striped-bg:     var(--ac-stripe);
   --bs-table-hover-bg:       var(--ac-surface-hover);
   --bs-form-control-bg:      var(--ac-surface-raised);
   --bs-form-control-color:   var(--ac-text-primary);
@@ -310,15 +437,15 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   --bs-btn-disabled-border-color: var(--ac-border);
 }
 .btn-success, .btn-danger, .btn-warning, .btn-info {
-  --bs-btn-color: var(--ac-text-on-accent);
-  --bs-btn-hover-color: var(--ac-text-on-accent);
-  --bs-btn-active-color: var(--ac-text-on-accent);
-  --bs-btn-disabled-color: var(--ac-text-on-accent);
+  --bs-btn-color: var(--ac-text-on-status);
+  --bs-btn-hover-color: var(--ac-text-on-status);
+  --bs-btn-active-color: var(--ac-text-on-status);
+  --bs-btn-disabled-color: var(--ac-text-on-status);
 }
-.btn-outline-success { --bs-btn-color: var(--ac-success); --bs-btn-border-color: var(--ac-success); --bs-btn-hover-bg: var(--ac-success); --bs-btn-hover-color: var(--ac-text-on-accent); --bs-btn-active-bg: var(--ac-success); --bs-btn-active-color: var(--ac-text-on-accent); }
-.btn-outline-danger  { --bs-btn-color: var(--ac-danger);  --bs-btn-border-color: var(--ac-danger);  --bs-btn-hover-bg: var(--ac-danger);  --bs-btn-hover-color: var(--ac-text-on-accent); --bs-btn-active-bg: var(--ac-danger);  --bs-btn-active-color: var(--ac-text-on-accent); }
-.btn-outline-warning { --bs-btn-color: var(--ac-warning); --bs-btn-border-color: var(--ac-warning); --bs-btn-hover-bg: var(--ac-warning); --bs-btn-hover-color: var(--ac-text-on-accent); --bs-btn-active-bg: var(--ac-warning); --bs-btn-active-color: var(--ac-text-on-accent); }
-.btn-outline-info    { --bs-btn-color: var(--ac-info);    --bs-btn-border-color: var(--ac-info);    --bs-btn-hover-bg: var(--ac-info);    --bs-btn-hover-color: var(--ac-text-on-accent); --bs-btn-active-bg: var(--ac-info);    --bs-btn-active-color: var(--ac-text-on-accent); }
+.btn-outline-success { --bs-btn-color: var(--ac-success); --bs-btn-border-color: var(--ac-success); --bs-btn-hover-bg: var(--ac-success); --bs-btn-hover-color: var(--ac-text-on-status); --bs-btn-active-bg: var(--ac-success); --bs-btn-active-color: var(--ac-text-on-status); }
+.btn-outline-danger  { --bs-btn-color: var(--ac-danger);  --bs-btn-border-color: var(--ac-danger);  --bs-btn-hover-bg: var(--ac-danger);  --bs-btn-hover-color: var(--ac-text-on-status); --bs-btn-active-bg: var(--ac-danger);  --bs-btn-active-color: var(--ac-text-on-status); }
+.btn-outline-warning { --bs-btn-color: var(--ac-warning); --bs-btn-border-color: var(--ac-warning); --bs-btn-hover-bg: var(--ac-warning); --bs-btn-hover-color: var(--ac-text-on-status); --bs-btn-active-bg: var(--ac-warning); --bs-btn-active-color: var(--ac-text-on-status); }
+.btn-outline-info    { --bs-btn-color: var(--ac-info);    --bs-btn-border-color: var(--ac-info);    --bs-btn-hover-bg: var(--ac-info);    --bs-btn-hover-color: var(--ac-text-on-status); --bs-btn-active-bg: var(--ac-info);    --bs-btn-active-color: var(--ac-text-on-status); }
 .btn-link { --bs-btn-color: var(--ac-accent-base); --bs-btn-hover-color: var(--ac-accent-hover); }
 
 a { color: var(--ac-accent-base); }
@@ -326,8 +453,13 @@ a:hover { color: var(--ac-accent-hover); }
 .text-primary { color: var(--ac-accent-base) !important; }
 .bg-primary { background: var(--ac-accent-base) !important; color: var(--ac-text-on-accent) !important; }
 .badge.bg-primary { background: var(--ac-accent-base) !important; color: var(--ac-text-on-accent) !important; }
-.badge.bg-success, .badge.bg-danger, .badge.bg-warning, .badge.bg-info,
-.badge.bg-light, .badge.bg-secondary { color: var(--ac-text-on-accent) !important; }
+.badge.bg-success, .badge.bg-danger, .badge.bg-warning, .badge.bg-info {
+  color: var(--ac-text-on-status) !important;
+}
+.badge.bg-light { color: var(--ac-text-on-accent) !important; }
+/* Secondary is the only badge with no status colour behind it — Bootstrap's
+   stock #6c757d never went through the bridge, so it takes the chip tokens. */
+.badge.bg-secondary { background: var(--ac-chip-bg) !important; color: var(--ac-chip-fg) !important; }
 .badge.bg-dark { background: var(--ac-surface-overlay) !important; color: var(--ac-text-primary) !important; }
 .text-muted { color: var(--ac-text-secondary) !important; }
 .text-dark { color: var(--ac-text-primary) !important; }
@@ -399,7 +531,8 @@ hr { border-color: var(--ac-border); opacity: 1; }
 }
 .modal-content { background-color: var(--ac-surface-raised); border: 1px solid var(--ac-border); }
 .modal-header, .modal-footer { border-color: var(--ac-border); }
-.modal-backdrop { --bs-backdrop-bg: #000; --bs-backdrop-opacity: .75; }
+/* The scrim carries its own alpha per theme, so opacity stays at 1. */
+.modal-backdrop, .offcanvas-backdrop { --bs-backdrop-bg: var(--ac-backdrop); --bs-backdrop-opacity: 1; }
 .offcanvas { background-color: var(--ac-surface-raised); color: var(--ac-text-primary); }
 .offcanvas-header, .offcanvas-footer { border-color: var(--ac-border); }
 .dropdown-menu { box-shadow: var(--ac-shadow-md); }
@@ -441,6 +574,9 @@ hr { border-color: var(--ac-border); opacity: 1; }
 }
 .ac-sidebar-toggle { border: 1px solid var(--ac-line-l); }
 .ac-sidebar-toggle .bi { font-size: 1.05rem; }
+/* Theme toggle sits with the bell; matches the sidebar toggle's chrome. */
+.ac-theme-toggle { border: 1px solid var(--ac-line-l); }
+.ac-theme-toggle .bi { font-size: 1.05rem; display: block; }
 
 /* Collapsed state — narrow rail with icons only */
 .ac-layout.collapsed .ac-sidebar {
@@ -750,13 +886,13 @@ hr { border-color: var(--ac-border); opacity: 1; }
   color: var(--ac-success); border-color: var(--ac-success);
 }
 .ac-themed .card-header .btn-outline-success:hover {
-  background: var(--ac-success); color: var(--ac-text-on-accent); border-color: var(--ac-success);
+  background: var(--ac-success); color: var(--ac-text-on-status); border-color: var(--ac-success);
 }
 .ac-themed .card-header .btn-outline-danger {
   color: var(--ac-danger); border-color: var(--ac-danger);
 }
 .ac-themed .card-header .btn-outline-danger:hover {
-  background: var(--ac-danger); color: var(--ac-text-on-accent); border-color: var(--ac-danger);
+  background: var(--ac-danger); color: var(--ac-text-on-status); border-color: var(--ac-danger);
 }
 .ac-themed .card-header .badge.bg-primary {
   background: var(--ac-primary) !important; color: var(--ac-text-on-accent) !important;
@@ -940,7 +1076,7 @@ hr { border-color: var(--ac-border); opacity: 1; }
 .ac-region-chip--sm .ac-region-name { font-size: .62rem; }
 
 .ac-region-chip[data-region="US"]   { --rg-accent: var(--ac-success); --rg-bg: rgba(52,211,153,0.09);  --rg-border: rgba(52,211,153,0.24);  --rg-fg: var(--ac-success); }
-.ac-region-chip[data-region="UK"]   { --rg-accent: #a78bfa; --rg-bg: rgba(96,165,250,0.09);  --rg-border: rgba(96,165,250,0.24);  --rg-fg: #a78bfa; }
+.ac-region-chip[data-region="UK"]   { --rg-accent: var(--ac-violet); --rg-bg: rgba(96,165,250,0.09);  --rg-border: rgba(96,165,250,0.24);  --rg-fg: var(--ac-violet); }
 .ac-region-chip[data-region="EURO"] { --rg-accent: var(--ac-info); --rg-bg: rgba(96,165,250,0.09);  --rg-border: rgba(96,165,250,0.24);  --rg-fg: var(--ac-info); }
 
 /* Brand Detail header — identity stack: name + owners (Team Lead / APC) on the
@@ -1193,8 +1329,12 @@ hr { border-color: var(--ac-border); opacity: 1; }
   }
   /* Paper is white. Re-point the tokens to a light scale for print only, so
      every rule that already reads from them inverts in one place instead of
-     printing a black page (or dropping ink-heavy backgrounds entirely). */
-  :root {
+     printing a black page (or dropping ink-heavy backgrounds entirely).
+     The [data-theme="dark"] arm is required, not redundant: without it the
+     dark block out-specifies a bare :root and dark-mode users print black. */
+  :root,
+  :root[data-theme="dark"],
+  :root[data-theme="light"] {
     --ac-surface-base:    #ffffff;
     --ac-surface-strong:  #f4f4f5;
     --ac-surface-raised:  #ffffff;
@@ -1209,6 +1349,15 @@ hr { border-color: var(--ac-border); opacity: 1; }
     --ac-warning:         #b45309;
     --ac-danger:          #b91c1c;
     --ac-info:            #1d4ed8;
+    --ac-success-rgb:     4, 120, 87;
+    --ac-warning-rgb:     180, 83, 9;
+    --ac-danger-rgb:      185, 28, 28;
+    --ac-info-rgb:        29, 78, 216;
+    --ac-text-on-status:  #ffffff;
+    --ac-accent-text:     #b8460f;
+    --ac-chip-bg:         #ededf0;
+    --ac-chip-fg:         #333333;
+    --ac-stripe:          rgba(0, 0, 0, .03);
     --ac-shadow-sm: none;
     --ac-shadow-md: none;
     --ac-shadow-lg: none;
@@ -2308,7 +2457,7 @@ input[type="number"] {
   border-color: rgba(52,211,153,0.45);
 }
 .pp-tile-purple {
-  color: #a78bfa;
+  color: var(--ac-violet);
   background:
     radial-gradient(120% 80% at 100% 0%, rgba(167,139,250,0.15) 0%, rgba(167,139,250,0) 65%),
     linear-gradient(180deg, rgba(167,139,250,0.75) 0%, rgba(167,139,250,0.55) 100%);
@@ -3677,7 +3826,7 @@ input[type="number"] {
 .ac-status-pill.sm { font-size: .68rem; padding: 1px 8px; }
 .ac-status-pill.todo   { background: var(--ac-surface-overlay); color: var(--ac-text-primary); }
 .ac-status-pill.doing  { background: rgba(96,165,250,0.14); color: var(--ac-info); }
-.ac-status-pill.review { background: rgba(167,139,250,0.14); color: #a78bfa; }
+.ac-status-pill.review { background: rgba(167,139,250,0.14); color: var(--ac-violet); }
 .ac-status-pill.done   { background: rgba(52,211,153,0.14); color: var(--ac-success); }
 
 /* One-click status control: the three states sit in a pill track — the current
@@ -3696,12 +3845,12 @@ input[type="number"] {
 .ac-status-click-opt:hover { background: var(--ac-surface-hover); box-shadow: none; }
 .ac-status-click-opt.todo:hover   { color: var(--ac-text-primary); }
 .ac-status-click-opt.doing:hover  { color: var(--ac-info); }
-.ac-status-click-opt.review:hover { color: #a78bfa; }
+.ac-status-click-opt.review:hover { color: var(--ac-violet); }
 .ac-status-click-opt.done:hover   { color: var(--ac-success); }
 .ac-status-click-opt.on { background: var(--ac-surface-overlay); box-shadow: inset 0 0 0 1px var(--ac-border-strong); cursor: default; }
 .ac-status-click-opt.todo.on   { color: var(--ac-text-primary); }
 .ac-status-click-opt.doing.on  { color: var(--ac-info); }
-.ac-status-click-opt.review.on { color: #a78bfa; }
+.ac-status-click-opt.review.on { color: var(--ac-violet); }
 .ac-status-click-opt.done.on   { color: var(--ac-success); }
 .ac-status-click.sm .ac-status-click-opt { padding: 2px 7px; font-size: .68rem; }
 
@@ -3717,7 +3866,7 @@ input[type="number"] {
 .ac-status-seg-opt:hover { border-color: var(--ac-text-muted); }
 .ac-status-seg-opt.todo.on   { background: var(--ac-surface-overlay); border-color: var(--ac-border); color: var(--ac-text-primary); }
 .ac-status-seg-opt.doing.on  { background: rgba(96,165,250,0.12); border-color: var(--ac-info); color: var(--ac-info); }
-.ac-status-seg-opt.review.on { background: rgba(167,139,250,0.12); border-color: #a78bfa; color: #a78bfa; }
+.ac-status-seg-opt.review.on { background: rgba(167,139,250,0.12); border-color: var(--ac-violet); color: var(--ac-violet); }
 .ac-status-seg-opt.done.on   { background: rgba(52,211,153,0.12); border-color: var(--ac-success); color: var(--ac-success); }
 
 /* Status filter row (top of task list, all users) */
@@ -3739,7 +3888,7 @@ input[type="number"] {
 .ac-status-filter-opt.on:not(.todo):not(.doing):not(.review):not(.done) { background: var(--ac-primary); } /* All */
 .ac-status-filter-opt.todo.on   { background: var(--ac-surface-overlay); }
 .ac-status-filter-opt.doing.on  { background: var(--ac-info); }
-.ac-status-filter-opt.review.on { background: #a78bfa; }
+.ac-status-filter-opt.review.on { background: var(--ac-violet); }
 .ac-status-filter-opt.done.on   { background: var(--ac-success); }
 
 /* Review decision buttons (assigner, on an in-review task) */
@@ -3751,9 +3900,9 @@ input[type="number"] {
   transition: background .12s ease, color .12s ease;
 }
 .ac-review-btn.accept { border-color: var(--ac-success); color: var(--ac-success); }
-.ac-review-btn.accept:hover { background: var(--ac-success); color: var(--ac-text-on-accent); }
+.ac-review-btn.accept:hover { background: var(--ac-success); color: var(--ac-text-on-status); }
 .ac-review-btn.reject { border-color: var(--ac-danger); color: var(--ac-danger); }
-.ac-review-btn.reject:hover { background: var(--ac-danger); color: var(--ac-text-on-accent); }
+.ac-review-btn.reject:hover { background: var(--ac-danger); color: var(--ac-text-on-status); }
 .ac-review-actions.sm .ac-review-btn { font-size: .66rem; padding: 2px 8px; }
 .ac-view-tabs {
   display: inline-flex; align-items: center; gap: 2px;
@@ -4470,7 +4619,7 @@ body.ac-pdf-capturing .dash-sidebar { display: none !important; }
 .v3-channel-sub { font-size: .74rem; color: var(--ac-text-secondary); }
 
 /* §11 — top live sessions */
-.v3-live-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(244,114,182,0.1); color: #f472b6; font-weight: 800; font-size: .7rem; padding: 5px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: .06em; }
+.v3-live-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(244,114,182,0.1); color: var(--ac-pink); font-weight: 800; font-size: .7rem; padding: 5px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: .06em; }
 .v3-live-meta { font-size: .84rem; color: var(--ac-text-primary); }
 .v3-live-prod { display: inline-flex; align-items: center; font-weight: 600; color: var(--ac-text-primary); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 

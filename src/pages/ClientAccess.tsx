@@ -520,13 +520,13 @@ function ModePill({ active, onClick, icon, title, sub }: {
       className="border rounded text-start px-3 py-2"
       style={{
         flex: 1, minWidth: 200,
-        borderColor: active ? 'var(--ac-primary, #fc6215)' : '#292929',
+        borderColor: active ? 'var(--ac-accent-base)' : 'var(--ac-border)',
         background: active ? 'var(--ac-accent-soft)' : 'var(--ac-surface-raised)',
         cursor: 'pointer',
         transition: 'all .15s',
       }}>
       <div className="d-flex align-items-center gap-2">
-        <i className={`bi ${icon}`} style={{ fontSize: '1.1rem', color: active ? 'var(--ac-primary, #fc6215)' : '#919191' }} />
+        <i className={`bi ${icon}`} style={{ fontSize: '1.1rem', color: active ? 'var(--ac-accent-base)' : 'var(--ac-text-secondary)' }} />
         <strong>{title}</strong>
       </div>
       <div className="text-muted small mt-1">{sub}</div>

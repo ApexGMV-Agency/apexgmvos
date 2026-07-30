@@ -925,7 +925,7 @@ export default function SharedReports() {
                   position: 'relative',
                   background: active ? 'linear-gradient(135deg, #60a5fa, #a78bfa)' : 'var(--ac-surface-raised)',
                   color: active ? 'var(--ac-text-on-accent)' : 'var(--ac-text-primary)',
-                  border: active ? 'none' : '1px solid #292929',
+                  border: active ? 'none' : '1px solid var(--ac-border)',
                   borderRadius: 12,
                   padding: '12px 18px',
                   width: 248,

@@ -6,6 +6,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import './styles.css';
 import App from './App';
 import { AuthProvider } from './auth/AuthContext';
+import { ThemeProvider } from './theme/ThemeContext';
 import { NotificationsProvider } from './notifications/NotificationsContext';
 import { registerSW } from './notifications/swSetup';
 import InstallPrompt from './components/InstallPrompt';
@@ -18,12 +19,14 @@ if (import.meta.env.PROD) registerSW();
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AuthProvider>
-        <NotificationsProvider>
-          <App />
-          <InstallPrompt />
-        </NotificationsProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <NotificationsProvider>
+            <App />
+            <InstallPrompt />
+          </NotificationsProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

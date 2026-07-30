@@ -213,8 +213,8 @@ export default function Resources() {
                   onClick={() => setActiveScope(s.key)}
                   className="border-0 rounded d-inline-flex align-items-center gap-2 px-3 py-2"
                   style={{
-                    background: active ? 'rgba(252, 98, 21,.12)' : '#0f0f0f',
-                    border: active ? '1px solid rgba(252, 98, 21,.55)' : '1px solid #292929',
+                    background: active ? 'var(--ac-accent-soft)' : 'var(--ac-surface-strong)',
+                    border: active ? '1px solid var(--ac-accent-ring)' : '1px solid var(--ac-border)',
                     boxShadow: active ? '0 0 0 1px rgba(252, 98, 21,.25)' : undefined,
                     transition: 'all .12s',
                   }}

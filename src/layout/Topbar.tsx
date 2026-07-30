@@ -2,12 +2,14 @@ import { Button, Dropdown, Badge } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import Avatar from '../components/Avatar';
 import { useAuth } from '../auth/AuthContext';
+import { useTheme } from '../theme/ThemeContext';
 import { useNotifications } from '../notifications/NotificationsContext';
 import { requestNotificationPermission, subscribePush } from '../notifications/swSetup';
 import { useEffect, useState } from 'react';
 
 export default function Topbar({ collapsed, onToggleSidebar }: { collapsed: boolean; onToggleSidebar: () => void }) {
   const { profile, user, signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const { notifications, unreadCount, markRead, markAllRead } = useNotifications();
   const nav = useNavigate();
   const [permission, setPermission] = useState<NotificationPermission>(typeof Notification !== 'undefined' ? Notification.permission : 'default');
@@ -39,6 +41,18 @@ export default function Topbar({ collapsed, onToggleSidebar }: { collapsed: bool
         <div className="fw-semibold">Welcome{profile?.full_name ? `, ${profile.full_name}` : ''}</div>
       </div>
       <div className="d-flex align-items-center gap-2">
+        {/* Icon shows the mode the click switches TO, so it reads as an action. */}
+        <Button
+          variant="light"
+          size="sm"
+          onClick={toggleTheme}
+          aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+          title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+          className="ac-theme-toggle"
+        >
+          <i className={`bi ${theme === 'dark' ? 'bi-sun' : 'bi-moon-stars'}`} />
+        </Button>
+
         <Dropdown align="end">
           <Dropdown.Toggle variant="light" size="sm" id="notif-bell" className="position-relative">
             <i className="bi bi-bell" />

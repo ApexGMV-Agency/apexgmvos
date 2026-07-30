@@ -123,7 +123,7 @@ export default function NotificationsPage() {
                 return (
                   <Card key={n.id} className="shadow-sm"
                     style={{
-                      borderLeft: unread ? `4px solid ${accent}` : '4px solid #292929',
+                      borderLeft: unread ? `4px solid ${accent}` : '4px solid var(--ac-border)',
                       background: unread ? accentSoft : undefined,
                       cursor: n.link ? 'pointer' : 'default',
                     }}
