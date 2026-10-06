@@ -154,12 +154,18 @@
 /* focus products table */
 .ac-sop-table-wrap { overflow-x: auto; background: var(--sop-card); border: 1px solid var(--sop-line); border-radius: 12px; }
 .ac-sop-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-.ac-sop-table th {
-  padding: 11px 14px; text-align: center; white-space: nowrap;
+/* Scoped under .ac-sop-sheet so it out-ranks styles.css's
+   `.ac-themed table thead th` (which sets colour/font for the app's tables). */
+.ac-sop-sheet .ac-sop-table th {
+  padding: 11px 14px; text-align: center; white-space: nowrap; font-family: var(--sop-font); letter-spacing: .03em;
   background: #f6faf7; border-bottom: 1px solid var(--sop-line);
-  font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--sop-text);
+  font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--sop-text);
 }
 .ac-sop-table td { padding: 12px 14px; vertical-align: middle; border-bottom: 1px solid var(--sop-line); }
+/* Product column reads from the start; the data columns stay centred.
+   !important because styles.css centres every `.ac-themed table` th/td with
+   !important — this selector is more specific, so it wins. */
+.ac-sop-table th:first-child, .ac-sop-table td:first-child { text-align: start !important; }
 .ac-sop-table tbody tr:last-child td { border-bottom: 0; }
 .ac-sop-prod-cell { display: flex; align-items: flex-start; gap: 12px; min-width: 260px; }
 .ac-sop-row-num {
@@ -265,6 +271,8 @@
 .ac-sop-rich blockquote { border-left: 3px solid var(--sop-accent); margin: 0 0 .6rem; padding: 2px 0 2px 12px; color: var(--sop-muted); }
 .ac-sop-rich table { border-collapse: collapse; width: 100%; margin: 0 0 .7rem; table-layout: fixed; }
 .ac-sop-rich td, .ac-sop-rich th { border: 1px solid var(--sop-line); padding: 6px 9px; vertical-align: top; }
+/* Written tables read from the start too (styles.css centres .ac-themed cells). */
+.ac-sop-sheet .ac-sop-rich td, .ac-sop-sheet .ac-sop-rich th { text-align: start !important; color: var(--sop-text); }
 .ac-sop-rich .ql-align-center { text-align: center; }
 .ac-sop-rich .ql-align-right { text-align: right; }
 .ac-sop-rich .ql-align-justify { text-align: justify; }
