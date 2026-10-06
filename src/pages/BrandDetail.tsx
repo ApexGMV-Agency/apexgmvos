@@ -10,6 +10,7 @@ import BrandGmvMaxTab from './brand/BrandGmvMaxTab';
 import BrandSamplesTab from './brand/BrandSamplesTab';
 import BrandProductsTab from './brand/BrandProductsTab';
 import BrandBillingTab from './brand/BrandBillingTab';
+import BrandSopTab from './brand/BrandSopTab';
 import Avatar from '../components/Avatar';
 import RegionChip from '../components/RegionChip';
 import { SCOPE_LABEL, SCOPE_ICON } from '../lib/brandScope';
@@ -29,7 +30,7 @@ interface Brand {
   scope: string[] | null;
 }
 
-type TabKey = 'resources' | 'reporting' | 'approvals' | 'gmv-max' | 'samples' | 'products' | 'billing';
+type TabKey = 'resources' | 'sop' | 'reporting' | 'approvals' | 'gmv-max' | 'samples' | 'products' | 'billing';
 
 const TABS: { key: TabKey; label: string; icon: string }[] = [
   { key: 'resources',   label: 'Resources',      icon: 'bi-folder2-open' },
@@ -38,6 +39,7 @@ const TABS: { key: TabKey; label: string; icon: string }[] = [
   { key: 'gmv-max',     label: 'GMV Max',        icon: 'bi-graph-up-arrow' },
   { key: 'samples',     label: 'Sample Seeding', icon: 'bi-box-seam' },
   { key: 'products',    label: 'Products',       icon: 'bi-tags' },
+  { key: 'sop',         label: 'SOP',            icon: 'bi-journal-text' },
   { key: 'billing',     label: 'Billing',        icon: 'bi-cash-coin' },
 ];
 
@@ -332,6 +334,8 @@ export default function BrandDetail() {
   const canEditGmvMax    = (isBob || canManageGmvMax || tlAssigned || amAssigned) && brandActive;
   const canEditSamples   = (isBob || (isApc && assignedToMe) || tlAssigned) && brandActive;
   const canEditProducts   = (isBob || (isApc && assignedToMe) || tlAssigned) && brandActive;
+  // SOP: Bob + the brand's Team Lead write; APC / Ads Manager read (RLS mirrors this).
+  const canEditSop       = (isBob || tlAssigned) && brandActive;
   // Reporting share toggles are Bob-only and require active brand.
   const canEditReporting = isBob && brandActive;
 
@@ -574,6 +578,7 @@ export default function BrandDetail() {
       </Card>
 
       {currentTab === 'resources'   && <BrandResourcesTab brandId={brand.id} brandName={brand.name} canEdit={canEditResources} />}
+      {currentTab === 'sop'         && <BrandSopTab brandId={brand.id} brandName={brand.name} canEdit={canEditSop} />}
       {currentTab === 'reporting'   && <BrandReportingTab brand={brand} isBob={isBob} canEdit={canEditReporting} onShareEnabledChanged={onShareEnabledChanged} />}
       {currentTab === 'approvals'   && <BrandApprovalsTab brandId={brand.id} brandName={brand.name} />}
       {currentTab === 'gmv-max'     && <BrandGmvMaxTab brandId={brand.id} canEdit={canEditGmvMax} currency={brand.currency} />}

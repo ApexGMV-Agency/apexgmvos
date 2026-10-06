@@ -30,6 +30,8 @@ import TeamLeads from './pages/TeamLeads';
 import AdsManagers from './pages/AdsManagers';
 import Bobs from './pages/Bobs';
 import Teams from './pages/Teams';
+import SopsPage from './pages/sops/SopsPage';
+import SharedSop from './pages/sops/SharedSop';
 import { ProtectedRoute } from './auth/ProtectedRoute';
 import { useAuth } from './auth/AuthContext';
 
@@ -50,6 +52,7 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/share/:token" element={<SharedReports />} />
+      <Route path="/sop/:token" element={<SharedSop />} />
       <Route
         path="/"
         element={
@@ -71,6 +74,8 @@ export default function App() {
         <Route path="bobs" element={<ProtectedRoute roles={['bob']}><Bobs /></ProtectedRoute>} />
         <Route path="clients" element={<ProtectedRoute roles={['bob']}><Clients /></ProtectedRoute>} />
         <Route path="client-access" element={<ProtectedRoute roles={['bob']}><ClientAccess /></ProtectedRoute>} />
+        {/* Cross-brand SOP overview — URL only, no sidebar link. */}
+        <Route path="sops" element={<ProtectedRoute roles={['bob', 'apc', 'team_lead', 'ads_manager']}><SopsPage /></ProtectedRoute>} />
         <Route path="resources" element={<ProtectedRoute roles={['bob', 'apc', 'team_lead', 'ads_manager']}><Resources /></ProtectedRoute>} />
         <Route path="budget" element={<Navigate to="/budget/brands" replace />} />
         <Route path="budget/brands" element={<ProtectedRoute roles={['bob']}><BudgetManager /></ProtectedRoute>} />
