@@ -386,6 +386,8 @@ export function normalizeContentV3(raw: any): WeeklyReportContentV3 {
         if (f.auto) continue;
         out[f.key] = (f.format === 'text' || f.format === 'url') ? str(r[f.key]) : numOrNull(r[f.key]);
       }
+      // Top Videos cover image (lib/videoPoster.ts) — not an editable field, kept as-is.
+      if (r.poster_url) { out.poster_url = str(r.poster_url); out.poster_for = str(r.poster_for); }
       return out;
     });
   };

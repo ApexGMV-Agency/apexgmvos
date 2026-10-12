@@ -5,7 +5,8 @@ import {
   LineChart, Line,
 } from 'recharts';
 import DOMPurify from 'dompurify';
-import { MonthlyReportContent, ThisLast } from '../lib/monthlyReportSchema';
+import { MonthlyReportContent, MonthlyTopVideo, ThisLast } from '../lib/monthlyReportSchema';
+import { posterFor } from '../lib/videoPoster';
 import { setReportCurrency, formatMoney } from '../lib/currency';
 import { Comment, CommentSection } from './SectionComments';
 import SectionComments from './SectionComments';
@@ -519,21 +520,32 @@ function CreatorsTable({ rows }: { rows: { username: string; gmv: number }[] }) 
   );
 }
 
-function VideosTable({ rows }: { rows: { username: string; video_url: string; gmv: number }[] }) {
+function VideosTable({ rows }: { rows: MonthlyTopVideo[] }) {
   if (rows.length === 0) return <p className="text-muted small mb-0 px-3 pb-3">No data</p>;
   return (
     <Table size="sm" className="mb-0 align-middle">
       <thead><tr><th className="ps-3">Video</th><th className="text-end pe-3">GMV Generated</th></tr></thead>
-      <tbody>{rows.map((r, i) => (
+      <tbody>{rows.map((r, i) => {
+        const poster = posterFor(r.video_url, r.poster_url, r.poster_for);
+        return (
         <tr key={i}>
           <td className="ps-3 fw-semibold">
-            {r.video_url
-              ? <a href={r.video_url} target="_blank" rel="noreferrer">{r.username || r.video_url}</a>
-              : (r.username || '—')}
+            <div className="d-flex align-items-center gap-2">
+              {poster && (
+                <a className="ac-video-poster-sm" href={r.video_url} target="_blank" rel="noreferrer"
+                   style={{ backgroundImage: `url(${JSON.stringify(poster)})` }} aria-label="Watch on TikTok" />
+              )}
+              <span className="text-break">
+                {r.video_url
+                  ? <a href={r.video_url} target="_blank" rel="noreferrer">{r.username || r.video_url}</a>
+                  : (r.username || '—')}
+              </span>
+            </div>
           </td>
           <td className="text-end pe-3">{formatMoney(r.gmv)}</td>
         </tr>
-      ))}</tbody>
+        );
+      })}</tbody>
     </Table>
   );
 }

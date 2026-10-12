@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 import { fnError } from '../lib/functionError';
 import {
   MonthlyReportContent, emptyMonthlyContent, normalizeMonthlyContent, applyLastMonthFromPrev,
-  emptyMonthlyTopCreator, emptyMonthlyTopVideo, emptyMonthlyProduct,
+  emptyMonthlyTopCreator, emptyMonthlyTopVideo, emptyMonthlyProduct, MonthlyTopVideo,
   ThisLast, RichTextWithImage,
 } from '../lib/monthlyReportSchema';
 import { CustomSection, CustomField, CustomFieldType, StandardSectionId } from '../lib/reportSchema';
@@ -30,6 +30,7 @@ import ImageInput from '../components/ImageInput';
 import { parseMonthlyReportPdf } from '../lib/importMonthlyReport';
 import { useEditLock } from '../lib/useEditLock';
 import { useLiveReportContent } from '../lib/useLiveReportContent';
+import { useVideoPosters, posterFor } from '../lib/videoPoster';
 import EditLockBanner from '../components/EditLockBanner';
 
 const SECTION_LABELS: Record<string, string> = {
@@ -302,6 +303,22 @@ export default function MonthlyReportEdit() {
       g[field] = { ...(g[field] as ThisLast), [side]: n };
       return { ...prev, [group]: g } as MonthlyReportContent;
     });
+  // Top Videos covers: copy each new video link's TikTok poster into storage and
+  // patch it onto the row(s) — the autosave above then persists it.
+  useVideoPosters({
+    pending: [...c.top_videos_this, ...c.top_videos_last]
+      .filter(r => !posterFor(r.video_url, r.poster_url, r.poster_for))
+      .map(r => r.video_url),
+    enabled: !loading && !!report && !lock.isLockedOut && !reloading && brand?.client_status !== 'closed',
+    brandId: report?.brand_id,
+    reportType: 'monthly',
+    onPoster: (link, url) => setC(prev => {
+      const patch = (rows: MonthlyTopVideo[]) => rows.map(r => r.video_url.trim() === link
+        ? { ...r, poster_url: url, poster_for: link } : r);
+      return { ...prev, top_videos_this: patch(prev.top_videos_this), top_videos_last: patch(prev.top_videos_last) };
+    }),
+  });
+
   const setTotalSales = (k: keyof MonthlyReportContent['total_sales'], v: any) =>
     setC(prev => ({ ...prev, total_sales: { ...prev.total_sales, [k]: v } }));
   const setRich = (sec: 'strategy_insights'|'discounting'|'gmv_max_ads'|'paid_collabs'|'ai_content'|'strategy_moving_forward', patch: Partial<RichTextWithImage>) =>
