@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, FormEvent } from 'react';
-import { Button, Card, Modal, Form, Table, Spinner, Alert, Badge, InputGroup } from 'react-bootstrap';
+import { Button, Card, Modal, Form, Table, Spinner, Alert, Badge, InputGroup, OverlayTrigger, Popover } from 'react-bootstrap';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../auth/AuthContext';
 import { resourceIcon } from '../lib/resourceIcon';
@@ -212,6 +212,13 @@ export default function ClientAccess() {
 
   const linkUrl = (token: string) => `${window.location.origin}/share/${token}`;
 
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const copyLink = (l: Link) => {
+    navigator.clipboard.writeText(linkUrl(l.token));
+    setCopiedId(l.id);
+    setTimeout(() => setCopiedId(id => (id === l.id ? null : id)), 1500);
+  };
+
   return (
     <>
       <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
@@ -241,71 +248,95 @@ export default function ClientAccess() {
             : links.length === 0 ? <p className="text-muted text-center mb-0 py-4">No share links yet.</p>
             : filteredLinks.length === 0 ? <p className="text-muted text-center mb-0 py-4">No links match your search.</p>
             : (
-              <Table hover responsive className="align-middle mb-0">
-                <thead><tr>
-                  <th>Label</th><th>Client</th><th>Mode</th><th>Scope</th><th>Includes</th><th>URL</th><th>Status</th><th style={{width:160}}></th>
-                </tr></thead>
-                <tbody>
-                  {filteredLinks.map(l => {
-                    const cl = clientMap.get(l.client_id);
-                    const mode: LinkMode = (l.link_mode as LinkMode) ?? 'brand';
-                    return (
-                      <tr key={l.id}>
-                        <td className="fw-semibold">{l.label || '—'}</td>
-                        <td>{cl?.name ?? '—'}</td>
-                        <td>
-                          {mode === 'general'
-                            ? <Badge bg="dark"><i className="bi bi-folder2-open me-1" />General files</Badge>
-                            : <Badge bg="primary"><i className="bi bi-shop me-1" />Brand</Badge>}
-                        </td>
-                        <td>
-                          {mode === 'general' ? (
-                            <Badge bg="secondary">{l.resource_ids?.length ?? 0} file{(l.resource_ids?.length ?? 0) === 1 ? '' : 's'}</Badge>
-                          ) : (
-                            l.brand_ids.map(id => (
-                              <Badge key={id} bg="info" className="me-1">{brandMap.get(id)?.name ?? '?'}</Badge>
-                            ))
-                          )}
-                        </td>
-                        <td>
-                          {mode === 'general'
-                            ? <Badge bg="warning" text="dark"><i className="bi bi-folder2 me-1" />Files only</Badge>
-                            : (
-                              <>
-                                {l.include_reports !== false && <Badge bg="success" className="me-1"><i className="bi bi-bar-chart me-1" />Weekly</Badge>}
-                                {l.include_monthly_reports === true && <Badge bg="info" className="me-1"><i className="bi bi-calendar-month me-1" />Monthly</Badge>}
-                                {l.include_resources !== false && <Badge bg="warning" text="dark" className="me-1"><i className="bi bi-folder2 me-1" />Resources</Badge>}
-                              </>
+              <div className="ac-share-table-wrap">
+                <Table hover className="ac-share-table align-middle mb-0">
+                  <colgroup>
+                    <col style={{ width: '24%' }} />
+                    <col style={{ width: '24%' }} />
+                    <col style={{ width: 260 }} />
+                    <col style={{ width: '22%' }} />
+                    <col style={{ width: 96 }} />
+                    <col style={{ width: 132 }} />
+                  </colgroup>
+                  <thead><tr>
+                    <th>Link</th><th>Brands</th><th>Includes</th><th>URL</th><th>Status</th><th className="text-end">Actions</th>
+                  </tr></thead>
+                  <tbody>
+                    {filteredLinks.map(l => {
+                      const cl = clientMap.get(l.client_id);
+                      const mode: LinkMode = (l.link_mode as LinkMode) ?? 'brand';
+                      const url = linkUrl(l.token);
+                      return (
+                        <tr key={l.id} className={l.revoked_at ? 'is-revoked' : undefined}>
+                          <td>
+                            <div className="ac-share-label" title={l.label || undefined}>{l.label || '—'}</div>
+                            <div className="ac-share-meta">
+                              <i className={`bi ${mode === 'general' ? 'bi-folder2-open' : 'bi-shop'}`} />
+                              <span>{mode === 'general' ? 'General files' : 'Brand'}</span>
+                              <span className="ac-share-dot">·</span>
+                              <span className="text-truncate">{cl?.name ?? 'No client'}</span>
+                            </div>
+                          </td>
+                          <td>
+                            {mode === 'general' ? (
+                              <span className="ac-chip neutral ac-chip-sm">
+                                <i className="bi bi-files" />
+                                {l.resource_ids?.length ?? 0} file{(l.resource_ids?.length ?? 0) === 1 ? '' : 's'}
+                              </span>
+                            ) : (
+                              <BrandChips names={l.brand_ids.map(id => brandMap.get(id)?.name ?? 'Unknown brand')} />
                             )}
-                        </td>
-                        <td>
-                          <InputGroup size="sm">
-                            <Form.Control readOnly value={linkUrl(l.token)} onFocus={e => (e.target as HTMLInputElement).select()} />
-                            <Button variant="outline-secondary" onClick={() => { navigator.clipboard.writeText(linkUrl(l.token)); }}>
-                              <i className="bi bi-clipboard" />
-                            </Button>
-                            <Button variant="outline-secondary" onClick={() => window.open(linkUrl(l.token), '_blank')}>
-                              <i className="bi bi-box-arrow-up-right" />
-                            </Button>
-                          </InputGroup>
-                        </td>
-                        <td>
-                          {l.revoked_at
-                            ? <Badge bg="danger">Revoked</Badge>
-                            : <Badge bg="success">Active</Badge>}
-                        </td>
-                        <td className="text-end">
-                          <Button size="sm" variant="outline-primary" className="me-2" onClick={() => openEdit(l)}><i className="bi bi-pencil" /></Button>
-                          {l.revoked_at
-                            ? <Button size="sm" variant="outline-success" className="me-2" onClick={() => reactivate(l)}>Reactivate</Button>
-                            : <Button size="sm" variant="outline-warning" className="me-2" onClick={() => revoke(l)}>Revoke</Button>}
-                          <Button size="sm" variant="outline-danger" onClick={() => remove(l)}><i className="bi bi-trash" /></Button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </Table>
+                          </td>
+                          <td>
+                            {mode === 'general' ? (
+                              <div className="ac-share-includes">
+                                <span className="ac-share-inc on"><i className="bi bi-folder2" />Files only</span>
+                              </div>
+                            ) : (
+                              <div className="ac-share-includes">
+                                <IncludeSlot on={l.include_reports !== false} icon="bi-bar-chart" label="Weekly" />
+                                <IncludeSlot on={l.include_monthly_reports === true} icon="bi-calendar-month" label="Monthly" />
+                                <IncludeSlot on={l.include_resources !== false} icon="bi-folder2" label="Files" />
+                              </div>
+                            )}
+                          </td>
+                          <td>
+                            <div className="ac-share-url">
+                              <span className="ac-share-url-text" title={url}>/share/{l.token}</span>
+                              <button type="button" className="ac-share-icon-btn"
+                                title={copiedId === l.id ? 'Copied' : 'Copy link'} onClick={() => copyLink(l)}>
+                                <i className={`bi ${copiedId === l.id ? 'bi-check2' : 'bi-clipboard'}`} />
+                              </button>
+                              <button type="button" className="ac-share-icon-btn" title="Open link"
+                                onClick={() => window.open(url, '_blank')}>
+                                <i className="bi bi-box-arrow-up-right" />
+                              </button>
+                            </div>
+                          </td>
+                          <td>
+                            <span className={`ac-share-status ${l.revoked_at ? 'revoked' : 'active'}`}>
+                              {l.revoked_at ? 'Revoked' : 'Active'}
+                            </span>
+                          </td>
+                          <td>
+                            <div className="ac-share-actions">
+                              <Button size="sm" variant="outline-secondary" title="Edit" onClick={() => openEdit(l)}>
+                                <i className="bi bi-pencil" />
+                              </Button>
+                              {l.revoked_at
+                                ? <Button size="sm" variant="outline-success" title="Reactivate" onClick={() => reactivate(l)}><i className="bi bi-arrow-counterclockwise" /></Button>
+                                : <Button size="sm" variant="outline-warning" title="Revoke" onClick={() => revoke(l)}><i className="bi bi-slash-circle" /></Button>}
+                              <Button size="sm" variant="outline-danger" title="Delete" onClick={() => remove(l)}>
+                                <i className="bi bi-trash" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </Table>
+              </div>
             )}
         </Card.Body>
       </Card>
@@ -510,6 +541,44 @@ function generateToken() {
   const arr = new Uint8Array(24);
   crypto.getRandomValues(arr);
   return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Fixed three-slot "includes" strip: every row renders the same slots so the
+// column lines up; the ones a link leaves out are shown dimmed.
+function IncludeSlot({ on, icon, label }: { on: boolean; icon: string; label: string }) {
+  return (
+    <span className={`ac-share-inc ${on ? 'on' : 'off'}`} title={`${label}: ${on ? 'shared' : 'not shared'}`}>
+      <i className={`bi ${on ? icon : 'bi-dash'}`} />{label}
+    </span>
+  );
+}
+
+// Brand chips capped at a fixed count so a link with many brands keeps the
+// same row height; the overflow lives behind a "+N" popover.
+const MAX_BRAND_CHIPS = 2;
+function BrandChips({ names }: { names: string[] }) {
+  if (names.length === 0) return <span className="text-muted">—</span>;
+  const shown = names.slice(0, MAX_BRAND_CHIPS);
+  const rest = names.length - shown.length;
+  return (
+    <div className="ac-share-brands">
+      {shown.map((n, i) => <span key={i} className="ac-chip ac-chip-sm ac-share-brand" title={n}>{n}</span>)}
+      {rest > 0 && (
+        <OverlayTrigger trigger={['hover', 'focus']} placement="bottom" overlay={
+          <Popover>
+            <Popover.Body className="py-2">
+              <div className="small fw-semibold mb-1">{names.length} brands</div>
+              <div className="ac-chip-group">
+                {names.map((n, i) => <span key={i} className="ac-chip ac-chip-sm">{n}</span>)}
+              </div>
+            </Popover.Body>
+          </Popover>
+        }>
+          <button type="button" className="ac-chip neutral ac-chip-sm ac-share-more">+{rest}</button>
+        </OverlayTrigger>
+      )}
+    </div>
+  );
 }
 
 function ModePill({ active, onClick, icon, title, sub }: {

@@ -4712,3 +4712,72 @@ body.ac-pdf-capturing .dash-sidebar { display: none !important; }
 .v3-offtrend-body { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
 .v3-offtrend-val { font-size: 1.5rem; font-weight: 800; color: var(--ac-text-primary); line-height: 1.15; white-space: nowrap; }
 .v3-offtrend-spark { flex: 1 1 0; min-width: 0; height: 58px; }
+
+/* ── Client Access: share-link table ─────────────────────────────────────
+   Fixed layout + colgroup widths so every row lines up no matter how many
+   brands a link carries (overflow brands collapse into a "+N" chip). */
+.ac-share-table-wrap { overflow-x: auto; }
+.ac-share-table { table-layout: fixed; min-width: 1040px; }
+.ac-share-table th {
+  font-size: .72rem; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--ac-text-secondary); font-weight: 600; white-space: nowrap;
+}
+.ac-share-table td { padding-top: 14px; padding-bottom: 14px; }
+.ac-share-table tr.is-revoked td > * { opacity: .55; }
+.ac-share-table tr.is-revoked td:last-child > *,
+.ac-share-table tr.is-revoked td:nth-last-child(2) > * { opacity: 1; }
+.ac-share-label {
+  font-weight: 600; color: var(--ac-text-primary);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ac-share-meta {
+  display: flex; align-items: center; gap: 5px; min-width: 0;
+  margin-top: 2px; font-size: .78rem; color: var(--ac-text-secondary);
+}
+.ac-share-dot { opacity: .6; }
+.ac-share-brands { display: flex; flex-wrap: nowrap; gap: 6px; min-width: 0; }
+.ac-share-brand { min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; display: inline-block; }
+.ac-share-more { cursor: pointer; flex-shrink: 0; }
+.ac-share-includes { display: flex; gap: 6px; }
+.ac-share-inc {
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  width: 78px; padding: 3px 0; border-radius: var(--ac-radius-pill);
+  font-size: .72rem; font-weight: 600; white-space: nowrap;
+  border: 1px solid transparent;
+}
+.ac-share-includes .ac-share-inc:only-child { width: auto; padding: 3px 10px; }
+.ac-share-inc.on {
+  background: rgba(var(--ac-success-rgb), .1); color: var(--ac-success);
+  border-color: rgba(var(--ac-success-rgb), .22);
+}
+.ac-share-inc.off {
+  color: var(--ac-text-secondary); border-color: var(--ac-border); border-style: dashed;
+  opacity: .7;
+}
+.ac-share-url {
+  display: flex; align-items: center; min-width: 0;
+  border: 1px solid var(--ac-border); border-radius: 8px;
+  background: var(--ac-surface-raised);
+}
+.ac-share-url-text {
+  flex: 1; min-width: 0; padding: 4px 8px;
+  font-family: var(--ac-font-mono); font-size: .74rem; color: var(--ac-text-secondary);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ac-share-icon-btn {
+  flex-shrink: 0; border: 0; border-left: 1px solid var(--ac-border);
+  background: transparent; color: var(--ac-text-secondary);
+  width: 32px; height: 30px; display: inline-flex; align-items: center; justify-content: center;
+}
+.ac-share-icon-btn:hover { background: var(--ac-surface-hover); color: var(--ac-text-primary); }
+.ac-share-status {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .78rem; font-weight: 600;
+}
+.ac-share-status::before {
+  content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor;
+}
+.ac-share-status.active { color: var(--ac-success); }
+.ac-share-status.revoked { color: var(--ac-danger); }
+.ac-share-actions { display: flex; justify-content: flex-end; gap: 6px; white-space: nowrap; }
+.ac-share-actions .btn { width: 32px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
