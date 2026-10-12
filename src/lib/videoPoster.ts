@@ -38,7 +38,9 @@ const failed = new Set<string>();
 async function fetchAndStorePoster(link: string, folder: string): Promise<string> {
   const cached = done.get(link);
   if (cached) return cached;
-  const meta = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(link)}`);
+  // TikTok Shop copies carry ?shop_region=…&shop_id=… — oEmbed only needs the bare video URL.
+  const u = new URL(link);
+  const meta = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(u.origin + u.pathname)}`);
   if (!meta.ok) throw new Error(`oEmbed ${meta.status}`);
   const json = await meta.json().catch(() => null);
   const thumb = json?.thumbnail_url;
