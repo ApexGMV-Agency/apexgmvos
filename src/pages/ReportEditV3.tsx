@@ -17,7 +17,6 @@ import SectionComments, { Comment, CommentSection } from '../components/SectionC
 import { useAuth } from '../auth/AuthContext';
 import { useEditLock } from '../lib/useEditLock';
 import { useLiveReportContent } from '../lib/useLiveReportContent';
-import { useVideoPosters, posterFor } from '../lib/videoPoster';
 import EditLockBanner from '../components/EditLockBanner';
 import RichTextEditor from '../components/RichTextEditor';
 import { CustomSectionInline, CustomSectionDefModal, customSectionsAt, newSection, AddSectionMenu } from '../components/CustomSectionEditor';
@@ -211,22 +210,6 @@ export default function ReportEditV3({ kind = 'weekly' }: { kind?: ReportKind })
     return () => clearTimeout(t);   // debounce: cancel the not-yet-fired timer
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contentKey, lock.isLockedOut, reloading]);
-
-  // Top Videos covers: copy each new video link's TikTok poster into storage and
-  // patch it onto the row — the autosave above then persists it.
-  useVideoPosters({
-    pending: c.top_videos
-      .filter(r => !posterFor(r.video_link, r.poster_url, r.poster_for))
-      .map(r => String(r.video_link ?? '')),
-    enabled: !loading && !!report && !lock.isLockedOut && !reloading && brand?.client_status !== 'closed',
-    brandId: report?.brand_id,
-    reportType: kind,
-    onPoster: (link, url) => setC(prev => ({
-      ...prev,
-      top_videos: prev.top_videos.map(r => String(r.video_link ?? '').trim() === link
-        ? { ...r, poster_url: url, poster_for: link } : r),
-    })),
-  });
 
   // Follow the current editor's autosaved changes live while locked out, so a
   // read-only viewer never has to reload to see the latest data. It stays on

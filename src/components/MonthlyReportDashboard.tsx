@@ -6,7 +6,6 @@ import {
 } from 'recharts';
 import DOMPurify from 'dompurify';
 import { MonthlyReportContent, MonthlyTopVideo, ThisLast } from '../lib/monthlyReportSchema';
-import { posterFor } from '../lib/videoPoster';
 import { setReportCurrency, formatMoney } from '../lib/currency';
 import { Comment, CommentSection } from './SectionComments';
 import SectionComments from './SectionComments';
@@ -525,27 +524,16 @@ function VideosTable({ rows }: { rows: MonthlyTopVideo[] }) {
   return (
     <Table size="sm" className="mb-0 align-middle">
       <thead><tr><th className="ps-3">Video</th><th className="text-end pe-3">GMV Generated</th></tr></thead>
-      <tbody>{rows.map((r, i) => {
-        const poster = posterFor(r.video_url, r.poster_url, r.poster_for);
-        return (
+      <tbody>{rows.map((r, i) => (
         <tr key={i}>
           <td className="ps-3 fw-semibold">
-            <div className="d-flex align-items-center gap-2">
-              {poster && (
-                <a className="ac-video-poster-sm" href={r.video_url} target="_blank" rel="noreferrer"
-                   style={{ backgroundImage: `url(${JSON.stringify(poster)})` }} aria-label="Watch on TikTok" />
-              )}
-              <span className="text-break">
-                {r.video_url
-                  ? <a href={r.video_url} target="_blank" rel="noreferrer">{r.username || r.video_url}</a>
-                  : (r.username || '—')}
-              </span>
-            </div>
+            {r.video_url
+              ? <a href={r.video_url} target="_blank" rel="noreferrer">{r.username || r.video_url}</a>
+              : (r.username || '—')}
           </td>
           <td className="text-end pe-3">{formatMoney(r.gmv)}</td>
         </tr>
-        );
-      })}</tbody>
+      ))}</tbody>
     </Table>
   );
 }

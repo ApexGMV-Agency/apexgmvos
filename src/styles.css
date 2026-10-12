@@ -3592,15 +3592,6 @@ input[type="number"] {
   background: linear-gradient(135deg, var(--ac-surface-strong) 0%, var(--ac-surface-raised) 55%, var(--ac-accent-press) 100%);
   color: var(--ac-text-on-accent); text-decoration: none;
 }
-/* Monthly Top Videos table — small 9:16 cover beside the link */
-.ac-video-poster-sm { flex: 0 0 auto; width: 40px; height: 71px; border-radius: 6px; background: var(--ac-surface-strong) center / cover no-repeat; }
-/* Real TikTok cover (lib/videoPoster.ts). A background, not <img object-fit>, so
-   html2canvas crops it the same way in the PDF. Black scrim = over a photo, not themed. */
-.tp-thumb.has-poster { height: 300px; overflow: hidden; }
-.tp-poster { position: absolute; inset: 0; background: center / cover no-repeat; }
-.tp-thumb.has-poster::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 45%, rgba(0,0,0,0.55) 100%); }
-.tp-thumb.has-poster > :not(.tp-poster) { position: relative; z-index: 1; }
-.tp-thumb.has-poster .tp-rank-badge { position: absolute; }
 .tp-thumb .tp-play { font-size: 2.7rem; opacity: .92; transition: transform .15s ease; }
 .tp-thumb:hover .tp-play { transform: scale(1.08); }
 .tp-rank-badge { position: absolute; top: 10px; left: 10px; color: var(--ac-text-on-accent); font-weight: 800; font-size: .78rem; padding: 3px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 3px; }

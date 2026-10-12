@@ -34,11 +34,7 @@ export interface GMVBreakdownM {
 }
 
 export interface MonthlyTopCreator { username: string; gmv: number; }
-export interface MonthlyTopVideo   {
-  username: string; video_url: string; gmv: number;
-  /** Cover image copied into storage (lib/videoPoster.ts), valid while poster_for === video_url. */
-  poster_url?: string; poster_for?: string;
-}
+export interface MonthlyTopVideo   { username: string; video_url: string; gmv: number; }
 
 export interface VideoPerformanceM {
   product_impressions: ThisLast;
@@ -210,7 +206,6 @@ export function normalizeMonthlyContent(raw: any): MonthlyReportContent {
     .map((r: any) => ({ username: str(r.username), gmv: num(r.gmv) }));
   const topVideo = (r: any): MonthlyTopVideo => ({
     username: str(r.username), video_url: str(r.video_url), gmv: num(r.gmv),
-    ...(r.poster_url ? { poster_url: str(r.poster_url), poster_for: str(r.poster_for) } : {}),
   });
   const top_videos_this: MonthlyTopVideo[] = (Array.isArray(src.top_videos_this) ? src.top_videos_this : [])
     .map(topVideo);

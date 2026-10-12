@@ -10,7 +10,6 @@ import {
 } from '../lib/reportSchemaV3';
 import { setReportCurrency } from '../lib/currency';
 import { sanitizeRich } from '../lib/sanitize';
-import { posterFor } from '../lib/videoPoster';
 import DashSidebar, { DashNavItem } from './report/DashSidebar';
 import SectionComments, { Comment, CommentSection } from './SectionComments';
 import { CustomSectionView } from './ReportDashboardV2';
@@ -637,12 +636,10 @@ function TopVideos({ rows }: { rows: RowData[] }) {
     <div className="row g-3">
       {vs.map((v, i) => {
         const url = String(v.video_link ?? '').trim();
-        const poster = posterFor(v.video_link, v.poster_url, v.poster_for);
         return (
           <div className="col-sm-6 col-lg-4" key={i}>
             <div className={`s14-card h-100 tp-video ${i === 0 ? 'tp-gold' : ''}`}>
-              <a className={`tp-thumb ${poster ? 'has-poster' : ''}`} href={url || undefined} target="_blank" rel="noreferrer" style={{ pointerEvents: url ? 'auto' : 'none' }}>
-                {poster && <span className="tp-poster" style={{ backgroundImage: `url(${JSON.stringify(poster)})` }} />}
+              <a className="tp-thumb" href={url || undefined} target="_blank" rel="noreferrer" style={{ pointerEvents: url ? 'auto' : 'none' }}>
                 <span className="tp-rank-badge" style={{ background: rankColor(i) }}>{rankInner(i)}</span>
                 <span className="tp-thumb-c">
                   <i className="bi bi-play-circle-fill tp-play" />
