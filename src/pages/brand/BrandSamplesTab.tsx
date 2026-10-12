@@ -519,13 +519,13 @@ export default function BrandSamplesTab({ brandId, canEdit, currency }: { brandI
               <KpiTile icon="bi-camera-video" color="var(--ac-info)" label="New Videos" value={totalNewVideos.toLocaleString()} />
             </Col>
             <Col md={6} xl={2}>
-              <KpiTile icon="bi-broadcast" color="#f472b6" label="LIVE" value={totalLiveSessions.toLocaleString()} />
+              <KpiTile icon="bi-broadcast" color="var(--ac-pink)" label="LIVE" value={totalLiveSessions.toLocaleString()} />
             </Col>
             <Col md={6} xl={2}>
               <KpiTile icon="bi-graph-up" color="var(--ac-success)" label="Avg SPS" value={avgSps == null ? '—' : avgSps.toFixed(2)} />
             </Col>
             <Col md={6} xl={2}>
-              <KpiTile icon="bi-calendar-check" color="#a78bfa" label="Days Entered" value={`${daysWithEntry} / ${allDates.length}`} />
+              <KpiTile icon="bi-calendar-check" color="var(--ac-violet)" label="Days Entered" value={`${daysWithEntry} / ${allDates.length}`} />
             </Col>
           </Row>
         </Card.Body>
@@ -638,7 +638,7 @@ export default function BrandSamplesTab({ brandId, canEdit, currency }: { brandI
                   <tr key={date}
                       style={{
                         cursor: canEdit ? 'pointer' : 'default',
-                        backgroundColor: weekend ? 'rgba(252, 98, 21, 0.05)' : undefined,
+                        backgroundColor: weekend ? 'rgba(var(--ac-accent-rgb),  0.05)' : undefined,
                       }}>
                     <td className="fw-semibold" onClick={() => canEdit && openEditDay(date)}>
                       {new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' })}
@@ -1153,7 +1153,7 @@ e.g.
 // =====================================================================
 
 export function GoalProgressTile({ approved, goal, pct }: { approved: number; goal: number; pct: number }) {
-  const color = pct >= 100 ? '#34d399' : pct >= 75 ? '#fc6215' : pct >= 40 ? '#fb923c' : '#f87171';
+  const color = pct >= 100 ? 'var(--ac-success)' : pct >= 75 ? '#fc6215' : pct >= 40 ? '#fb923c' : 'var(--ac-danger)';
   return (
     <div className="p-3 rounded h-100 position-relative" style={{
       background: 'linear-gradient(135deg, var(--ac-accent-soft) 0%, var(--ac-accent-soft) 100%)',
@@ -1171,7 +1171,7 @@ export function GoalProgressTile({ approved, goal, pct }: { approved: number; go
           className="d-flex align-items-center justify-content-center rounded-circle text-white fw-bold"
           style={{
             width: 56, height: 56, fontSize: '1rem',
-            background: `conic-gradient(${color} ${pct}%, rgba(0,0,0,0.06) ${pct}% 100%)`,
+            background: `conic-gradient(${color} ${pct}%, var(--ac-surface-hover) ${pct}% 100%)`,
           }}
         >
           <div className="bg-white rounded-circle d-flex align-items-center justify-content-center"
@@ -1183,7 +1183,7 @@ export function GoalProgressTile({ approved, goal, pct }: { approved: number; go
       <div className="mt-3 position-relative" style={{ height: 14, borderRadius: 999, background: 'var(--ac-surface-hover)', overflow: 'hidden' }}>
         <div style={{
           width: `${pct}%`, height: '100%',
-          background: `linear-gradient(90deg, ${color} 0%, ${color}cc 100%)`,
+          background: `linear-gradient(90deg, ${color} 0%, color-mix(in srgb, ${color} 80%, transparent) 100%)`,
           transition: 'width .4s ease',
         }} />
       </div>
@@ -1198,12 +1198,12 @@ export function GoalProgressTile({ approved, goal, pct }: { approved: number; go
 export function KpiTile({ icon, color, label, value }: { icon: string; color: string; label: string; value: string }) {
   return (
     <div className="p-3 rounded h-100 d-flex align-items-center gap-3" style={{
-      background: `linear-gradient(135deg, ${color}1a 0%, ${color}0d 100%)`,
-      border: `1px solid ${color}33`,
+      background: `linear-gradient(135deg, color-mix(in srgb, ${color} 10%, transparent) 0%, color-mix(in srgb, ${color} 5%, transparent) 100%)`,
+      border: `1px solid color-mix(in srgb, ${color} 20%, transparent)`,
     }}>
       <div
-        className="d-flex align-items-center justify-content-center rounded text-white flex-shrink-0"
-        style={{ width: 44, height: 44, backgroundColor: color }}
+        className="d-flex align-items-center justify-content-center rounded flex-shrink-0"
+        style={{ width: 44, height: 44, backgroundColor: color, color: 'var(--ac-text-on-status)' }}
       >
         <i className={`bi ${icon}`} style={{ fontSize: '1.2rem' }} />
       </div>
@@ -1220,14 +1220,14 @@ export function KpiTile({ icon, color, label, value }: { icon: string; color: st
 // =====================================================================
 
 export function ProductProgressBar({ pct, approved, goal }: { pct: number; approved: number; goal: number }) {
-  const color = pct >= 100 ? '#34d399' : pct >= 75 ? '#fc6215' : pct >= 40 ? '#fb923c' : '#f87171';
+  const color = pct >= 100 ? 'var(--ac-success)' : pct >= 75 ? '#fc6215' : pct >= 40 ? '#fb923c' : 'var(--ac-danger)';
   return (
     <div className="d-flex align-items-center gap-2">
       <div className="position-relative flex-grow-1"
         style={{ height: 14, borderRadius: 999, background: 'var(--ac-surface-hover)', overflow: 'hidden', minWidth: 120 }}>
         <div style={{
           width: `${pct}%`, height: '100%',
-          background: `linear-gradient(90deg, ${color} 0%, ${color}cc 100%)`,
+          background: `linear-gradient(90deg, ${color} 0%, color-mix(in srgb, ${color} 80%, transparent) 100%)`,
           transition: 'width .3s ease',
         }} />
       </div>

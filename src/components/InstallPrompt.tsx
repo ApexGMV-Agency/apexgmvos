@@ -40,7 +40,7 @@ export default function InstallPrompt() {
     position: 'fixed', left: '50%', bottom: 18, transform: 'translateX(-50%)', zIndex: 1090,
     display: 'flex', alignItems: 'center', gap: 12, width: 'calc(100% - 24px)', maxWidth: 440,
     background: 'var(--ac-surface-raised)', border: '1px solid var(--ac-border)', borderRadius: 14, padding: '12px 14px',
-    boxShadow: '0 14px 38px rgba(0,0,0,.65)',
+    boxShadow: '0 14px 38px rgba(var(--ac-shadow-rgb), calc(.65 * var(--ac-shadow-a)))',
   };
 
   return (

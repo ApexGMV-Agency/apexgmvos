@@ -7,8 +7,8 @@ function tiktokLink(handle: string): string {
 }
 const num = (v: any): number | null => { const n = Number(v); return Number.isFinite(n) ? n : null; };
 const MEDAL = ['#fbbf24', '#919191', '#cd7f32']; // gold / silver / bronze
-const AVATAR_BG = ['#fff1e9', '#eef2ff', '#ecfdf5'];
-const AVATAR_FG = ['#c5640f', '#4f46e5', '#0f766e'];
+const AVATAR_BG = ['var(--ac-accent-soft)', 'var(--ac-info-soft)', 'var(--ac-success-soft)'];
+const AVATAR_FG = ['var(--ac-accent-text)', 'var(--ac-info)', 'var(--ac-success)'];
 function initials(name: string): string {
   const clean = name.replace(/^@+/, '').trim();
   if (!clean) return '?';

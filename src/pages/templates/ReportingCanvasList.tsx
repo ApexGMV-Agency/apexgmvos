@@ -12,7 +12,7 @@ import {
 const KIND_META: Record<ReportKind, { label: string; color: string; icon: string }> = {
   weekly:  { label: 'Weekly',  color: 'var(--ac-info)', icon: 'bi-calendar-week' },
   monthly: { label: 'Monthly', color: 'var(--ac-success)', icon: 'bi-calendar-month' },
-  custom:  { label: 'Custom',  color: '#a78bfa', icon: 'bi-stars' },
+  custom:  { label: 'Custom',  color: 'var(--ac-violet)', icon: 'bi-stars' },
 };
 
 export default function ReportingCanvasList() {
@@ -165,7 +165,7 @@ export default function ReportingCanvasList() {
                   role="button"
                   onClick={() => nav(`/templates/${t.id}`)}
                   style={{ cursor: 'pointer', transition: 'transform .15s, box-shadow .15s' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(0,0,0,.5)'; }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(var(--ac-shadow-rgb), calc(.5 * var(--ac-shadow-a)))'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; (e.currentTarget as HTMLElement).style.boxShadow = ''; }}
                 >
                   <Card.Body className="d-flex flex-column">

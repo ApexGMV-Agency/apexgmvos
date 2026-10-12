@@ -26,7 +26,7 @@ const CLIENT_HIDE = new Set<string>([]);
 // numv() coerces to 0 for sums / chart values where a real number is required.
 const num = (v: any): number | null => { if (v == null || v === '') return null; const n = Number(v); return Number.isFinite(n) ? n : null; };
 const numv = (v: any): number => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
-const PIE = ['#fc6215', '#60a5fa', '#34d399', '#a78bfa', '#fbbf24', '#f87171'];
+const PIE = ['#fc6215', 'var(--ac-info)', 'var(--ac-success)', 'var(--ac-violet)', 'var(--ac-warning)', 'var(--ac-danger)'];
 
 function fmtPct(p: number): string {
   const a = Math.abs(p);
@@ -120,7 +120,7 @@ function TileGrid({ def, data, prev, skip, col }: {
 }
 
 // ---- ss2 · Shop Health semicircle gauge ------------------------------------
-function spsColor(v: number) { return v >= 4.5 ? '#34d399' : v >= 3.5 ? '#fc6215' : '#f87171'; }
+function spsColor(v: number) { return v >= 4.5 ? 'var(--ac-success)' : v >= 3.5 ? '#fc6215' : 'var(--ac-danger)'; }
 function spsLabel(v: number) { return v >= 4.5 ? 'Excellent' : v >= 3.5 ? 'Healthy' : 'Needs attention'; }
 
 function ShopHealthGauge({ score, ranking, prevRanking }: {
@@ -128,7 +128,7 @@ function ShopHealthGauge({ score, ranking, prevRanking }: {
 }) {
   const s = score;
   const arc = s == null ? [{ v: 0 }, { v: 5 }] : [{ v: s }, { v: Math.max(0, 5 - s) }];
-  const color = s == null ? '#919191' : spsColor(s);
+  const color = s == null ? 'var(--ac-text-secondary)' : spsColor(s);
   const rankDelta = (ranking != null && prevRanking != null) ? prevRanking - ranking : null; // rank up = improvement
   return (
     <div className="s14-card h-100 v3-gauge-card">
@@ -200,7 +200,7 @@ function WowCombo({ data }: { data: WowPoint[] }) {
       <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
         <div className="s14-kpi-label">GMV &amp; Orders · last {data.length} weeks</div>
         <div className="d-flex gap-3 align-items-center">
-          <span className="ac-legend-dot" style={{ '--c': '#c9ced9' } as any}>Orders</span>
+          <span className="ac-legend-dot" style={{ '--c': 'var(--ac-text-secondary)' } as any}>Orders</span>
           <span className="ac-legend-dot" style={{ '--c': '#fc6215' } as any}>GMV</span>
           <span className="v3-live-legend"><span className="v3-live-pulse" />This week</span>
         </div>
@@ -213,8 +213,8 @@ function WowCombo({ data }: { data: WowPoint[] }) {
             <YAxis yAxisId="o" tick={{ fontSize: 11, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false} width={40} />
             <YAxis yAxisId="g" orientation="right" tick={{ fontSize: 11, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false}
               width={52} tickFormatter={(v: number) => formatValue('currency', v, { compact: true })} />
-            <Tooltip cursor={{ fill: 'rgba(252,98,21,.06)' }}
-              contentStyle={{ borderRadius: 12, border: '1px solid var(--ac-border)', boxShadow: '0 10px 28px rgba(0,0,0,.55)', fontSize: 13 }}
+            <Tooltip cursor={{ fill: 'rgba(var(--ac-accent-rgb), .06)' }}
+              contentStyle={{ borderRadius: 12, border: '1px solid var(--ac-border)', boxShadow: '0 10px 28px rgba(var(--ac-shadow-rgb), calc(.55 * var(--ac-shadow-a)))', fontSize: 13 }}
               formatter={(v: any, n: any) => n === 'GMV' ? [formatValue('currency', Number(v)), 'GMV'] : [formatValue('number', Number(v)), 'Orders']} />
             <Bar yAxisId="o" dataKey="orders" name="Orders" fill="var(--ac-text-secondary)" radius={[6, 6, 0, 0]} maxBarSize={44} />
             <Line yAxisId="g" type="monotone" dataKey="gmv" name="GMV" stroke="var(--ac-accent-base)" strokeWidth={3}
@@ -241,7 +241,7 @@ function SamplesLineChart({ data }: { data: { label: string; samples: number | n
         <div className="s14-kpi-label">Samples &amp; videos · last {data.length} weeks</div>
         <div className="d-flex gap-3 align-items-center">
           <span className="ac-legend-dot" style={{ '--c': '#fc6215' } as any}>Samples</span>
-          <span className="ac-legend-dot" style={{ '--c': '#60a5fa' } as any}>Videos</span>
+          <span className="ac-legend-dot" style={{ '--c': 'var(--ac-info)' } as any}>Videos</span>
           <span className="v3-live-legend"><span className="v3-live-pulse" />This week</span>
         </div>
       </div>
@@ -251,11 +251,11 @@ function SamplesLineChart({ data }: { data: { label: string; samples: number | n
             <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="var(--ac-border)" />
             <XAxis dataKey="label" tick={{ fontSize: 12, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={{ stroke: 'var(--ac-border)' }} />
             <YAxis tick={{ fontSize: 11, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false} width={36} allowDecimals={false} />
-            <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid var(--ac-border)', boxShadow: '0 10px 28px rgba(0,0,0,.55)', fontSize: 13 }} />
+            <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid var(--ac-border)', boxShadow: '0 10px 28px rgba(var(--ac-shadow-rgb), calc(.55 * var(--ac-shadow-a)))', fontSize: 13 }} />
             <Line type="monotone" dataKey="samples" name="Samples" stroke="var(--ac-accent-base)" strokeWidth={3} dot={makeDot(lastIdx, '#fc6215')} activeDot={{ r: 6 }} isAnimationActive={false} connectNulls>
               <LabelList dataKey="samples" position="top" offset={12} formatter={numLabel} style={{ fontSize: 11, fontWeight: 700, fill: 'var(--ac-accent-base)' }} />
             </Line>
-            <Line type="monotone" dataKey="videos" name="Videos" stroke="var(--ac-info)" strokeWidth={3} dot={makeDot(lastIdx, '#60a5fa')} activeDot={{ r: 6 }} isAnimationActive={false} connectNulls>
+            <Line type="monotone" dataKey="videos" name="Videos" stroke="var(--ac-info)" strokeWidth={3} dot={makeDot(lastIdx, 'var(--ac-info)')} activeDot={{ r: 6 }} isAnimationActive={false} connectNulls>
               <LabelList dataKey="videos" position="bottom" offset={12} formatter={numLabel} style={{ fontSize: 11, fontWeight: 700, fill: 'var(--ac-info)' }} />
             </Line>
           </ComposedChart>
@@ -273,8 +273,8 @@ function SamplesLineChart({ data }: { data: { label: string; samples: number | n
 export type AffPoint = { label: string; affiliate_gmv: number | null; live_sessions: number | null; contacted_creators: number | null };
 const AFF_LINES: { key: keyof AffPoint; name: string; color: string; axis: 'n' | 'g'; fmt: 'currency' | 'number'; pos: 'top' | 'bottom' }[] = [
   { key: 'affiliate_gmv', name: 'Affiliate GMV', color: 'var(--ac-accent-base)', axis: 'g', fmt: 'currency', pos: 'top' },
-  { key: 'contacted_creators', name: 'Contacted Creators', color: '#22d3ee', axis: 'n', fmt: 'number', pos: 'top' },
-  { key: 'live_sessions', name: 'LIVE Sessions', color: '#a78bfa', axis: 'n', fmt: 'number', pos: 'bottom' },
+  { key: 'contacted_creators', name: 'Contacted Creators', color: 'var(--ac-cyan)', axis: 'n', fmt: 'number', pos: 'top' },
+  { key: 'live_sessions', name: 'LIVE Sessions', color: 'var(--ac-violet)', axis: 'n', fmt: 'number', pos: 'bottom' },
 ];
 function AffiliateTrend({ data }: { data: AffPoint[] }) {
   if (data.filter(d => AFF_LINES.some(l => d[l.key] != null)).length < 2) return null;
@@ -298,7 +298,7 @@ function AffiliateTrend({ data }: { data: AffPoint[] }) {
             <YAxis yAxisId="n" tick={{ fontSize: 11, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false} width={34} allowDecimals={false} />
             <YAxis yAxisId="g" orientation="right" tick={{ fontSize: 11, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false}
               width={50} tickFormatter={(v: number) => formatValue('currency', v, { compact: true })} />
-            <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid var(--ac-border)', boxShadow: '0 10px 28px rgba(0,0,0,.55)', fontSize: 13 }}
+            <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid var(--ac-border)', boxShadow: '0 10px 28px rgba(var(--ac-shadow-rgb), calc(.55 * var(--ac-shadow-a)))', fontSize: 13 }}
               formatter={(v: any, n: any) => { const l = AFF_LINES.find(x => x.name === n); return [formatValue(l?.fmt ?? 'number', Number(v)), n]; }} />
             {AFF_LINES.map(l => (
               <Line key={String(l.key)} yAxisId={l.axis} type="monotone" dataKey={l.key as string} name={l.name} stroke={l.color} strokeWidth={3}
@@ -346,7 +346,7 @@ function OffsiteTrend({ data }: { data: OffPoint[] }) {
               width={50} tickFormatter={(v: number) => formatValue('currency', v, { compact: true })} />
             <YAxis yAxisId="p" orientation="right" tick={{ fontSize: 11, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false}
               width={44} tickFormatter={(v: number) => formatValue('percent', v)} />
-            <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid var(--ac-border)', boxShadow: '0 10px 28px rgba(0,0,0,.55)', fontSize: 13 }}
+            <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid var(--ac-border)', boxShadow: '0 10px 28px rgba(var(--ac-shadow-rgb), calc(.55 * var(--ac-shadow-a)))', fontSize: 13 }}
               formatter={(v: any, n: any) => { const l = OFF_LINES.find(x => x.name === n); return [formatValue(l?.fmt ?? 'currency', Number(v)), n]; }} />
             {OFF_LINES.map(l => (
               <Line key={String(l.key)} yAxisId={l.axis} type="monotone" dataKey={l.key as string} name={l.name} stroke={l.color} strokeWidth={3}
@@ -685,7 +685,7 @@ function ChannelPair({ def, rows, prevRows }: { def: SectionDefV3; rows: RowData
   const find = (arr: RowData[], ch: string) => arr.find(r => String(r.channel) === ch) ?? {};
   const META: Record<string, { icon: string; color: string; sub: string }> = {
     Video: { icon: 'bi-play-btn-fill', color: 'var(--ac-info)', sub: 'Short-form video' },
-    LIVE: { icon: 'bi-broadcast', color: '#f472b6', sub: 'LIVE selling' },
+    LIVE: { icon: 'bi-broadcast', color: 'var(--ac-pink)', sub: 'LIVE selling' },
   };
   return (
     <div className="row g-3">
@@ -718,7 +718,7 @@ const GMX_METRICS: { key: keyof Omit<GmvMaxPoint, 'label'>; label: string; color
   { key: 'revenue', label: 'Gross Revenue', color: 'var(--ac-success)', kind: 'currency' },
   { key: 'ad_spend', label: 'Ad Spend', color: 'var(--ac-text-secondary)', kind: 'currency' },
   { key: 'roas', label: 'Blended ROAS', color: 'var(--ac-accent-base)', kind: 'roas' },
-  { key: 'cpo', label: 'Blended CPO', color: '#a78bfa', kind: 'cpo' },
+  { key: 'cpo', label: 'Blended CPO', color: 'var(--ac-violet)', kind: 'cpo' },
 ];
 function fmtGmx(kind: 'currency' | 'roas' | 'cpo', v: number | null, compact = false): string {
   if (v == null) return '—';
@@ -778,7 +778,7 @@ function GmvMaxViz({ rows, series }: { rows: RowData[]; series?: GmvMaxPoint[] }
                 <XAxis dataKey="label" tick={{ fontSize: 12, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={{ stroke: 'var(--ac-border)' }} />
                 <YAxis tick={{ fontSize: 11, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false} width={52}
                   tickFormatter={(v: number) => fmtGmx(active.kind, v, true)} />
-                <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid var(--ac-border)', boxShadow: '0 10px 28px rgba(0,0,0,.55)', fontSize: 13 }}
+                <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid var(--ac-border)', boxShadow: '0 10px 28px rgba(var(--ac-shadow-rgb), calc(.55 * var(--ac-shadow-a)))', fontSize: 13 }}
                   formatter={(v: any) => [fmtGmx(active.kind, Number(v)), active.label]} />
                 <Line type="monotone" dataKey={active.key as string} name={active.label} stroke={active.color} strokeWidth={3}
                   dot={makeDot(lastIdx, active.color)} activeDot={{ r: 6 }} isAnimationActive={false} connectNulls>
@@ -795,8 +795,8 @@ function GmvMaxViz({ rows, series }: { rows: RowData[]; series?: GmvMaxPoint[] }
           <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
             <div className="s14-kpi-label">Ad spend vs gross revenue by product</div>
             <div className="d-flex gap-3">
-              <span className="ac-legend-dot" style={{ '--c': '#c9ced9' } as any}>Cost</span>
-              <span className="ac-legend-dot" style={{ '--c': '#34d399' } as any}>Revenue</span>
+              <span className="ac-legend-dot" style={{ '--c': 'var(--ac-text-secondary)' } as any}>Cost</span>
+              <span className="ac-legend-dot" style={{ '--c': 'var(--ac-success)' } as any}>Revenue</span>
             </div>
           </div>
           <div style={{ height: 240 }}>
@@ -824,9 +824,9 @@ const NAV_ICON: Record<string, string> = {
   top_videos: 'bi-play-btn-fill', top_lives: 'bi-broadcast', gmv_max: 'bi-cash-stack',
 };
 const SECTION_ACCENT: Record<string, string> = {
-  sampling: 'var(--ac-accent-base)', overall: 'var(--ac-accent-base)', product_analytics: '#60a5fa', product_traffic: '#22d3ee',
-  traffic_analysis: '#22d3ee', channel_analytics: '#a78bfa', offsite: '#22d3ee', affiliate: 'var(--ac-success)',
-  top_creators: '#fc6215', top_videos: '#60a5fa', top_lives: '#f472b6', gmv_max: '#a78bfa',
+  sampling: 'var(--ac-accent-base)', overall: 'var(--ac-accent-base)', product_analytics: 'var(--ac-info)', product_traffic: 'var(--ac-cyan)',
+  traffic_analysis: 'var(--ac-cyan)', channel_analytics: 'var(--ac-violet)', offsite: 'var(--ac-cyan)', affiliate: 'var(--ac-success)',
+  top_creators: '#fc6215', top_videos: 'var(--ac-info)', top_lives: 'var(--ac-pink)', gmv_max: 'var(--ac-violet)',
 };
 
 export default function ReportDashboardV3({
@@ -990,7 +990,7 @@ export default function ReportDashboardV3({
         const gmv = numv(data?.gmv);
         const attr: Slice[] = [
           { label: 'Seller LIVE', value: numv(data?.seller_live_gmv), color: 'var(--ac-info)' },
-          { label: 'Seller Video', value: numv(data?.seller_video_gmv), color: '#a78bfa' },
+          { label: 'Seller Video', value: numv(data?.seller_video_gmv), color: 'var(--ac-violet)' },
           { label: 'Creator', value: numv(data?.creator_gmv), color: 'var(--ac-success)' },
         ];
         const sumAttr = attr.reduce((a, b) => a + b.value, 0);
@@ -1094,7 +1094,7 @@ export default function ReportDashboardV3({
 
         {insightsText && (
           <section className="s14-section" data-section="insights">
-            <SectionTitle title="Insights" sub="This week in words" color="#22d3ee" fb={<FeedbackIcon section="insights" />} />
+            <SectionTitle title="Insights" sub="This week in words" color="var(--ac-cyan)" fb={<FeedbackIcon section="insights" />} />
             <div className="s14-card"><div className="ac-rte-view" dangerouslySetInnerHTML={{ __html: sanitizeRich(c.insights.summary) }} /></div>
           </section>
         )}

@@ -68,7 +68,9 @@ export default function MonthlyReportView() {
     await new Promise<void>(r => requestAnimationFrame(() => requestAnimationFrame(() => r())));
     try {
       const canvas = await html2canvas(el, {
-        scale: 2, useCORS: true, backgroundColor: 'var(--ac-surface-raised)',
+        scale: 2, useCORS: true,
+        // html2canvas can't parse var(), so hand it the resolved token value.
+        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--ac-surface-raised').trim(),
         windowWidth: captureWidth, width: captureWidth, scrollX: 0, scrollY: 0,
       });
       const PX_TO_MM = 25.4 / 96;

@@ -40,7 +40,7 @@ export function showToast(message: string) {
         position: 'fixed', left: '50%', bottom: '28px', zIndex: '99999',
         background: 'var(--ac-surface-raised)', color: 'var(--ac-text-primary)', padding: '10px 18px', borderRadius: '999px',
         fontSize: '13px', fontWeight: '700', fontFamily: 'inherit',
-        boxShadow: '0 12px 36px rgba(0,0,0,.7)', display: 'inline-flex', alignItems: 'center',
+        boxShadow: '0 12px 36px rgba(var(--ac-shadow-rgb), calc(.7 * var(--ac-shadow-a)))', display: 'inline-flex', alignItems: 'center',
         gap: '8px', pointerEvents: 'none', transition: 'opacity .18s ease, transform .18s ease',
       } as Partial<CSSStyleDeclaration>);
       document.body.appendChild(el);

@@ -935,7 +935,7 @@ export default function SharedReports() {
                   overflow: 'visible',
                   textAlign: 'left',
                   cursor: 'pointer',
-                  boxShadow: active ? '0 8px 20px rgba(37,99,235,.25)' : 'none',
+                  boxShadow: active ? '0 8px 20px rgba(var(--ac-info-rgb), .25)' : 'none',
                   transition: 'all .15s',
                 }}
               >
@@ -1026,7 +1026,7 @@ export default function SharedReports() {
                               className="h-100 shadow-sm report-card"
                               style={{ cursor: 'pointer', borderLeft: '4px solid var(--ac-info)', transition: 'transform .15s, box-shadow .15s' }}
                               onClick={() => setOpenId(r.id)}
-                              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(0,0,0,.5)'; }}
+                              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(var(--ac-shadow-rgb), calc(.5 * var(--ac-shadow-a)))'; }}
                               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; (e.currentTarget as HTMLElement).style.boxShadow = ''; }}
                             >
                               <Card.Body>
@@ -1117,7 +1117,7 @@ export default function SharedReports() {
                                     className="h-100 shadow-sm report-card"
                                     style={{ cursor: 'pointer', borderLeft: '4px solid var(--ac-success)', transition: 'transform .15s, box-shadow .15s' }}
                                     onClick={() => setOpenMonthlyId(r.id)}
-                                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(0,0,0,.5)'; }}
+                                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(var(--ac-shadow-rgb), calc(.5 * var(--ac-shadow-a)))'; }}
                                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; (e.currentTarget as HTMLElement).style.boxShadow = ''; }}
                                   >
                                     <Card.Body>
@@ -1192,7 +1192,7 @@ export default function SharedReports() {
                       {approvalsForBrand.map(({ decision: d, reportType, reportId, periodLabel, monthKey, approvalHtml }) => {
                         const state: 'pending' | 'approved' | 'changes' =
                           !d ? 'pending' : d.decision === 'approved' ? 'approved' : 'changes';
-                        const color = state === 'approved' ? '#34d399' : state === 'changes' ? '#d97706' : '#f87171';
+                        const color = state === 'approved' ? 'var(--ac-success)' : state === 'changes' ? 'var(--ac-warning)' : 'var(--ac-danger)';
                         const icon = state === 'approved' ? 'bi-check-circle-fill'
                           : state === 'changes' ? 'bi-arrow-repeat' : 'bi-shield-exclamation';
                         return (
@@ -1214,11 +1214,11 @@ export default function SharedReports() {
                             window.scrollTo({ top: 0 });
                           }}
                           onKeyDown={e => { if (e.key === 'Enter') (e.currentTarget as HTMLElement).click(); }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(0,0,0,.5)'; }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(var(--ac-shadow-rgb), calc(.5 * var(--ac-shadow-a)))'; }}
                           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; (e.currentTarget as HTMLElement).style.boxShadow = ''; }}
                         >
                           <div style={{
-                            width: 44, height: 44, borderRadius: 10, background: `${color}15`,
+                            width: 44, height: 44, borderRadius: 10, background: `color-mix(in srgb, ${color} 8%, transparent)`,
                             display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                           }}>
                             <i className={`bi ${icon}`} style={{ color, fontSize: '1.3rem' }} />
@@ -1334,7 +1334,7 @@ export default function SharedReports() {
                               onMouseEnter={e => {
                                 const el = e.currentTarget as HTMLElement;
                                 el.style.transform = 'translateY(-2px)';
-                                el.style.boxShadow = '0 10px 25px rgba(0,0,0,.5)';
+                                el.style.boxShadow = '0 10px 25px rgba(var(--ac-shadow-rgb), calc(.5 * var(--ac-shadow-a)))';
                                 el.style.borderColor = ic.color;
                               }}
                               onMouseLeave={e => {
@@ -1524,7 +1524,7 @@ function MonthQuickPicks({ month, setMonth, monthsWithData }: {
           >
             <i className="bi bi-calendar3 me-1" />
             {fmtShort(ym)}
-            {has && <span className="ms-1" style={{ color: active ? 'var(--ac-text-on-accent)' : '#34d399' }}>●</span>}
+            {has && <span className="ms-1" style={{ color: active ? 'var(--ac-text-on-accent)' : 'var(--ac-success)' }}>●</span>}
           </Button>
         );
       })}

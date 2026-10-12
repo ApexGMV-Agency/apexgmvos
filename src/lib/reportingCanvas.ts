@@ -385,7 +385,7 @@ const presetKpiGrid = (xPct: number, y: number) => [
   },
   {
     type: 'kpi' as BlockType,
-    props: { label: 'Units sold', value: '', metric_key: 'units_sold', color: '#a78bfa', bg: 'rgba(167,139,250,.14)' },
+    props: { label: 'Units sold', value: '', metric_key: 'units_sold', color: 'var(--ac-violet)', bg: 'rgba(var(--ac-violet-rgb), .14)' },
     layout: { x: xPct + 75 > 100 - 24 ? 100 - 24 : xPct + 75, y, w: 24, h: 110 },
   },
 ];

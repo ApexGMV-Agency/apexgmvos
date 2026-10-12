@@ -7,9 +7,9 @@ const TYPE_META: Record<string, { icon: string; color: string; label: string }> 
   chat:            { icon: 'bi-chat-dots-fill',      color: 'var(--ac-info)', label: 'Message' },
   staff_comment:   { icon: 'bi-chat-left-text-fill', color: 'var(--ac-accent-base)', label: 'Team reply' },
   client_comment:  { icon: 'bi-chat-left-text-fill', color: 'var(--ac-success)', label: 'Client comment' },
-  announcement:    { icon: 'bi-megaphone-fill',      color: '#a78bfa', label: 'Announcement' },
-  task:            { icon: 'bi-check2-square',        color: '#22d3ee', label: 'Task' },
-  report_review:   { icon: 'bi-clipboard-check-fill', color: '#22d3ee', label: 'Report' },
+  announcement:    { icon: 'bi-megaphone-fill',      color: 'var(--ac-violet)', label: 'Announcement' },
+  task:            { icon: 'bi-check2-square',        color: 'var(--ac-cyan)', label: 'Task' },
+  report_review:   { icon: 'bi-clipboard-check-fill', color: 'var(--ac-cyan)', label: 'Report' },
 };
 const DEFAULT_META = { icon: 'bi-bell-fill', color: 'var(--ac-text-secondary)', label: 'Notification' };
 const metaFor = (t: string) => TYPE_META[t] ?? DEFAULT_META;
@@ -57,7 +57,7 @@ export default function NotificationToaster() {
         <span className="ac-toast-accent" style={{ background: meta.color }} />
         <div className="ac-toast-main">
           <div className="ac-toast-head">
-            <span className="ac-toast-avatar" style={{ background: `${meta.color}1f`, color: meta.color }}>
+            <span className="ac-toast-avatar" style={{ background: `color-mix(in srgb, ${meta.color} 12%, transparent)`, color: meta.color }}>
               <i className={`bi ${meta.icon}`} />
             </span>
             <span className="ac-toast-type" style={{ color: meta.color }}>{meta.label}</span>

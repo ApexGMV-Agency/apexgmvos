@@ -45,7 +45,7 @@ export interface ApprovalActionConfig {
   onSubmit: (decision: 'approved' | 'changes_requested', comment: string, name: string) => Promise<void>;
 }
 
-const PIE_COLORS = ['#fc6215', '#60a5fa', '#34d399', '#a78bfa', '#f87171'];
+const PIE_COLORS = ['#fc6215', 'var(--ac-info)', 'var(--ac-success)', 'var(--ac-violet)', 'var(--ac-danger)'];
 
 // §14 sub-section comment keys -> label (for the per-section feedback threads).
 const S14_LABELS: Record<string, string> = {
@@ -215,7 +215,7 @@ export default function ReportDashboard({
                 <div className="s14-kpi-label">GMV by week · last {trendData.length} weeks</div>
                 <div className="d-flex gap-3">
                   <span className="ac-legend-dot" style={{ '--c': '#fc6215' } as any}>GMV</span>
-                  <span className="ac-legend-dot" style={{ '--c': '#f5b06a' } as any}>Affiliate GMV</span>
+                  <span className="ac-legend-dot" style={{ '--c': 'var(--ac-accent-hover)' } as any}>Affiliate GMV</span>
                 </div>
               </div>
               <div style={{ height: 280 }}>
@@ -232,8 +232,8 @@ export default function ReportDashboard({
                     <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="var(--ac-border)" />
                     <XAxis dataKey="label" tick={{ fontSize: 12, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={{ stroke: 'var(--ac-border)' }} />
                     <YAxis tick={{ fontSize: 12, fill: 'var(--ac-text-secondary)' }} tickLine={false} axisLine={false} width={58} tickFormatter={(v: number) => formatValue('currency', v, { compact: true })} />
-                    <Tooltip cursor={{ fill: 'rgba(252,98,21,.07)', radius: 8 }}
-                      contentStyle={{ borderRadius: 12, border: '1px solid var(--ac-border)', boxShadow: '0 10px 28px rgba(0,0,0,.55)', fontSize: 13 }}
+                    <Tooltip cursor={{ fill: 'rgba(var(--ac-accent-rgb), .07)', radius: 8 }}
+                      contentStyle={{ borderRadius: 12, border: '1px solid var(--ac-border)', boxShadow: '0 10px 28px rgba(var(--ac-shadow-rgb), calc(.55 * var(--ac-shadow-a)))', fontSize: 13 }}
                       formatter={(v: any, n: any) => [formatValue('currency', Number(v)), n]} />
                     <Bar dataKey="GMV" fill="url(#gmvBar)" radius={[8, 8, 0, 0]} maxBarSize={56} />
                     <Bar dataKey="Affiliate GMV" fill="url(#affBar)" radius={[8, 8, 0, 0]} maxBarSize={56} />

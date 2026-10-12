@@ -102,8 +102,8 @@ export default function LatestReportsModal({
                     className="ac-latest-report-card"
                   >
                     <div className="ac-latest-report-icon" style={{
-                      background: isWeekly ? 'rgba(37,99,235,.10)' : 'rgba(20,184,166,.10)',
-                      color: isWeekly ? '#60a5fa' : '#0d9488',
+                      background: isWeekly ? 'rgba(var(--ac-info-rgb), .10)' : 'rgba(var(--ac-cyan-rgb), .10)',
+                      color: isWeekly ? 'var(--ac-info)' : 'var(--ac-cyan)',
                     }}>
                       <i className={`bi ${isWeekly ? 'bi-calendar-week' : 'bi-calendar-month'}`} />
                     </div>

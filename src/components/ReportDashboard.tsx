@@ -778,10 +778,10 @@ function tiktokLink(handle: string): string {
 }
 
 function spsColor(v: number) {
-  if (v >= 4.5) return '#34d399';   // success
+  if (v >= 4.5) return 'var(--ac-success)';   // success
   if (v >= 3.5) return '#fc6215';   // brand orange (apexgmvos.com)
-  if (v > 0)    return '#f87171';   // warning
-  return '#919191';
+  if (v > 0)    return 'var(--ac-danger)';   // warning
+  return 'var(--ac-text-secondary)';
 }
 
 function KpiCard({ label, value, prev, cur, money, dec, sub }: {

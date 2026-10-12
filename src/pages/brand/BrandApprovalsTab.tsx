@@ -161,7 +161,7 @@ export default function BrandApprovalsTab({ brandId, brandName }: { brandId: str
           {rows.map(({ reportType, reportId, periodLabel, decision: d, approvalHtml }) => {
             const state: 'pending' | 'approved' | 'changes' =
               !d ? 'pending' : d.decision === 'approved' ? 'approved' : 'changes';
-            const color = state === 'approved' ? '#34d399' : state === 'changes' ? '#d97706' : '#f87171';
+            const color = state === 'approved' ? 'var(--ac-success)' : state === 'changes' ? 'var(--ac-warning)' : 'var(--ac-danger)';
             const icon = state === 'approved' ? 'bi-check-circle-fill'
               : state === 'changes' ? 'bi-arrow-repeat' : 'bi-shield-exclamation';
             const cmtCount = commentCounts.get(reportId) ?? 0;
@@ -179,11 +179,11 @@ export default function BrandApprovalsTab({ brandId, brandName }: { brandId: str
                 }}
                 onClick={() => nav(`/reporting/${reportType}/${reportId}`)}
                 onKeyDown={e => { if (e.key === 'Enter') (e.currentTarget as HTMLElement).click(); }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(0,0,0,.5)'; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(var(--ac-shadow-rgb), calc(.5 * var(--ac-shadow-a)))'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; (e.currentTarget as HTMLElement).style.boxShadow = ''; }}
               >
                 <div style={{
-                  width: 44, height: 44, borderRadius: 10, background: `${color}15`,
+                  width: 44, height: 44, borderRadius: 10, background: `color-mix(in srgb, ${color} 8%, transparent)`,
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                 }}>
                   <i className={`bi ${icon}`} style={{ color, fontSize: '1.3rem' }} />

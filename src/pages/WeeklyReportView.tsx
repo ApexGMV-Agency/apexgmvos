@@ -96,7 +96,8 @@ export default function WeeklyReportView() {
       const canvas = await html2canvas(el, {
         scale: 2,
         useCORS: true,
-        backgroundColor: 'var(--ac-surface-raised)',
+        // html2canvas can't parse var(), so hand it the resolved token value.
+        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--ac-surface-raised').trim(),
         windowWidth: captureWidth,
         width: captureWidth,
         scrollX: 0,

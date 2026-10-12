@@ -451,7 +451,7 @@ export default function Brands() {
                 className="h-100 shadow-sm"
                 role="button"
                 onClick={() => nav(`/brands/${b.id}`)}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(0,0,0,.5)'; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(var(--ac-shadow-rgb), calc(.5 * var(--ac-shadow-a)))'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; (e.currentTarget as HTMLElement).style.boxShadow = ''; }}
                 style={{ cursor: 'pointer', transition: 'transform .15s, box-shadow .15s' }}
               >

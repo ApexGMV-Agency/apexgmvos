@@ -272,7 +272,7 @@ export default function FolderExplorer({
       {/* Multi-select toolbar (sticky banner) */}
       {selected.size > 0 && (
         <div className="d-flex align-items-center gap-2 p-2 mb-2 rounded"
-          style={{ background: 'var(--ac-accent-soft)', border: '1px solid rgba(252,98,21,.35)' }}>
+          style={{ background: 'var(--ac-accent-soft)', border: '1px solid rgba(var(--ac-accent-rgb), .35)' }}>
           <strong className="me-2">
             <i className="bi bi-check2-square me-1" />{selected.size} selected
           </strong>
@@ -484,7 +484,7 @@ function FolderCard({
           opacity: drag.isDragging ? .4 : 1,
           borderColor: drop.isOver ? '#fc6215' : undefined,
           boxShadow: drop.isOver ? '0 0 0 2px #fc6215' : undefined,
-          background: drop.isOver ? 'rgba(252, 98, 21,.05)' : undefined,
+          background: drop.isOver ? 'rgba(var(--ac-accent-rgb), .05)' : undefined,
           transition: 'transform .12s, box-shadow .12s',
         }}
       >
@@ -494,7 +494,7 @@ function FolderCard({
             background: 'var(--ac-accent-soft)', color: 'var(--ac-accent-base)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexShrink: 0, fontSize: '1.4rem',
-            border: '1px solid rgba(252,98,21,.25)',
+            border: '1px solid rgba(var(--ac-accent-rgb), .25)',
           }}>
             <i className={`bi ${pinned ? 'bi-folder-fill' : 'bi-folder2'}`} />
           </div>
@@ -569,7 +569,7 @@ function ResourceCard({
           borderLeft: `4px solid ${ic.color}`,
           outline: selected ? '2px solid #fc6215' : undefined,
           outlineOffset: '-2px',
-          background: selected ? 'rgba(252, 98, 21,.04)' : undefined,
+          background: selected ? 'rgba(var(--ac-accent-rgb), .04)' : undefined,
         }}
       >
         <div className="card-body">
@@ -733,7 +733,7 @@ function RootDrop({
   return (
     <span ref={drop.setNodeRef}
       style={{
-        background: drop.isOver ? 'rgba(252, 98, 21,.1)' : undefined,
+        background: drop.isOver ? 'rgba(var(--ac-accent-rgb), .1)' : undefined,
         borderRadius: 6,
         outline: drop.isOver ? '1px dashed #fc6215' : undefined,
       }}>

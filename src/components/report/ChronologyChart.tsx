@@ -18,8 +18,8 @@ const METRICS: { key: keyof ChronoPoint; label: string; format: FieldFormat; col
   { key: 'total_gmv', label: 'Total GMV', format: 'currency', color: 'var(--ac-accent-base)' },
   { key: 'orders', label: 'Orders', format: 'number', color: 'var(--ac-info)' },
   { key: 'aov', label: 'AOV', format: 'currency', color: 'var(--ac-success)' },
-  { key: 'samples', label: 'Samples', format: 'number', color: '#a78bfa' },
-  { key: 'videos', label: 'Videos', format: 'number', color: '#22d3ee' },
+  { key: 'samples', label: 'Samples', format: 'number', color: 'var(--ac-violet)' },
+  { key: 'videos', label: 'Videos', format: 'number', color: 'var(--ac-cyan)' },
   { key: 'lives', label: 'LIVEs', format: 'number', color: 'var(--ac-warning)' },
 ];
 
@@ -91,7 +91,7 @@ export default function ChronologyChart({ data }: { data: ChronoPoint[] }) {
               />
               <Tooltip
                 formatter={(v: any) => [formatValue(metric.format, Number(v)), metric.label]}
-                contentStyle={{ borderRadius: 10, border: '1px solid var(--ac-border)', boxShadow: '0 6px 18px rgba(0,0,0,.5)' }}
+                contentStyle={{ borderRadius: 10, border: '1px solid var(--ac-border)', boxShadow: '0 6px 18px rgba(var(--ac-shadow-rgb), calc(.5 * var(--ac-shadow-a)))' }}
               />
               <Area
                 type="monotone" dataKey="value" stroke={metric.color} strokeWidth={3}

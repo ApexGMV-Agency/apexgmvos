@@ -56,9 +56,9 @@ function SectionTitle({ title, sub, color = 'var(--ac-accent-base)', fb }: { tit
 }
 
 function spsColor(v: number) {
-  if (v >= 4.5) return '#34d399';
+  if (v >= 4.5) return 'var(--ac-success)';
   if (v >= 3.5) return '#fc6215';
-  return '#f87171';
+  return 'var(--ac-danger)';
 }
 
 const RAG_META: Record<RagStatus, { bg: string; fg: string; icon: string; label: string }> = {
@@ -164,7 +164,7 @@ export default function Section14Dashboard({ data, targets, renderFeedback, clie
 
       {/* Conversion Funnel */}
       <section className="s14-section" data-section="14.3">
-        <SectionTitle title="Conversion Funnel" sub="Impressions → Clicks → Cart → Orders" color="#22d3ee" fb={fb('14.3')} />
+        <SectionTitle title="Conversion Funnel" sub="Impressions → Clicks → Cart → Orders" color="var(--ac-cyan)" fb={fb('14.3')} />
         <div className="row g-3">
           <div className="col-lg-7">
             <div className="s14-card h-100">
@@ -229,10 +229,10 @@ export default function Section14Dashboard({ data, targets, renderFeedback, clie
 
       {/* Paid Media Efficiency */}
       <section className="s14-section" data-section="14.5">
-        <SectionTitle title="Paid Media Efficiency" color="#a78bfa" fb={fb('14.5')} />
+        <SectionTitle title="Paid Media Efficiency" color="var(--ac-violet)" fb={fb('14.5')} />
         <div className="row g-3">
           {paid.map(k => (
-            <div className="col-6 col-lg-2" key={k.key}><KpiTile k={k} accent="#a78bfa" /></div>
+            <div className="col-6 col-lg-2" key={k.key}><KpiTile k={k} accent="var(--ac-violet)" /></div>
           ))}
         </div>
       </section>
@@ -250,7 +250,7 @@ export default function Section14Dashboard({ data, targets, renderFeedback, clie
       {/* Weekly Targets & Action Items — internal only, hidden from the client */}
       {!clientMode && realTargets.length > 0 && (
         <section className="s14-section" data-section="14.7">
-          <SectionTitle title="Weekly Targets & Action Items" color="#22d3ee" fb={fb('14.7')} />
+          <SectionTitle title="Weekly Targets & Action Items" color="var(--ac-cyan)" fb={fb('14.7')} />
           <div className="s14-card">
             <div className="d-flex flex-column gap-3">
               {realTargets.map((t, i) => <TargetRowView key={i} t={t} />)}

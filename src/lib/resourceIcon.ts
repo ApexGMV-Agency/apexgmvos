@@ -11,12 +11,12 @@ export function resourceIcon(url: string): { icon: string; color: string; label:
       return { icon: 'bi-file-earmark-text', color: '#4285f4', label: 'Google Docs' };
     }
     if (host.includes('drive.google.com'))  return { icon: 'bi-hdd',         color: '#4285f4', label: 'Google Drive' };
-    if (host.includes('notion.so') || host.includes('notion.site')) return { icon: 'bi-journal-text', color: '#000',   label: 'Notion' };
+    if (host.includes('notion.so') || host.includes('notion.site')) return { icon: 'bi-journal-text', color: '#787774', label: 'Notion' };
     if (host.includes('figma.com'))         return { icon: 'bi-pentagon',    color: '#a259ff', label: 'Figma' };
     if (host.includes('airtable.com'))      return { icon: 'bi-table',       color: '#ffb100', label: 'Airtable' };
     if (host.includes('youtube.com') || host.includes('youtu.be')) return { icon: 'bi-youtube',      color: '#ff0000', label: 'YouTube' };
     if (host.includes('dropbox.com'))       return { icon: 'bi-dropbox',     color: '#0061ff', label: 'Dropbox' };
-    if (host.includes('github.com'))        return { icon: 'bi-github',      color: '#181717', label: 'GitHub' };
+    if (host.includes('github.com'))        return { icon: 'bi-github',      color: '#6e7681', label: 'GitHub' };
     if (path.endsWith('.pdf'))              return { icon: 'bi-file-earmark-pdf', color: '#d93025', label: 'PDF' };
     return { icon: 'bi-link-45deg', color: '#2563eb', label: host };
   } catch {

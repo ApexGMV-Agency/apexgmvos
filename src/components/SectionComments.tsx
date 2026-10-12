@@ -247,7 +247,7 @@ function CommentNode(p: NodeProps) {
         style={{
           background: flash ? 'var(--ac-warning-soft)' : 'var(--ac-surface-raised)',
           border: `1px solid ${flash ? 'var(--ac-warning)' : 'var(--ac-border)'}`,
-          boxShadow: flash ? '0 0 0 3px rgba(245,158,11,.25)' : undefined,
+          boxShadow: flash ? '0 0 0 3px rgba(var(--ac-warning-rgb), .25)' : undefined,
           transition: 'background .25s ease, border-color .25s ease, box-shadow .25s ease',
         }}
       >

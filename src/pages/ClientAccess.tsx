@@ -367,7 +367,7 @@ export default function ClientAccess() {
                       const checked = pickedResourceIds.includes(r.id);
                       return (
                         <div key={r.id} className="d-flex align-items-center py-1"
-                          style={{ background: checked ? 'rgba(252, 98, 21,.06)' : undefined, borderRadius: 6, padding: '4px 6px' }}>
+                          style={{ background: checked ? 'rgba(var(--ac-accent-rgb), .06)' : undefined, borderRadius: 6, padding: '4px 6px' }}>
                           <Form.Check type="checkbox" id={`g-${r.id}`}
                             checked={checked}
                             onChange={() => togglePickedResource(r.id)}

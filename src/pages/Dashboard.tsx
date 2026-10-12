@@ -24,7 +24,7 @@ interface WeeklyReportRow {
 }
 
 const STATUS_META: Record<ClientStatus, { label: string; color: string; icon: string }> = {
-  onboarding:  { label: 'Onboarding',  color: '#22d3ee', icon: 'bi-rocket-takeoff-fill' },
+  onboarding:  { label: 'Onboarding',  color: 'var(--ac-cyan)', icon: 'bi-rocket-takeoff-fill' },
   in_progress: { label: 'In Progress', color: 'var(--ac-success)', icon: 'bi-check-circle-fill' },
   paused:      { label: 'Paused',      color: 'var(--ac-warning)', icon: 'bi-pause-circle-fill' },
   closed:      { label: 'Closed',      color: 'var(--ac-text-secondary)', icon: 'bi-archive-fill' },
@@ -193,7 +193,7 @@ export default function Dashboard() {
           <Card body className="h-100 shadow-sm">
             <div className="d-flex align-items-center justify-content-between">
               <div className="text-muted small text-uppercase fw-semibold" style={{ letterSpacing: '.5px' }}>
-                <i className="bi bi-people-fill me-1" style={{ color: '#a78bfa' }} />Clients
+                <i className="bi bi-people-fill me-1" style={{ color: 'var(--ac-violet)' }} />Clients
               </div>
               {!loading && (
                 <Link to="/clients" className="small text-decoration-none">
@@ -201,7 +201,7 @@ export default function Dashboard() {
                 </Link>
               )}
             </div>
-            <div className="fs-1 fw-bold mt-1" style={{ color: '#a78bfa', fontFamily: 'var(--ac-font-primary)' }}>
+            <div className="fs-1 fw-bold mt-1" style={{ color: 'var(--ac-violet)', fontFamily: 'var(--ac-font-primary)' }}>
               {loading ? <Spinner animation="border" size="sm" /> : clients.length}
             </div>
             {!loading && (

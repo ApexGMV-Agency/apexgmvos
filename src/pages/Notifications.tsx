@@ -44,15 +44,15 @@ export default function NotificationsPage() {
   // Theme per tab.
   const accents: Record<TabKey, string> = {
     unread: 'var(--ac-accent-base)',   // orange
-    weekly: '#22d3ee',   // cyan
-    monthly: '#f472b6',  // pink
+    weekly: 'var(--ac-cyan)',   // cyan
+    monthly: 'var(--ac-pink)',  // pink
     all: 'var(--ac-info)',      // blue
   };
   const accent = accents[tab];
-  const accentSoft = tab === 'unread' ? 'rgba(249,115,22,.06)'
-    : tab === 'weekly' ? 'rgba(8,145,178,.06)'
-    : tab === 'monthly' ? 'rgba(219,39,119,.06)'
-    : 'rgba(37,99,235,.04)';
+  const accentSoft = tab === 'unread' ? 'rgba(var(--ac-accent-rgb), .06)'
+    : tab === 'weekly' ? 'rgba(var(--ac-cyan-rgb), .06)'
+    : tab === 'monthly' ? 'rgba(var(--ac-pink-rgb), .06)'
+    : 'rgba(var(--ac-info-rgb), .04)';
 
   const emptyMsg = tab === 'unread' ? 'No unread notifications. You\'re all caught up.'
     : tab === 'weekly' ? 'No weekly reporting notifications.'

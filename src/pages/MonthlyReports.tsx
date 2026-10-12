@@ -40,11 +40,11 @@ const AVATAR_COLORS = [
   { bg: 'var(--ac-accent-soft)', text: 'var(--ac-accent-base)' },
   { bg: 'var(--ac-info-soft)', text: 'var(--ac-info)' },
   { bg: 'var(--ac-success-soft)', text: 'var(--ac-success)' },
-  { bg: 'rgba(244,114,182,.14)', text: '#a78bfa' },
+  { bg: 'rgba(var(--ac-pink-rgb), .14)', text: 'var(--ac-violet)' },
   { bg: 'var(--ac-danger-soft)', text: 'var(--ac-danger)' },
-  { bg: 'rgba(167,139,250,.14)', text: '#a78bfa' },
+  { bg: 'rgba(var(--ac-violet-rgb), .14)', text: 'var(--ac-violet)' },
   { bg: 'var(--ac-warning-soft)', text: 'var(--ac-warning)' },
-  { bg: 'rgba(34,211,238,.14)', text: '#22d3ee' },
+  { bg: 'rgba(var(--ac-cyan-rgb), .14)', text: 'var(--ac-cyan)' },
 ];
 function avatarFor(name: string) {
   let h = 0;

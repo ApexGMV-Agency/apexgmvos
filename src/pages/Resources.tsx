@@ -215,7 +215,7 @@ export default function Resources() {
                   style={{
                     background: active ? 'var(--ac-accent-soft)' : 'var(--ac-surface-strong)',
                     border: active ? '1px solid var(--ac-accent-ring)' : '1px solid var(--ac-border)',
-                    boxShadow: active ? '0 0 0 1px rgba(252, 98, 21,.25)' : undefined,
+                    boxShadow: active ? '0 0 0 1px rgba(var(--ac-accent-rgb), .25)' : undefined,
                     transition: 'all .12s',
                   }}
                 >
