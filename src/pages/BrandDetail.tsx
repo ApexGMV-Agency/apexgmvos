@@ -9,7 +9,6 @@ import BrandApprovalsTab from './brand/BrandApprovalsTab';
 import BrandGmvMaxTab from './brand/BrandGmvMaxTab';
 import BrandSamplesTab from './brand/BrandSamplesTab';
 import BrandProductsTab from './brand/BrandProductsTab';
-import BrandBillingTab from './brand/BrandBillingTab';
 import BrandSopTab from './brand/BrandSopTab';
 import Avatar from '../components/Avatar';
 import RegionChip from '../components/RegionChip';
@@ -30,7 +29,7 @@ interface Brand {
   scope: string[] | null;
 }
 
-type TabKey = 'resources' | 'sop' | 'reporting' | 'approvals' | 'gmv-max' | 'samples' | 'products' | 'billing';
+type TabKey = 'resources' | 'sop' | 'reporting' | 'approvals' | 'gmv-max' | 'samples' | 'products';
 
 const TABS: { key: TabKey; label: string; icon: string }[] = [
   { key: 'resources',   label: 'Resources',      icon: 'bi-folder2-open' },
@@ -40,7 +39,6 @@ const TABS: { key: TabKey; label: string; icon: string }[] = [
   { key: 'samples',     label: 'Sample Seeding', icon: 'bi-box-seam' },
   { key: 'products',    label: 'Products',       icon: 'bi-tags' },
   { key: 'sop',         label: 'SOP',            icon: 'bi-journal-text' },
-  { key: 'billing',     label: 'Billing',        icon: 'bi-cash-coin' },
 ];
 
 // Status filter for the prev/next walk + brand switcher. Mirrors the Brands list
@@ -277,21 +275,13 @@ export default function BrandDetail() {
 
   const visibleTabs = useMemo(() => {
     if (isBob) return TABS;
-    // Team Lead: APC-level access to their brands, minus the Bob-only Billing.
-    if (isTeamLead) {
-      if (!assignedToMe) return [];
-      return TABS.filter(t => t.key !== 'billing');
-    }
+    // Team Lead: APC-level access to their brands.
     // Ads Manager: view-only APC tab set (GMV Max always included — it's their
-    // edit surface), minus the Bob-only Billing.
-    if (isAdsManager) {
-      if (!assignedToMe) return [];
-      return TABS.filter(t => t.key !== 'billing');
-    }
+    // edit surface).
+    if (isTeamLead || isAdsManager) return assignedToMe ? TABS : [];
     if (!isApc || !assignedToMe) return [];
     return TABS.filter(t => {
       if (t.key === 'gmv-max') return canManageGmvMax;
-      if (t.key === 'billing') return false; // Bob-only financial data
       return true;
     });
   }, [isBob, isApc, isTeamLead, isAdsManager, assignedToMe, canManageGmvMax]);
@@ -584,7 +574,6 @@ export default function BrandDetail() {
       {currentTab === 'gmv-max'     && <BrandGmvMaxTab brandId={brand.id} canEdit={canEditGmvMax} currency={brand.currency} />}
       {currentTab === 'samples'     && <BrandSamplesTab brandId={brand.id} canEdit={canEditSamples} currency={brand.currency} />}
       {currentTab === 'products'    && <BrandProductsTab brandId={brand.id} canEdit={canEditProducts} />}
-      {currentTab === 'billing'     && <BrandBillingTab brandId={brand.id} />}
     </div>
   );
 }

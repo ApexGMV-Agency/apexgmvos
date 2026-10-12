@@ -11,17 +11,12 @@ import { useNotifications } from '../notifications/NotificationsContext';
 import { MonthlyReportContent, normalizeMonthlyContent } from '../lib/monthlyReportSchema';
 import MonthlyReportDashboard, { MonthlyTrendPoint } from '../components/MonthlyReportDashboard';
 import { ApprovalDecisionView } from '../components/ReportDashboard';
-import CanvasRenderer from '../components/canvas/CanvasRenderer';
-import {
-  CanvasSchema, parseTemplateRow, buildMetricBagFromReportContent,
-} from '../lib/reportingCanvas';
 import { Comment, CommentSection } from '../components/SectionComments';
 import ReportReviewBar, { ReviewState, ReviewStatus } from '../components/ReportReviewBar';
 
 interface MonthlyRow {
   id: string; brand_id: string; month: string;
   status: string; content: any;
-  template_id?: string | null;
   review_status?: ReviewStatus; reviewed_at?: string | null; review_note?: string | null;
 }
 interface Brand { id: string; name: string; client: string; client_status: string | null; currency?: string | null; }
@@ -46,7 +41,6 @@ export default function MonthlyReportView() {
   const { profile } = useAuth();
   const { notifications, markRead } = useNotifications();
   const [report, setReport] = useState<MonthlyRow | null>(null);
-  const [templateSchema, setTemplateSchema] = useState<CanvasSchema | null>(null);
   const [brand, setBrand] = useState<Brand | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [decisions, setDecisions] = useState<ApprovalDecisionView[]>([]);
@@ -107,13 +101,6 @@ export default function MonthlyReportView() {
       setReport(r);
       const { data: bd } = await supabase.from('brands').select('id,name,client,client_status,currency').eq('id', r.brand_id).single();
       setBrand(bd as Brand);
-      if (r.template_id) {
-        const { data: tpl } = await supabase
-          .from('report_templates').select('*').eq('id', r.template_id).maybeSingle();
-        if (tpl) setTemplateSchema(parseTemplateRow(tpl).schema_json);
-      } else {
-        setTemplateSchema(null);
-      }
       // Previous month (for "Last Month" auto-comparison) and 8-month trend
       const prevMonth = shiftMonth(r.month, -1);
       const { data: pv } = await supabase.from('monthly_reports')
@@ -229,25 +216,6 @@ export default function MonthlyReportView() {
             </div>
           </div>
         </div>
-
-        {templateSchema && (
-          <div className="mb-4">
-            <div className="d-flex align-items-center gap-2 mb-2">
-              <Badge bg="warning" text="dark">
-                <i className="bi bi-easel2 me-1" />Canvas template
-              </Badge>
-              <small className="text-muted">Rendered above the standard dashboard for this report.</small>
-            </div>
-            <CanvasRenderer
-              schema={templateSchema}
-              metricBag={{
-                current: buildMetricBagFromReportContent(c),
-                previous: prev ? buildMetricBagFromReportContent((prev as any).content) : {},
-              }}
-            />
-            <hr className="my-4" />
-          </div>
-        )}
 
         <MonthlyReportDashboard
           c={c}

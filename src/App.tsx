@@ -16,16 +16,12 @@ import NotificationsPage from './pages/Notifications';
 import Profile from './pages/Profile';
 import SharedReports from './pages/SharedReports';
 import Reporting from './pages/Reporting';
-import BudgetManager from './pages/BudgetManager';
-import CompanyBudget from './pages/CompanyBudget';
 import WeeklyReports from './pages/WeeklyReports';
 import WeeklyReportEdit from './pages/WeeklyReportEdit';
 import WeeklyReportView from './pages/WeeklyReportView';
 import MonthlyReports from './pages/MonthlyReports';
 import MonthlyReportEdit from './pages/MonthlyReportEdit';
 import MonthlyReportView from './pages/MonthlyReportView';
-import ReportingCanvasList from './pages/templates/ReportingCanvasList';
-import ReportingCanvasEditor from './pages/templates/ReportingCanvasEditor';
 import TeamLeads from './pages/TeamLeads';
 import AdsManagers from './pages/AdsManagers';
 import Bobs from './pages/Bobs';
@@ -77,9 +73,6 @@ export default function App() {
         {/* Cross-brand SOP overview — URL only, no sidebar link. */}
         <Route path="sops" element={<ProtectedRoute roles={['bob', 'apc', 'team_lead', 'ads_manager']}><SopsPage /></ProtectedRoute>} />
         <Route path="resources" element={<ProtectedRoute roles={['bob', 'apc', 'team_lead', 'ads_manager']}><Resources /></ProtectedRoute>} />
-        <Route path="budget" element={<Navigate to="/budget/brands" replace />} />
-        <Route path="budget/brands" element={<ProtectedRoute roles={['bob']}><BudgetManager /></ProtectedRoute>} />
-        <Route path="budget/company" element={<ProtectedRoute roles={['bob']}><CompanyBudget /></ProtectedRoute>} />
         <Route path="notifications" element={<NotificationsPage />} />
         <Route path="profile" element={<Profile />} />
         <Route path="reporting/weekly" element={<ProtectedRoute roles={['bob', 'apc', 'team_lead', 'ads_manager']}><WeeklyReports /></ProtectedRoute>} />
@@ -90,8 +83,6 @@ export default function App() {
         <Route path="reporting/monthly/:id" element={<ProtectedRoute roles={['bob', 'apc', 'team_lead', 'ads_manager']}><MonthlyReportView /></ProtectedRoute>} />
         <Route path="reporting/monthly/:id/edit" element={<ProtectedRoute roles={['bob', 'apc', 'team_lead']}><MonthlyReportEdit /></ProtectedRoute>} />
         <Route path="reporting/bi-weekly" element={<ProtectedRoute roles={['bob', 'apc', 'team_lead', 'ads_manager']}><Reporting kind="Bi-Weekly" /></ProtectedRoute>} />
-        <Route path="templates" element={<ProtectedRoute roles={['bob', 'apc']}><ReportingCanvasList /></ProtectedRoute>} />
-        <Route path="templates/:id" element={<ProtectedRoute roles={['bob']}><ReportingCanvasEditor /></ProtectedRoute>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

@@ -36,17 +36,12 @@ function chronoFromContent(content: any): Omit<ChronoPoint, 'label'> {
     total_gmv, orders, aov,
   };
 }
-import CanvasRenderer from '../components/canvas/CanvasRenderer';
-import {
-  CanvasSchema, parseTemplateRow, buildMetricBagFromReportContent,
-} from '../lib/reportingCanvas';
 import { Comment, CommentSection } from '../components/SectionComments';
 import ReportReviewBar, { ReviewState, ReviewStatus } from '../components/ReportReviewBar';
 
 interface ReportRow {
   id: string; brand_id: string; week_start: string; week_end: string;
   week_number: number; status: string; content: any;
-  template_id?: string | null;
   review_status?: ReviewStatus; reviewed_at?: string | null; review_note?: string | null;
 }
 interface Brand { id: string; name: string; client: string; client_status: string | null; currency?: string | null; }
@@ -68,8 +63,6 @@ export default function WeeklyReportView() {
   // Every week this brand has a report for (newest first) — powers the
   // previous/next week navigation at the foot of the dashboard.
   const [siblings, setSiblings] = useState<SiblingWeek[]>([]);
-  // Optional canvas template overlay — populated when the report has template_id.
-  const [templateSchema, setTemplateSchema] = useState<CanvasSchema | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [decisions, setDecisions] = useState<ApprovalDecisionView[]>([]);
   const [loading, setLoading] = useState(true);
@@ -152,13 +145,6 @@ export default function WeeklyReportView() {
       setReport(r);
       const { data: bd } = await supabase.from('brands').select('id,name,client,client_status,currency').eq('id', r.brand_id).single();
       setBrand(bd as Brand);
-      if (r.template_id) {
-        const { data: tpl } = await supabase
-          .from('report_templates').select('*').eq('id', r.template_id).maybeSingle();
-        if (tpl) setTemplateSchema(parseTemplateRow(tpl).schema_json);
-      } else {
-        setTemplateSchema(null);
-      }
       const prevEnd = addDays(r.week_start, -1);
       const { data: pv } = await supabase.from('weekly_reports')
         .select('*').eq('brand_id', r.brand_id).eq('week_end', prevEnd).maybeSingle();
@@ -376,25 +362,6 @@ export default function WeeklyReportView() {
             </div>
           </div>
         </div>
-
-        {templateSchema && (
-          <div className="mb-4">
-            <div className="d-flex align-items-center gap-2 mb-2">
-              <Badge bg="warning" text="dark">
-                <i className="bi bi-easel2 me-1" />Canvas template
-              </Badge>
-              <small className="text-muted">Rendered above the standard dashboard for this report.</small>
-            </div>
-            <CanvasRenderer
-              schema={templateSchema}
-              metricBag={{
-                current: buildMetricBagFromReportContent(c),
-                previous: prev ? buildMetricBagFromReportContent(p) : {},
-              }}
-            />
-            <hr className="my-4" />
-          </div>
-        )}
 
         {fmt === 'v3' ? (
           <ReportDashboardV3

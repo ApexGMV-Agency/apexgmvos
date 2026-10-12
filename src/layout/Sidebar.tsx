@@ -7,7 +7,6 @@ import Avatar from '../components/Avatar';
 
 export default function Sidebar({ collapsed = false }: { collapsed?: boolean }) {
   const [reportingOpen, setReportingOpen] = useState(true);
-  const [budgetOpen, setBudgetOpen] = useState(true);
   const { profile } = useAuth();
   const { unreadCount, notifications } = useNotifications();
   const isBob = profile?.role === 'bob';
@@ -68,29 +67,8 @@ export default function Sidebar({ collapsed = false }: { collapsed?: boolean }) 
                 <NavLink to="/client-access" title="Client Access">
                   <i className="bi bi-link-45deg" /> <span className="ac-nav-label">Client Access</span>
                 </NavLink>
-                {collapsed ? (
-                  <NavLink to="/budget/brands" title="Budget">
-                    <i className="bi bi-cash-coin" />
-                  </NavLink>
-                ) : (
-                  <>
-                    <button className="ac-nav-toggle" onClick={() => setBudgetOpen(o => !o)}>
-                      <i className="bi bi-cash-coin" /> <span className="ac-nav-label">Budget</span>
-                      <i className={`bi ms-auto ac-nav-label ${budgetOpen ? 'bi-chevron-up' : 'bi-chevron-down'}`} />
-                    </button>
-                    {budgetOpen && (
-                      <div className="ac-sub">
-                        <NavLink to="/budget/brands"><span className="ac-nav-label">Brand Budget</span></NavLink>
-                        <NavLink to="/budget/company"><span className="ac-nav-label">Company Budget</span></NavLink>
-                      </div>
-                    )}
-                  </>
-                )}
                 <NavLink to="/resources" title="Resources">
                   <i className="bi bi-folder2" /> <span className="ac-nav-label">Resources</span>
-                </NavLink>
-                <NavLink to="/templates" title="Reporting Canvas">
-                  <i className="bi bi-easel2" /> <span className="ac-nav-label">Reporting Canvas</span>
                 </NavLink>
               </>
             )}

@@ -5,7 +5,6 @@ import DOMPurify from 'dompurify';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../auth/AuthContext';
 import { useNotifications } from '../notifications/NotificationsContext';
-import TemplatePicker from '../components/canvas/TemplatePicker';
 import ReportConversationOffcanvas, { ConvReport } from '../components/ReportConversationOffcanvas';
 
 function thisMonth() {
@@ -133,7 +132,6 @@ export default function MonthlyReports() {
   const [show, setShow] = useState(false);
   const [createBrand, setCreateBrand] = useState<Brand | null>(null);
   const [createMonth, setCreateMonth] = useState(thisMonth());
-  const [createTemplateId, setCreateTemplateId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const load = async () => {
@@ -253,7 +251,6 @@ export default function MonthlyReports() {
         created_by: user.id,
         month: createMonth,
         status: 'draft',
-        template_id: createTemplateId,
       }).select('id').single();
       if (error) throw error;
       setShow(false);
@@ -601,14 +598,6 @@ export default function MonthlyReports() {
                 If a previous month's report exists for this brand, "Last Month" data will be auto-pulled into the new one.
               </Form.Text>
             </Form.Group>
-            {createBrand && (
-              <TemplatePicker
-                reportKind="monthly"
-                brandId={createBrand.id}
-                value={createTemplateId}
-                onChange={setCreateTemplateId}
-              />
-            )}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShow(false)} disabled={saving}>Cancel</Button>

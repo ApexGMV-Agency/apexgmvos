@@ -6,7 +6,6 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../auth/AuthContext';
 import { useNotifications } from '../notifications/NotificationsContext';
 import { addDays, formatRange, formatWeekShort, fromISO } from '../lib/dates';
-import TemplatePicker from '../components/canvas/TemplatePicker';
 import ReportConversationOffcanvas, { ConvReport } from '../components/ReportConversationOffcanvas';
 
 // Weekly cycles are identical across brands, so the list is filtered by the
@@ -125,8 +124,6 @@ export default function WeeklyReports() {
   const [show, setShow] = useState(false);
   const [createBrand, setCreateBrand] = useState<Brand | null>(null);
   const [anchorPick, setAnchorPick] = useState('');
-  // Optional Reporting Canvas template — null = legacy layout.
-  const [createTemplateId, setCreateTemplateId] = useState<string | null>(null);
   // Which report format to create: 'v3' = new 12-section (default), 'v2' =
   // earlier 14-section, 'classic' = original layout.
   const [createFormat, setCreateFormat] = useState<'classic' | 'v2' | 'v3'>('v3');
@@ -306,7 +303,6 @@ export default function WeeklyReports() {
         week_end: end,
         week_number,
         status: 'draft',
-        template_id: createTemplateId,
         // Stamp the chosen format into content; classic stays null (unchanged behaviour).
         content: createFormat === 'classic' ? null : { format_version: createFormat },
       }).select('id').single();
@@ -773,14 +769,6 @@ export default function WeeklyReports() {
                 </label>
               </div>
             </div>
-            {createBrand && (
-              <TemplatePicker
-                reportKind="weekly"
-                brandId={createBrand.id}
-                value={createTemplateId}
-                onChange={setCreateTemplateId}
-              />
-            )}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShow(false)} disabled={saving}>Cancel</Button>
