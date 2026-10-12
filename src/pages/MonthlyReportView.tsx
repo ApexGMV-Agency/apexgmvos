@@ -10,6 +10,9 @@ import { useAuth } from '../auth/AuthContext';
 import { useNotifications } from '../notifications/NotificationsContext';
 import { MonthlyReportContent, normalizeMonthlyContent } from '../lib/monthlyReportSchema';
 import MonthlyReportDashboard, { MonthlyTrendPoint } from '../components/MonthlyReportDashboard';
+import ReportDashboardV3 from '../components/ReportDashboardV3';
+import { normalizeContentV3 } from '../lib/reportSchemaV3';
+import { buildV3Series, shortMonth } from '../lib/v3Series';
 import { ApprovalDecisionView } from '../components/ReportDashboard';
 import { Comment, CommentSection } from '../components/SectionComments';
 import ReportReviewBar, { ReviewState, ReviewStatus } from '../components/ReportReviewBar';
@@ -108,8 +111,9 @@ export default function MonthlyReportView() {
       setPrev(pv as MonthlyRow | null);
       const { data: tr } = await supabase.from('monthly_reports')
         .select('*').eq('brand_id', r.brand_id)
-        .lte('month', r.month).order('month', { ascending: true }).limit(8);
-      setTrend((tr as MonthlyRow[]) ?? []);
+        .lte('month', r.month).order('month', { ascending: false }).limit(8);
+      // Newest 8 (ending at this month), charted oldest -> newest.
+      setTrend(((tr as MonthlyRow[]) ?? []).reverse());
       const { data: cm } = await supabase.from('report_comments')
         .select('*').eq('report_id', r.id).eq('report_type', 'monthly')
         .order('created_at', { ascending: true });
@@ -130,8 +134,42 @@ export default function MonthlyReportView() {
     })();
   }, [id]);
 
+  // v3 = the 12-section template shared with weekly reports; anything else is
+  // a legacy monthly report on the original monthly dashboard.
+  const isV3 = (report?.content as any)?.format_version === 'v3';
   const c = useMemo<MonthlyReportContent>(() => normalizeMonthlyContent(report?.content), [report]);
   const p = useMemo<MonthlyReportContent | null>(() => prev ? normalizeMonthlyContent(prev.content) : null, [prev]);
+  const c3 = useMemo(() => isV3 ? normalizeContentV3(report?.content) : null, [report, isV3]);
+  // Only compare against last month when it is v3 too — a legacy report has a
+  // different shape, so deltas against it would all be blank anyway.
+  const p3 = useMemo(() => isV3 && prev && (prev.content as any)?.format_version === 'v3'
+    ? normalizeContentV3(prev.content) : null, [prev, isV3]);
+  const v3Series = useMemo(() => buildV3Series(trend.map(t => ({ label: shortMonth(t.month), content: t.content }))), [trend]);
+
+  // v3 §3 per-product "samples approved this month" (from Sample Seeding).
+  const [productSamples, setProductSamples] = useState<Record<string, number | null>>({});
+  useEffect(() => {
+    if (!report || !isV3) return;
+    let alive = true;
+    (async () => {
+      const [y, m] = report.month.split('-').map(Number);
+      const end = `${report.month}-${String(new Date(y, m, 0).getDate()).padStart(2, '0')}`;
+      const [{ data: daily }, { data: sprods }] = await Promise.all([
+        supabase.from('brand_samples_daily').select('product_counts')
+          .eq('brand_id', report.brand_id).gte('entry_date', `${report.month}-01`).lte('entry_date', end),
+        supabase.from('brand_samples_products').select('id,external_product_id').eq('brand_id', report.brand_id),
+      ]);
+      if (!alive) return;
+      const bySpid: Record<string, number> = {};
+      for (const d of (daily as any[]) ?? []) for (const [spid, cnt] of Object.entries(d.product_counts ?? {})) bySpid[spid] = (bySpid[spid] ?? 0) + (Number(cnt) || 0);
+      const extBySpid = new Map(((sprods as any[]) ?? []).map(p => [String(p.id), String(p.external_product_id ?? '')]));
+      const byExt: Record<string, number> = {};
+      for (const [spid, cnt] of Object.entries(bySpid)) { const ext = extBySpid.get(spid); if (ext) byExt[ext] = (byExt[ext] ?? 0) + cnt; }
+      setProductSamples(byExt);
+    })();
+    return () => { alive = false; };
+  }, [report, isV3]);
+
   const trendData: MonthlyTrendPoint[] = useMemo(() => trend.map(t => {
     const n = normalizeMonthlyContent(t.content);
     const [y, mm] = t.month.split('-').map(Number);
@@ -217,6 +255,27 @@ export default function MonthlyReportView() {
           </div>
         </div>
 
+        {c3 ? (
+          <ReportDashboardV3
+            period="month"
+            c={c3}
+            p={p3}
+            currency={brand.currency ?? undefined}
+            {...v3Series}
+            productSamples={productSamples}
+            hasPrev={!!p3}
+            openSectionOnLoad={openSection}
+            highlightCommentId={highlightCommentId}
+            approvalDecisions={decisions}
+            commentsConfig={{
+              mode: 'authed',
+              comments,
+              currentAuthorName: profile?.full_name || profile?.email || 'User',
+              onAdd: addComment,
+              canReply: profile?.role === 'bob',
+            }}
+          />
+        ) : (
         <MonthlyReportDashboard
           c={c}
           p={p}
@@ -237,6 +296,7 @@ export default function MonthlyReportView() {
             canReply: profile?.role === 'bob',
           }}
         />
+        )}
       </div>
     </>
   );

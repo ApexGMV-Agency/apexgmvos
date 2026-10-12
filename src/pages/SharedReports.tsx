@@ -11,10 +11,11 @@ import { WeeklyReportContent, normalizeContent } from '../lib/reportSchema';
 import { normalizeContentV2 } from '../lib/reportSchemaV2';
 import { normalizeContentV3 } from '../lib/reportSchemaV3';
 import { MonthlyReportContent, normalizeMonthlyContent } from '../lib/monthlyReportSchema';
-import ReportDashboard, { TrendPoint, ApprovalDecisionView } from '../components/ReportDashboard';
+import ReportDashboard, { TrendPoint, ApprovalDecisionView, ApprovalActionConfig, CommentsConfig } from '../components/ReportDashboard';
 import ReportDashboardV2 from '../components/ReportDashboardV2';
 import ReportDashboardV3 from '../components/ReportDashboardV3';
 import MonthlyReportDashboard from '../components/MonthlyReportDashboard';
+import { buildV3Series, shortMonth } from '../lib/v3Series';
 import SectionComments, { Comment, CommentSection } from '../components/SectionComments';
 import { resourceIcon } from '../lib/resourceIcon';
 import ResourceComments, { ResourceComment } from '../components/ResourceComments';
@@ -707,81 +708,110 @@ export default function SharedReports() {
       const [y, m] = yyyymm.split('-').map(Number);
       return new Date(y, m - 1, 1).toLocaleString(undefined, { month: 'long', year: 'numeric' });
     };
+    // v3 = the 12-section template shared with weekly reports (client dashboard);
+    // older monthly reports keep the original monthly layout.
+    const isOpenM3 = (openMonthly.content as any)?.format_version === 'v3';
+    const prevM = (() => {
+      const [y, mm] = openMonthly.month.split('-').map(Number);
+      const d = new Date(y, mm - 2, 1);
+      const prevYM = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      return monthlyReports.find(r => r.brand_id === openMonthly.brand_id && r.month === prevYM) ?? null;
+    })();
+    const mDecisions = allDecisions
+      .filter(d => d.report_id === openMonthly.id && d.report_type === 'monthly')
+      .map(d => ({
+        id: d.id, decision: d.decision, comment: d.comment,
+        decided_by_name: d.decided_by_name, decided_at: d.decided_at,
+      }));
+    const mApprovalAction: ApprovalActionConfig | undefined = openMonthly.content?.approval?.enabled ? {
+      myDecision: (() => {
+        const d = latestDecisions.get(`monthly:${openMonthly.id}`);
+        return d ? {
+          id: d.id, decision: d.decision, comment: d.comment,
+          decided_by_name: d.decided_by_name, decided_at: d.decided_at,
+        } : null;
+      })(),
+      defaultName: publicName,
+      onSubmit: async (choice, comment, name) => {
+        await submitApprovals([{
+          report_id: openMonthly.id,
+          report_type: 'monthly',
+          decision: choice,
+          comment,
+          decided_by_name: name,
+        }]);
+      },
+    } : undefined;
+    const mCommentsConfig: CommentsConfig = {
+      mode: 'public',
+      comments: monthlyReportComments,
+      defaultPublicName: publicName,
+      onAdd: (section, body, name, parentId) => addComment(section, body, name, parentId, 'monthly'),
+    };
     return (
       <PublicShell clientName={clientName}>
         <div className="d-flex align-items-start gap-3 mb-4 flex-wrap">
           <button type="button" className="ac-back-btn" onClick={() => setOpenMonthlyId(null)}>
             <i className="bi bi-arrow-left" /> Back
           </button>
-          <div className="flex-grow-1 min-w-0">
-            <div className="text-muted small">{activeBrand.name}</div>
-            <h4 className="mb-0">{fmtMonthLabel(openMonthly.month)} <Badge bg="info" className="ms-2">Monthly</Badge></h4>
-          </div>
+          {!isOpenM3 && (
+            <div className="flex-grow-1 min-w-0">
+              <div className="text-muted small">{activeBrand.name}</div>
+              <h4 className="mb-0">{fmtMonthLabel(openMonthly.month)} <Badge bg="info" className="ms-2">Monthly</Badge></h4>
+            </div>
+          )}
         </div>
-        <MonthlyReportDashboard
-          c={normalizeMonthlyContent(openMonthly.content)}
-          p={(() => {
-            const [y, mm] = openMonthly.month.split('-').map(Number);
-            const prevYM = `${new Date(y, mm - 2, 1).getFullYear()}-${String(new Date(y, mm - 2, 1).getMonth() + 1).padStart(2, '0')}`;
-            const pr = monthlyReports.find(r => r.brand_id === openMonthly.brand_id && r.month === prevYM);
-            return pr ? normalizeMonthlyContent(pr.content) : null;
-          })()}
-          hasPrev={(() => {
-            const [y, mm] = openMonthly.month.split('-').map(Number);
-            const prevYM = `${new Date(y, mm - 2, 1).getFullYear()}-${String(new Date(y, mm - 2, 1).getMonth() + 1).padStart(2, '0')}`;
-            return monthlyReports.some(r => r.brand_id === openMonthly.brand_id && r.month === prevYM);
-          })()}
-          trendData={(() => {
-            const sameBrand = monthlyReports
+        {isOpenM3 ? (
+          <ReportDashboardV3
+            period="month"
+            c={normalizeContentV3(openMonthly.content)}
+            p={prevM && (prevM.content as any)?.format_version === 'v3' ? normalizeContentV3(prevM.content) : null}
+            hasPrev={!!prevM && (prevM.content as any)?.format_version === 'v3'}
+            currency={activeBrand.currency ?? undefined}
+            {...buildV3Series(monthlyReports
               .filter(r => r.brand_id === openMonthly.brand_id && r.month <= openMonthly.month)
               .sort((a, b) => a.month.localeCompare(b.month))
-              .slice(-8);
-            return sameBrand.map(t => {
-              const n = normalizeMonthlyContent(t.content);
-              const [y, mm] = t.month.split('-').map(Number);
-              return {
-                label: new Date(y, mm - 1, 1).toLocaleString(undefined, { month: 'short' }),
-                'Total Sales':   n.total_sales.month,
-                'Affiliate GMV': n.gmv_breakdown.affiliate_gmv.this,
-              };
-            });
-          })()}
-          monthLabel={fmtMonthLabel(openMonthly.month)}
-          brandName={activeBrand.name}
-          clientName={activeBrand.client}
-          currency={activeBrand.currency ?? undefined}
-          approvalDecisions={allDecisions
-            .filter(d => d.report_id === openMonthly.id && d.report_type === 'monthly')
-            .map(d => ({
-              id: d.id, decision: d.decision, comment: d.comment,
-              decided_by_name: d.decided_by_name, decided_at: d.decided_at,
-            }))}
-          approvalAction={openMonthly.content?.approval?.enabled ? {
-            myDecision: (() => {
-              const d = latestDecisions.get(`monthly:${openMonthly.id}`);
-              return d ? {
-                id: d.id, decision: d.decision, comment: d.comment,
-                decided_by_name: d.decided_by_name, decided_at: d.decided_at,
-              } : null;
-            })(),
-            defaultName: publicName,
-            onSubmit: async (choice, comment, name) => {
-              await submitApprovals([{
-                report_id: openMonthly.id,
-                report_type: 'monthly',
-                decision: choice,
-                comment,
-                decided_by_name: name,
-              }]);
-            },
-          } : undefined}
-          commentsConfig={{
-            mode: 'public',
-            comments: monthlyReportComments,
-            defaultPublicName: publicName,
-            onAdd: (section, body, name, parentId) => addComment(section, body, name, parentId, 'monthly'),
-          }}
-        />
+              .slice(-8)
+              .map(t => ({ label: shortMonth(t.month), content: t.content })))}
+            audience="client"
+            reportMeta={{
+              title: `${activeBrand.name} — Monthly Performance`,
+              period: fmtMonthLabel(openMonthly.month),
+              compare: prevM ? `${fmtMonthLabel(openMonthly.month)} vs ${fmtMonthLabel(prevM.month)}` : undefined,
+            }}
+            approvalDecisions={mDecisions}
+            approvalAction={mApprovalAction}
+            commentsConfig={mCommentsConfig}
+          />
+        ) : (
+          <MonthlyReportDashboard
+            c={normalizeMonthlyContent(openMonthly.content)}
+            p={prevM ? normalizeMonthlyContent(prevM.content) : null}
+            hasPrev={!!prevM}
+            trendData={(() => {
+              const sameBrand = monthlyReports
+                .filter(r => r.brand_id === openMonthly.brand_id && r.month <= openMonthly.month)
+                .sort((a, b) => a.month.localeCompare(b.month))
+                .slice(-8);
+              return sameBrand.map(t => {
+                const n = normalizeMonthlyContent(t.content);
+                const [y, mm] = t.month.split('-').map(Number);
+                return {
+                  label: new Date(y, mm - 1, 1).toLocaleString(undefined, { month: 'short' }),
+                  'Total Sales':   n.total_sales.month,
+                  'Affiliate GMV': n.gmv_breakdown.affiliate_gmv.this,
+                };
+              });
+            })()}
+            monthLabel={fmtMonthLabel(openMonthly.month)}
+            brandName={activeBrand.name}
+            clientName={activeBrand.client}
+            currency={activeBrand.currency ?? undefined}
+            approvalDecisions={mDecisions}
+            approvalAction={mApprovalAction}
+            commentsConfig={mCommentsConfig}
+          />
+        )}
         <div className="ac-report-nav">
           <button
             type="button"

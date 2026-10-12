@@ -4,7 +4,7 @@ import { Spinner, Alert } from 'react-bootstrap';
 import { supabase } from '../lib/supabase';
 import WeeklyReportEditClassic from './WeeklyReportEditClassic';
 import WeeklyReportEditV2 from './WeeklyReportEditV2';
-import WeeklyReportEditV3 from './WeeklyReportEditV3';
+import ReportEditV3 from './ReportEditV3';
 
 /**
  * Routes a weekly report to the right editor based on the format it was created
@@ -31,7 +31,7 @@ export default function WeeklyReportEdit() {
 
   if (err) return <Alert variant="danger">{err}</Alert>;
   if (!fmt) return <div className="text-center py-5"><Spinner animation="border" /></div>;
-  return fmt === 'v3' ? <WeeklyReportEditV3 />
+  return fmt === 'v3' ? <ReportEditV3 kind="weekly" />
     : fmt === 'v2' ? <WeeklyReportEditV2 />
     : <WeeklyReportEditClassic />;
 }

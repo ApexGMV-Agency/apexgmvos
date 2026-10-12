@@ -9,6 +9,7 @@ import {
   WeeklyReportContentV3, emptyContentV3, normalizeContentV3, numOrNull,
   WEEKLY_SECTIONS_V3, SECTION_LABELS_V3, SectionDefV3, emptyRow,
   CustomSection, CustomField, CustomFieldType, StandardSectionIdV3,
+  ReportPeriod, forPeriod, sectionsForPeriod,
 } from '../lib/reportSchemaV3';
 import { ScalarSectionBodyV3, TableSectionBodyV3 } from '../components/report/SectionBodyV3';
 import VideoPasteBar from '../components/report/VideoPasteBar';
@@ -34,9 +35,32 @@ type ClickedSection =
   | { type: 'standard'; id: StandardSectionIdV3 }
   | { type: 'custom'; section: CustomSection };
 
+// Weekly rows carry week_start/week_end/week_number; monthly rows carry `month`
+// ('YYYY-MM'). periodOf() maps either onto one inclusive date window.
 interface ReportRow {
-  id: string; brand_id: string; week_start: string; week_end: string;
-  week_number: number; status: string; content: any;
+  id: string; brand_id: string; status: string; content: any;
+  week_start?: string; week_end?: string; week_number?: number;
+  month?: string;
+}
+type ReportKind = 'weekly' | 'monthly';
+
+function fmtMonth(yyyymm: string): string {
+  const [y, m] = yyyymm.split('-').map(Number);
+  return new Date(y, m - 1, 1).toLocaleString(undefined, { month: 'long', year: 'numeric' });
+}
+function periodOf(kind: ReportKind, r: ReportRow): { start: string; end: string } {
+  if (kind === 'weekly') return { start: r.week_start!, end: r.week_end! };
+  const [y, m] = r.month!.split('-').map(Number);
+  const lastDay = new Date(y, m, 0).getDate();
+  return { start: `${r.month}-01`, end: `${r.month}-${String(lastDay).padStart(2, '0')}` };
+}
+/** Short name of one report: "Week #12" / "March 2026". */
+function reportName(kind: ReportKind, r: ReportRow): string {
+  return kind === 'weekly' ? `Week #${r.week_number}` : fmtMonth(r.month!);
+}
+/** The date range a report covers, as shown in messages. */
+function periodLabel(kind: ReportKind, r: ReportRow): string {
+  return kind === 'weekly' ? formatRange(r.week_start!, r.week_end!) : fmtMonth(r.month!);
 }
 interface Brand { id: string; name: string; client: string; client_status: string | null; currency?: string | null; }
 type Msg = { kind: 'success' | 'warning' | 'danger'; text: string } | null;
@@ -44,13 +68,23 @@ type Msg = { kind: 'success' | 'warning' | 'danger'; text: string } | null;
 /** Hand-off freeze: long enough for the previous editor's final save to land. */
 const HANDOFF_SETTLE_MS = 2000;
 
-export default function WeeklyReportEditV3() {
+/**
+ * Editor for the 12-section v3 template. Weekly and monthly reports share it —
+ * same registry, same content shape — and differ only in which table they live
+ * in, the date window the auto-fills read, and the period wording.
+ */
+export default function ReportEditV3({ kind = 'weekly' }: { kind?: ReportKind }) {
   const { id } = useParams<{ id: string }>();
   const nav = useNavigate();
   const { profile } = useAuth();
+  const table = kind === 'monthly' ? 'monthly_reports' : 'weekly_reports';
+  const presetTable = kind === 'monthly' ? 'monthly_section_presets' : 'section_presets';
+  const period: ReportPeriod = kind === 'monthly' ? 'month' : 'week';
+  const pw = (text: string) => forPeriod(text, period);
+  const SECTIONS = sectionsForPeriod(period);
   // Collaborative edit lock — only one teammate edits a report at a time.
   const lock = useEditLock({
-    kind: 'weekly',
+    kind,
     id,
     userId: profile?.id,
     name: profile?.full_name || profile?.email || 'A teammate',
@@ -112,7 +146,7 @@ export default function WeeklyReportEditV3() {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase.from('weekly_reports').select('*').eq('id', id).single();
+      const { data, error } = await supabase.from(table).select('*').eq('id', id).single();
       if (error) { setErr(error.message); setLoading(false); return; }
       const r = data as ReportRow;
       setReport(r);
@@ -121,15 +155,16 @@ export default function WeeklyReportEditV3() {
       lastSavedContent.current = JSON.stringify(normalized);   // autosave baseline
       const { data: bd } = await supabase.from('brands').select('id,name,client,client_status,currency').eq('id', r.brand_id).single();
       setBrand(bd as Brand);
-      const { data: priors } = await supabase.from('weekly_reports')
-        .select('*').eq('brand_id', r.brand_id).lt('week_start', r.week_start)
-        .order('week_start', { ascending: false }).limit(12);
+      const periodCol = kind === 'monthly' ? 'month' : 'week_start';
+      const { data: priors } = await supabase.from(table)
+        .select('*').eq('brand_id', r.brand_id).lt(periodCol, (r as any)[periodCol])
+        .order(periodCol, { ascending: false }).limit(12);
       setPriorReports((priors as ReportRow[]) ?? []);
       if (priors && priors.length > 0) setSelectedPriorId((priors[0] as any).id);
       const { data: cm } = await supabase.from('report_comments')
         .select('*').eq('report_id', r.id).order('created_at', { ascending: true });
       setComments((cm as Comment[]) ?? []);
-      const { data: pr } = await supabase.from('section_presets')
+      const { data: pr } = await supabase.from(presetTable)
         .select('id,name,payload,kind,section_id,created_by,created_at').order('created_at', { ascending: false });
       setPresets(((pr as any[]) ?? []).map(p => ({
         ...p, kind: p.kind ?? 'custom', section_id: p.section_id ?? null,
@@ -157,7 +192,7 @@ export default function WeeklyReportEditV3() {
     if (snap === lastSavedContent.current) return;             // nothing new
     savingRef.current = true;
     setAutoSave('saving');
-    const { error } = await supabase.from('weekly_reports').update({ content: latestContentRef.current }).eq('id', id);
+    const { error } = await supabase.from(table).update({ content: latestContentRef.current }).eq('id', id);
     savingRef.current = false;
     if (!mountedRef.current) return;
     if (error) { setAutoSave('error'); return; }
@@ -185,7 +220,7 @@ export default function WeeklyReportEditV3() {
       .map(r => String(r.video_link ?? '')),
     enabled: !loading && !!report && !lock.isLockedOut && !reloading && brand?.client_status !== 'closed',
     brandId: report?.brand_id,
-    reportType: 'weekly',
+    reportType: kind,
     onPoster: (link, url) => setC(prev => ({
       ...prev,
       top_videos: prev.top_videos.map(r => String(r.video_link ?? '').trim() === link
@@ -198,7 +233,7 @@ export default function WeeklyReportEditV3() {
   // through the hand-off freeze too, so whoever takes over arrives holding the
   // previous editor's final save instead of a stale snapshot.
   useLiveReportContent({
-    table: 'weekly_reports',
+    table,
     id,
     active: lock.isLockedOut || reloading,
     onContent: raw => {
@@ -224,12 +259,12 @@ export default function WeeklyReportEditV3() {
     if (lostControl) {
       if (brand?.client_status === 'closed') return;
       const snapshot = latestContentRef.current;
-      void supabase.from('weekly_reports').update({ content: snapshot }).eq('id', id)
+      void supabase.from(table).update({ content: snapshot }).eq('id', id)
         .then(({ error }) => { if (!error) lastSavedContent.current = JSON.stringify(snapshot); });
     } else {
       setReloading(true);
       const t = setTimeout(async () => {
-        const { data, error } = await supabase.from('weekly_reports').select('content').eq('id', id).single();
+        const { data, error } = await supabase.from(table).select('content').eq('id', id).single();
         if (!error && data) {
           const normalized = normalizeContentV3(data.content);
           setC(normalized);
@@ -294,7 +329,7 @@ export default function WeeklyReportEditV3() {
       name: s.name, description: s.description, is_repeater: s.is_repeater,
       insert_after: s.insert_after, fields: s.fields.map(f => ({ label: f.label, type: f.type, options: f.options })),
     };
-    const { data, error } = await supabase.from('section_presets')
+    const { data, error } = await supabase.from(presetTable)
       .insert({ name: name.trim(), payload, created_by: profile?.id ?? null }).select().single();
     setPresetSavingId(null);
     if (error) { alert(error.message); return; }
@@ -306,7 +341,7 @@ export default function WeeklyReportEditV3() {
     if (!confirm(`Delete preset "${p.name}" from the shared library?`)) return;
     const prev = presets;
     setPresets(presets.filter(x => x.id !== p.id));
-    const { error } = await supabase.from('section_presets').delete().eq('id', p.id);
+    const { error } = await supabase.from(presetTable).delete().eq('id', p.id);
     if (error) { alert(error.message); setPresets(prev); }
   };
 
@@ -329,7 +364,7 @@ export default function WeeklyReportEditV3() {
     if (!name) return;
     const data = (c as any)[sectionId];
     if (data == null) return;
-    const { data: row, error } = await supabase.from('section_presets')
+    const { data: row, error } = await supabase.from(presetTable)
       .insert({ name: name.trim(), kind: 'standard', section_id: stdKey(sectionId), payload: { data }, created_by: profile?.id ?? null })
       .select().single();
     if (error) { alert(error.message); return; }
@@ -340,7 +375,7 @@ export default function WeeklyReportEditV3() {
   const addComment = async (section: CommentSection, body: string, _authorName: string, parentId?: string) => {
     if (!report) return;
     const { data, error } = await supabase.functions.invoke('post-staff-comment', {
-      body: { report_id: report.id, section, body, parent_id: parentId ?? null },
+      body: { report_id: report.id, report_type: kind, section, body, parent_id: parentId ?? null },
     });
     if (error) throw error;
     if ((data as any)?.error) throw new Error((data as any).error);
@@ -369,13 +404,14 @@ export default function WeeklyReportEditV3() {
   const fetchSamplingFromBrand = async () => {
     if (!report) return;
     setFetchingSampling(true); setSamplingMsg(null);
-    const label = formatRange(report.week_start, report.week_end);
+    const label = periodLabel(kind, report);
+    const { start, end } = periodOf(kind, report);
     const { data, error } = await supabase
       .from('brand_samples_daily')
       .select('entry_date,new_videos,others_count,product_counts')
       .eq('brand_id', report.brand_id)
-      .gte('entry_date', report.week_start)
-      .lte('entry_date', report.week_end);
+      .gte('entry_date', start)
+      .lte('entry_date', end);
     setFetchingSampling(false);
     if (error) { setSamplingMsg({ kind: 'danger', text: error.message }); return; }
     const rows = (data as any[]) ?? [];
@@ -391,7 +427,7 @@ export default function WeeklyReportEditV3() {
     setSamplingMsg({ kind: 'success', text: `Pulled ${approved} approved sample${approved === 1 ? '' : 's'} and ${videos} new video${videos === 1 ? '' : 's'} for ${label}. Don't forget to save.` });
   };
 
-  // ----- §2 Shop Performance Score — weekly avg SPS from the Sample-Seeding page.
+  // ----- §2 Shop Performance Score — avg SPS over the period from Sample Seeding.
   //  Mirrors the "Avg SPS" the Sample Seeding tab shows: the mean of the week's
   //  logged daily SPS values (weekend rows carry no SPS, so filtering non-null
   //  already excludes them). Only fills Shop Performance Score — every other
@@ -399,13 +435,14 @@ export default function WeeklyReportEditV3() {
   const fetchShopScoreFromBrand = async () => {
     if (!report) return;
     setFetchingScore(true); setScoreMsg(null);
-    const label = formatRange(report.week_start, report.week_end);
+    const label = periodLabel(kind, report);
+    const { start, end } = periodOf(kind, report);
     const { data, error } = await supabase
       .from('brand_samples_daily')
       .select('entry_date,daily_sps')
       .eq('brand_id', report.brand_id)
-      .gte('entry_date', report.week_start)
-      .lte('entry_date', report.week_end);
+      .gte('entry_date', start)
+      .lte('entry_date', end);
     setFetchingScore(false);
     if (error) { setScoreMsg({ kind: 'danger', text: error.message }); return; }
     const vals = ((data as any[]) ?? [])
@@ -422,17 +459,18 @@ export default function WeeklyReportEditV3() {
     setScoreMsg({ kind: 'success', text: `Set Shop Performance Score to ${avg.toFixed(1)} — the average of ${vals.length} daily SPS entr${vals.length === 1 ? 'y' : 'ies'} for ${label}. Don't forget to save.` });
   };
 
-  // ----- §8 LIVE Sessions — sum this week's daily live_sessions from Sample Seeding
+  // ----- §8 LIVE Sessions — sum the period's daily live_sessions from Sample Seeding
   const fetchLiveSessionsFromBrand = async () => {
     if (!report) return;
     setFetchingLive(true); setLiveMsg(null);
-    const label = formatRange(report.week_start, report.week_end);
+    const label = periodLabel(kind, report);
+    const { start, end } = periodOf(kind, report);
     const { data, error } = await supabase
       .from('brand_samples_daily')
       .select('entry_date,live_sessions')
       .eq('brand_id', report.brand_id)
-      .gte('entry_date', report.week_start)
-      .lte('entry_date', report.week_end);
+      .gte('entry_date', start)
+      .lte('entry_date', end);
     setFetchingLive(false);
     if (error) { setLiveMsg({ kind: 'danger', text: error.message }); return; }
     const rows = (data as any[]) ?? [];
@@ -479,17 +517,23 @@ export default function WeeklyReportEditV3() {
   const fetchGmvMaxProduct = async () => {
     if (!report) return;
     setFetchingGmv(true); setGmvMsg(null);
-    let label = formatRange(report.week_start, report.week_end);
-    const { data: exact, error } = await supabase
-      .from('brand_gmv_max_weekly').select('id')
-      .eq('brand_id', report.brand_id).eq('week_start', report.week_start);
+    let label = periodLabel(kind, report);
+    const { start, end } = periodOf(kind, report);
+    // Weekly: the GMV Max week that starts on this report's week. Monthly: every
+    // GMV Max week that STARTS inside the month, so a week straddling two months
+    // is counted once (in the month it began), never in both.
+    const exactQ = supabase.from('brand_gmv_max_weekly').select('id').eq('brand_id', report.brand_id);
+    const { data: exact, error } = kind === 'monthly'
+      ? await exactQ.gte('week_start', start).lte('week_start', end)
+      : await exactQ.eq('week_start', start);
     if (error) { setFetchingGmv(false); setGmvMsg({ kind: 'danger', text: error.message }); return; }
     let weeklyIds = ((exact as any[]) ?? []).map(r => r.id);
-    if (weeklyIds.length === 0) {
+    if (kind === 'monthly' && weeklyIds.length > 0) label += ` (${weeklyIds.length} GMV Max week${weeklyIds.length === 1 ? '' : 's'})`;
+    if (weeklyIds.length === 0 && kind === 'weekly') {
       const { data: overlap } = await supabase
         .from('brand_gmv_max_weekly').select('id')
         .eq('brand_id', report.brand_id)
-        .lte('week_start', report.week_end).gte('week_end', report.week_start);
+        .lte('week_start', end).gte('week_end', start);
       weeklyIds = ((overlap as any[]) ?? []).map(r => r.id);
       if (weeklyIds.length > 0) label += ` (${weeklyIds.length} GMV Max week${weeklyIds.length === 1 ? '' : 's'})`;
     }
@@ -549,10 +593,10 @@ export default function WeeklyReportEditV3() {
     setSaving(true); setErr(null);
     const update: Record<string, any> = { content: c, status };
     if (c.approval?.enabled) update.is_shared = true;
-    const { error } = await supabase.from('weekly_reports').update(update).eq('id', id);
+    const { error } = await supabase.from(table).update(update).eq('id', id);
     setSaving(false);
     if (error) { setErr(error.message); return; }
-    nav(`/reporting/weekly/${id}`);
+    nav(`/reporting/${kind}/${id}`);
   };
 
   const openCommentsModal = async () => {
@@ -572,7 +616,7 @@ export default function WeeklyReportEditV3() {
     const priorLabel = priorReports.find(p => p.id === cm.report_id);
     const origDate = new Date(cm.created_at).toLocaleDateString();
     const quoted = cm.body.split('\n').map(l => `> ${l}`).join('\n');
-    const body = `📌 Referenced from ${priorLabel ? `Week #${priorLabel.week_number}` : 'prior report'} — ${cm.author_name} (${origDate}):\n${quoted}`;
+    const body = `📌 Referenced from ${priorLabel ? reportName(kind, priorLabel) : 'prior report'} — ${cm.author_name} (${origDate}):\n${quoted}`;
     try {
       await addComment(cm.section as CommentSection, body, profile.full_name || profile.email || 'User');
       setShowComments(false);
@@ -838,7 +882,9 @@ export default function WeeklyReportEditV3() {
         <div>
           <h2 className="mb-1">{brand.name} <small className="text-muted fs-6">— {brand.client}</small></h2>
           <div className="text-muted">
-            Week #{report.week_number} · {formatRange(report.week_start, report.week_end)}
+            {kind === 'weekly'
+              ? <>Week #{report.week_number} · {formatRange(report.week_start!, report.week_end!)}</>
+              : <>Monthly report · {fmtMonth(report.month!)}</>}
             <Badge bg={report.status === 'draft' ? 'secondary' : 'success'} className="ms-2">{report.status}</Badge>
             <Badge bg="dark" className="ms-2">New format</Badge>
             {lock.ready && lock.othersCount > 0 && lock.isOwner && (
@@ -855,7 +901,7 @@ export default function WeeklyReportEditV3() {
             </Button>
           )}
           {autoSaveBadge}
-          <Button variant="outline-secondary" onClick={() => nav('/reporting/weekly')}>Cancel</Button>
+          <Button variant="outline-secondary" onClick={() => nav(`/reporting/${kind}`)}>Cancel</Button>
           <Button variant="outline-primary" disabled={saving || brandInactive || formFrozen} onClick={(e) => submit(e as any, 'draft')}>Save draft</Button>
           <Button variant="primary" disabled={saving || brandInactive || formFrozen} onClick={(e) => submit(e as any, 'submitted')}>{saving ? 'Saving…' : 'Save & view dashboard'}</Button>
         </div>
@@ -868,7 +914,7 @@ export default function WeeklyReportEditV3() {
       {renderCustomAt('start')}
 
       {/* 12 standard sections, registry-driven */}
-      {WEEKLY_SECTIONS_V3.map(def => (
+      {SECTIONS.map(def => (
         <Fragment key={def.id}>
           <Card className="mb-4" data-section={def.id}>
             <Card.Header>
@@ -888,18 +934,18 @@ export default function WeeklyReportEditV3() {
         <Card.Header><HeaderWithFeedback title="Insights" section="insights" sectionId="insights" /></Card.Header>
         <Card.Body>
           <Form.Text className="text-muted d-block mb-2">
-            Write your insights for this week. Use the <strong>Divider</strong> button to separate topics — pick its thickness, colour and style.
+            {pw('Write your insights for this week.')} Use the <strong>Divider</strong> button to separate topics — pick its thickness, colour and style.
           </Form.Text>
           <RichTextEditor
             value={c.insights.summary}
             onChange={html => setC(prev => ({ ...prev, insights: { summary: html } }))}
-            placeholder="Write your insights for this week…"
+            placeholder={pw('Write your insights for this week…')}
             minHeight={240}
           />
           {priorReports.length > 0 && (
             <div className="mt-4">
               <div className="text-muted small fw-semibold mb-2">
-                <i className="bi bi-clock-history me-1" />Previous weeks' insights (read-only) — for reference
+                <i className="bi bi-clock-history me-1" />{pw("Previous weeks' insights (read-only) — for reference")}
               </div>
               <Accordion>
                 {priorReports.map((p, i) => {
@@ -910,13 +956,13 @@ export default function WeeklyReportEditV3() {
                   return (
                     <Accordion.Item eventKey={String(i)} key={p.id}>
                       <Accordion.Header>
-                        <span className="fw-semibold">Week #{(p as any).week_number ?? i + 1}</span>
-                        <span className="text-muted ms-2 small">{formatRange(p.week_start, p.week_end)}</span>
+                        <span className="fw-semibold">{kind === 'weekly' ? `Week #${p.week_number ?? i + 1}` : fmtMonth(p.month!)}</span>
+                        {kind === 'weekly' && <span className="text-muted ms-2 small">{formatRange(p.week_start!, p.week_end!)}</span>}
                       </Accordion.Header>
                       <Accordion.Body>
                         {hasText
                           ? <div className="ac-rte-view" dangerouslySetInnerHTML={{ __html: clean }} />
-                          : <span className="text-muted fst-italic">No insights were written for this week.</span>}
+                          : <span className="text-muted fst-italic">{pw('No insights were written for this week.')}</span>}
                       </Accordion.Body>
                     </Accordion.Item>
                   );
@@ -945,7 +991,7 @@ export default function WeeklyReportEditV3() {
             <RichTextEditor
               value={c.approval?.content ?? ''}
               onChange={html => setC(prev => ({ ...prev, approval: { ...prev.approval, content: html } }))}
-              placeholder="Describe what needs the client's approval this week…"
+              placeholder={pw("Describe what needs the client's approval this week…")}
               minHeight={180}
             />
             <div className="mt-3 row g-2 align-items-end">
@@ -998,7 +1044,7 @@ export default function WeeklyReportEditV3() {
 
       <div className="d-flex justify-content-end gap-2 mb-4">
         {autoSaveBadge}
-        <Button variant="outline-secondary" onClick={() => nav('/reporting/weekly')}>Cancel</Button>
+        <Button variant="outline-secondary" onClick={() => nav(`/reporting/${kind}`)}>Cancel</Button>
         <Button variant="outline-primary" disabled={saving || brandInactive || formFrozen} onClick={(e) => submit(e as any, 'draft')}>Save draft</Button>
         <Button variant="primary" disabled={saving || brandInactive || formFrozen} onClick={(e) => submit(e as any, 'submitted')}>{saving ? 'Saving…' : 'Save & view dashboard'}</Button>
       </div>
@@ -1014,7 +1060,7 @@ export default function WeeklyReportEditV3() {
                 <Form.Label className="small">Choose a report</Form.Label>
                 <Form.Select value={selectedPriorId} onChange={e => { setSelectedPriorId(e.target.value); loadPriorComments(e.target.value); }}>
                   {priorReports.map(p => (
-                    <option key={p.id} value={p.id}>Week #{p.week_number} — {formatRange(p.week_start, p.week_end)}</option>
+                    <option key={p.id} value={p.id}>{reportName(kind, p)}{kind === 'weekly' && ` — ${periodLabel(kind, p)}`}</option>
                   ))}
                 </Form.Select>
               </Form.Group>

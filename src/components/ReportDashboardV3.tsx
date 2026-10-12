@@ -1,12 +1,12 @@
-import { useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Offcanvas, Button, Badge, Alert, Form } from 'react-bootstrap';
 import {
   ResponsiveContainer, ComposedChart, LineChart, Bar, Line, XAxis, YAxis, Tooltip, CartesianGrid,
   PieChart, Pie, Cell, LabelList,
 } from 'recharts';
 import {
-  WeeklyReportContentV3, WEEKLY_SECTIONS_V3, SECTION_BY_ID_V3, SectionDefV3, SectionField,
-  ScalarData, RowData, fieldValue, formatValue,
+  WeeklyReportContentV3, SectionDefV3, SectionField,
+  ScalarData, RowData, fieldValue, formatValue, ReportPeriod, forPeriod, sectionsForPeriod,
 } from '../lib/reportSchemaV3';
 import { setReportCurrency } from '../lib/currency';
 import { sanitizeRich } from '../lib/sanitize';
@@ -22,6 +22,14 @@ export interface WowPoint { label: string; gmv: number; orders: number }
 // Sections the internal team sees but the client does not (currently none —
 // GMV Max was client-hidden until 2026-07-17, user call to show it).
 const CLIENT_HIDE = new Set<string>([]);
+
+// The same dashboard renders weekly and monthly v3 reports; sub-components read
+// the period from context to word their captions ("last 8 weeks" / "months").
+const PeriodCtx = createContext<ReportPeriod>('week');
+function usePw() {
+  const period = useContext(PeriodCtx);
+  return (text: string) => forPeriod(text, period);
+}
 
 // num() preserves "never entered" as null (blank -> "—", no fabricated 0);
 // numv() coerces to 0 for sums / chart values where a real number is required.
@@ -67,6 +75,7 @@ function KpiTile({ f, data, prev }: { f: SectionField; data: ScalarData; prev: S
 function WeekMtdTile({ label, f, data, prev, mtd }: {
   label: string; f: SectionField; data: ScalarData; prev: ScalarData | null; mtd?: number | null;
 }) {
+  const pw = usePw();
   const cur = fieldValue(f, data);
   const pv = prev ? fieldValue(f, prev) : null;
   const hasMtd = mtd !== undefined;
@@ -76,7 +85,7 @@ function WeekMtdTile({ label, f, data, prev, mtd }: {
       <div className="v3-wmtile-split">
         <div className="v3-wmtile-half">
           <div className="ac-kpi-value">{formatValue(f.format, cur)}</div>
-          <div className="v3-mtd-note">This week</div>
+          <div className="v3-mtd-note">{pw('This week')}</div>
           {f.comparable && <div className="mt-2"><DeltaPill f={f} cur={cur} prev={pv} /></div>}
         </div>
         {hasMtd && (
@@ -195,15 +204,16 @@ function makeDot(lastIdx: number, baseColor: string, opts?: { small?: boolean })
 //  Every GMV point carries its value label (no hover needed); the latest week
 //  (the report being viewed) gets a blinking green "live" dot.
 function WowCombo({ data }: { data: WowPoint[] }) {
+  const pw = usePw();
   if (data.length < 2) return null;
   return (
     <div className="s14-card h-100">
       <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
-        <div className="s14-kpi-label">GMV &amp; Orders · last {data.length} weeks</div>
+        <div className="s14-kpi-label">GMV &amp; Orders · last {data.length} {pw('weeks')}</div>
         <div className="d-flex gap-3 align-items-center">
           <span className="ac-legend-dot" style={{ '--c': 'var(--ac-text-secondary)' } as any}>Orders</span>
           <span className="ac-legend-dot" style={{ '--c': '#fc6215' } as any}>GMV</span>
-          <span className="v3-live-legend"><span className="v3-live-pulse" />This week</span>
+          <span className="v3-live-legend"><span className="v3-live-pulse" />{pw('This week')}</span>
         </div>
       </div>
       <div style={{ height: 290 }}>
@@ -233,17 +243,18 @@ function WowCombo({ data }: { data: WowPoint[] }) {
 
 // ---- ss2 · Samples vs Videos weekly line chart (live dot on current week) --
 function SamplesLineChart({ data }: { data: { label: string; samples: number | null; videos: number | null }[] }) {
+  const pw = usePw();
   if (data.filter(d => d.samples != null || d.videos != null).length < 2) return null;
   const lastIdx = data.length - 1;
   const numLabel = (v: any) => (v == null || v === '') ? '' : formatValue('number', Number(v));
   return (
     <div className="s14-card mt-3">
       <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
-        <div className="s14-kpi-label">Samples &amp; videos · last {data.length} weeks</div>
+        <div className="s14-kpi-label">Samples &amp; videos · last {data.length} {pw('weeks')}</div>
         <div className="d-flex gap-3 align-items-center">
           <span className="ac-legend-dot" style={{ '--c': '#fc6215' } as any}>Samples</span>
           <span className="ac-legend-dot" style={{ '--c': 'var(--ac-info)' } as any}>Videos</span>
-          <span className="v3-live-legend"><span className="v3-live-pulse" />This week</span>
+          <span className="v3-live-legend"><span className="v3-live-pulse" />{pw('This week')}</span>
         </div>
       </div>
       <div style={{ height: 252 }}>
@@ -278,6 +289,7 @@ const AFF_LINES: { key: keyof AffPoint; name: string; color: string; axis: 'n' |
   { key: 'live_sessions', name: 'LIVE Sessions', color: 'var(--ac-violet)', axis: 'n', fmt: 'number', pos: 'bottom' },
 ];
 function AffiliateTrend({ data }: { data: AffPoint[] }) {
+  const pw = usePw();
   if (data.filter(d => AFF_LINES.some(l => d[l.key] != null)).length < 2) return null;
   const lastIdx = data.length - 1;
   const lab = (fmt: 'currency' | 'number') => (v: any) =>
@@ -285,10 +297,10 @@ function AffiliateTrend({ data }: { data: AffPoint[] }) {
   return (
     <div className="s14-card mt-3">
       <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
-        <div className="s14-kpi-label">Affiliate metrics · last {data.length} weeks</div>
+        <div className="s14-kpi-label">Affiliate metrics · last {data.length} {pw('weeks')}</div>
         <div className="d-flex gap-3 align-items-center flex-wrap">
           {AFF_LINES.map(l => <span key={String(l.key)} className="ac-legend-dot" style={{ '--c': l.color } as any}>{l.name}</span>)}
-          <span className="v3-live-legend"><span className="v3-live-pulse" />This week</span>
+          <span className="v3-live-legend"><span className="v3-live-pulse" />{pw('This week')}</span>
         </div>
       </div>
       <div style={{ height: 300 }}>
@@ -325,6 +337,7 @@ const OFF_LINES: { key: keyof OffPoint; name: string; color: string; axis: 'g' |
   { key: 'offsite_effect', name: 'Offsite Effect', color: 'var(--ac-success)', axis: 'p', fmt: 'percent', pos: 'top' },
 ];
 function OffsiteTrend({ data }: { data: OffPoint[] }) {
+  const pw = usePw();
   if (data.filter(d => OFF_LINES.some(l => d[l.key] != null)).length < 2) return null;
   const lastIdx = data.length - 1;
   const lab = (fmt: 'currency' | 'percent') => (v: any) =>
@@ -332,10 +345,10 @@ function OffsiteTrend({ data }: { data: OffPoint[] }) {
   return (
     <div className="s14-card mt-3">
       <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
-        <div className="s14-kpi-label">Weekly trend · last {data.length} weeks</div>
+        <div className="s14-kpi-label">{pw('Weekly')} trend · last {data.length} {pw('weeks')}</div>
         <div className="d-flex gap-3 align-items-center flex-wrap">
           {OFF_LINES.map(l => <span key={String(l.key)} className="ac-legend-dot" style={{ '--c': l.color } as any}>{l.name}</span>)}
-          <span className="v3-live-legend"><span className="v3-live-pulse" />This week</span>
+          <span className="v3-live-legend"><span className="v3-live-pulse" />{pw('This week')}</span>
         </div>
       </div>
       <div style={{ height: 300 }}>
@@ -505,6 +518,7 @@ function MetricTrend({ label, format, color, series, current, lowerIsBetter, hig
 function ProductTable({ def, rows, prevRows, samplesByProduct }: {
   def: SectionDefV3; rows: RowData[]; prevRows: RowData[]; samplesByProduct?: Record<string, number | null>;
 }) {
+  const pw = usePw();
   if (!rows || rows.length === 0) return <div className="s14-empty">No products yet</div>;
   // product_id is always a string ('' when unset), so fall back to the product
   // name with || and never key on an empty string (that would collide rows).
@@ -520,7 +534,7 @@ function ProductTable({ def, rows, prevRows, samplesByProduct }: {
           <thead><tr>
             <th style={{ width: 40 }}>#</th>
             <th>Product</th>
-            {showSamples && <th className="text-end">Samples Approved This Week</th>}
+            {showSamples && <th className="text-end">{pw('Samples Approved This Week')}</th>}
             {cols.map(f => <th key={f.key} className="text-end">{f.label}</th>)}
           </tr></thead>
           <tbody>
@@ -616,6 +630,7 @@ function TopCreators({ rows }: { rows: RowData[] }) {
 }
 
 function TopVideos({ rows }: { rows: RowData[] }) {
+  const pw = usePw();
   const vs = rows.filter(v => String(v.video_link ?? '').trim() !== '' || String(v.product_promoted ?? '').trim() !== '' || num(v.gmv) != null);
   if (vs.length === 0) return <div className="s14-empty">No videos yet</div>;
   return (
@@ -638,7 +653,7 @@ function TopVideos({ rows }: { rows: RowData[] }) {
                 <div className="tp-product">{String(v.product_promoted ?? '').trim() || 'Product'}</div>
                 <div className="tp-gmv">{formatValue('currency', num(v.gmv))}</div>
                 <div className="tp-sub">Video GMV</div>
-                <div className="tp-stat mt-1"><strong>{formatValue('number', num(v.items_sold))}</strong> items sold this week</div>
+                <div className="tp-stat mt-1"><strong>{formatValue('number', num(v.items_sold))}</strong> {pw('items sold this week')}</div>
               </div>
             </div>
           </div>
@@ -731,6 +746,7 @@ function fmtGmx(kind: 'currency' | 'roas' | 'cpo', v: number | null, compact = f
 }
 function GmvMaxViz({ rows, series }: { rows: RowData[]; series?: GmvMaxPoint[] }) {
   const [metricKey, setMetricKey] = useState<keyof Omit<GmvMaxPoint, 'label'>>('revenue');
+  const pw = usePw();
   if (!rows || rows.length === 0) return <div className="s14-empty">No GMV Max data yet</div>;
   const totCost = rows.reduce((a, r) => a + numv(r.cost), 0);
   const totRev = rows.reduce((a, r) => a + numv(r.gross_revenue), 0);
@@ -763,7 +779,7 @@ function GmvMaxViz({ rows, series }: { rows: RowData[]; series?: GmvMaxPoint[] }
       {hasTrend ? (
         <div className="s14-card">
           <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-            <div className="s14-kpi-label">{active.label} · last {S.length} weeks</div>
+            <div className="s14-kpi-label">{active.label} · last {S.length} {pw('weeks')}</div>
             <div className="d-flex align-items-center gap-3 flex-wrap">
               <div className="v3-seg">
                 {GMX_METRICS.map(m => (
@@ -771,7 +787,7 @@ function GmvMaxViz({ rows, series }: { rows: RowData[]; series?: GmvMaxPoint[] }
                     style={m.key === metricKey ? ({ '--seg': m.color } as any) : undefined} onClick={() => setMetricKey(m.key)}>{m.label}</button>
                 ))}
               </div>
-              <span className="v3-live-legend"><span className="v3-live-pulse" />This week</span>
+              <span className="v3-live-legend"><span className="v3-live-pulse" />{pw('This week')}</span>
             </div>
           </div>
           <div style={{ height: 280 }}>
@@ -834,7 +850,7 @@ const SECTION_ACCENT: Record<string, string> = {
 
 export default function ReportDashboardV3({
   c, p, wow, sampleSeries, mtd, productSamples, offsiteSeries, affiliateSeries, gmvMaxSeries, hasPrev, commentsConfig, openSectionOnLoad, highlightCommentId,
-  approvalDecisions, approvalAction, audience = 'staff', reportMeta, currency,
+  approvalDecisions, approvalAction, audience = 'staff', reportMeta, currency, period = 'week',
 }: {
   c: WeeklyReportContentV3;
   p: WeeklyReportContentV3 | null;
@@ -863,11 +879,16 @@ export default function ReportDashboardV3({
   approvalDecisions?: ApprovalDecisionView[];
   approvalAction?: ApprovalActionConfig;
   audience?: 'staff' | 'client';
+  /** 'month' renders a monthly report on this template (period-worded captions). */
+  period?: ReportPeriod;
 }) {
   // Set the report currency during render (before children paint) so every
   // formatValue('currency', …) below emits this brand's symbol.
   setReportCurrency(currency);
   const isClient = audience === 'client';
+  const pw = (text: string) => forPeriod(text, period);
+  const SECTIONS = sectionsForPeriod(period);
+  const sectionById: Record<string, SectionDefV3> = Object.fromEntries(SECTIONS.map(s => [s.id, s]));
   const [feedbackSection, setFeedbackSection] = useState<CommentSection | null>(null);
   const [navCollapsed, setNavCollapsed] = useState<boolean>(() => {
     try { return localStorage.getItem('ac_dash_nav') === '1'; } catch { return false; }
@@ -878,7 +899,7 @@ export default function ReportDashboardV3({
   // §1 "Sampling & Videos" is no longer a standalone section — its cards are
   // rendered inside §8 (Affiliate Performance). It stays in the schema/editor so
   // data entry + auto-fill keep working; it's just merged in the report view.
-  const visibleSections = WEEKLY_SECTIONS_V3.filter(d =>
+  const visibleSections = SECTIONS.filter(d =>
     d.id !== 'sampling'
     && !(isClient && CLIENT_HIDE.has(d.id)));
   // Display numbering follows the visible order (no gap left by the removed §1).
@@ -920,7 +941,7 @@ export default function ReportDashboardV3({
     if (cs) return cs.name || 'Custom Section';
     if (section === 'approval') return 'Approval Needed / Action Items';
     if (section === 'insights') return 'Insights';
-    const def = SECTION_BY_ID_V3[section];
+    const def = sectionById[section];
     if (!def) return section;
     const n = dispNum.get(section);
     return n ? `${n}. ${def.title}` : def.title;
@@ -979,7 +1000,7 @@ export default function ReportDashboardV3({
           <>
             <TileGrid def={def} data={data} prev={prev} skip={new Set(['shop_performance_score', 'shop_ranking'])} />
             <div className="row g-3 mt-0">
-              <div className="col-lg-8">{wowData.length >= 2 ? <WowCombo data={wowData} /> : <div className="s14-card h-100 d-flex align-items-center justify-content-center s14-empty">Week-over-week chart needs at least 2 weekly reports</div>}</div>
+              <div className="col-lg-8">{wowData.length >= 2 ? <WowCombo data={wowData} /> : <div className="s14-card h-100 d-flex align-items-center justify-content-center s14-empty">{pw('Week-over-week chart needs at least 2 weekly reports')}</div>}</div>
               <div className="col-lg-4">
                 <ShopHealthGauge score={fieldValue(scoreF, data)} ranking={num(data?.shop_ranking)} prevRanking={prev ? num(prev?.shop_ranking) : null} />
               </div>
@@ -1052,7 +1073,7 @@ export default function ReportDashboardV3({
                 <span><i className="bi bi-box-seam me-2" />Sampling &amp; videos</span>
                 <FeedbackIcon section={'sampling' as CommentSection} />
               </div>
-              {body(SECTION_BY_ID_V3.sampling)}
+              {body(sectionById.sampling)}
             </div>
             <div className="v3-subhead mt-4"><span><i className="bi bi-people-fill me-2" />Affiliate activity</span></div>
             <TileGrid def={def} data={data} prev={prev} col="col-6 col-lg-3" />
@@ -1097,7 +1118,7 @@ export default function ReportDashboardV3({
 
         {insightsText && (
           <section className="s14-section" data-section="insights">
-            <SectionTitle title="Insights" sub="This week in words" color="var(--ac-cyan)" fb={<FeedbackIcon section="insights" />} />
+            <SectionTitle title="Insights" sub={pw('This week in words')} color="var(--ac-cyan)" fb={<FeedbackIcon section="insights" />} />
             <div className="s14-card"><div className="ac-rte-view" dangerouslySetInnerHTML={{ __html: sanitizeRich(c.insights.summary) }} /></div>
           </section>
         )}
@@ -1132,6 +1153,7 @@ export default function ReportDashboardV3({
   );
 
   return (
+    <PeriodCtx.Provider value={period}>
     <div className="ac-themed dash-shell v3-dash">
       <DashSidebar items={navItems} collapsed={navCollapsed} onToggle={toggleNav} />
       <div className={`dash-client ${navCollapsed ? 'nav-collapsed' : ''}`}>
@@ -1154,6 +1176,7 @@ export default function ReportDashboardV3({
         {inner}
       </div>
     </div>
+    </PeriodCtx.Provider>
   );
 }
 

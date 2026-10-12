@@ -132,6 +132,9 @@ export default function MonthlyReports() {
   const [show, setShow] = useState(false);
   const [createBrand, setCreateBrand] = useState<Brand | null>(null);
   const [createMonth, setCreateMonth] = useState(thisMonth());
+  // Which template to create: 'v3' = the 12-section weekly template (default),
+  // 'classic' = the original monthly layout.
+  const [createFormat, setCreateFormat] = useState<'classic' | 'v3'>('v3');
   const [saving, setSaving] = useState(false);
 
   const load = async () => {
@@ -233,6 +236,7 @@ export default function MonthlyReports() {
     const existing = reports.filter(r => r.brand_id === b.id).map(r => r.month).sort();
     const latest = existing[existing.length - 1];
     setCreateMonth(latest ? shiftMonth(latest, 1) : thisMonth());
+    setCreateFormat('v3');
     setErr(null);
     setShow(true);
     setPickerOpen(false);
@@ -251,6 +255,8 @@ export default function MonthlyReports() {
         created_by: user.id,
         month: createMonth,
         status: 'draft',
+        // Stamp the chosen format into content; classic stays null (unchanged behaviour).
+        ...(createFormat === 'v3' ? { content: { format_version: 'v3' } } : {}),
       }).select('id').single();
       if (error) throw error;
       setShow(false);
@@ -595,9 +601,33 @@ export default function MonthlyReports() {
                 onChange={e => setCreateMonth(e.target.value)} />
               <Form.Text className="text-muted">
                 The report will cover <strong>{fmtMonth(createMonth)}</strong>.
-                If a previous month's report exists for this brand, "Last Month" data will be auto-pulled into the new one.
+                {createFormat === 'classic'
+                  ? <> If a previous month's report exists for this brand, "Last Month" data will be auto-pulled into the new one.</>
+                  : <> It is compared against last month's report automatically when that one uses the new format too.</>}
               </Form.Text>
             </Form.Group>
+            <div className="mt-3">
+              <Form.Label className="small fw-semibold mb-2">Report template</Form.Label>
+              <div className="d-flex flex-column gap-2">
+                <label className={`d-flex align-items-start gap-2 p-2 rounded border ${createFormat === 'v3' ? 'border-primary bg-light' : ''}`} style={{ cursor: 'pointer' }}>
+                  <Form.Check type="radio" name="monthly-report-format" checked={createFormat === 'v3'}
+                    onChange={() => setCreateFormat('v3')} className="mt-1" />
+                  <span>
+                    <span className="fw-semibold">New — 12-section TikTok-Shop format</span>
+                    <span className="badge bg-primary ms-2">New</span>
+                    <div className="text-muted small">Same template as the weekly report: Sampling &amp; Videos, Overall, Product Analytics, Channel, Offsite, Affiliate, Top Creators / Videos / LIVEs, with Sampling and GMV Max auto-filled for the whole month.</div>
+                  </span>
+                </label>
+                <label className={`d-flex align-items-start gap-2 p-2 rounded border ${createFormat === 'classic' ? 'border-primary bg-light' : ''}`} style={{ cursor: 'pointer' }}>
+                  <Form.Check type="radio" name="monthly-report-format" checked={createFormat === 'classic'}
+                    onChange={() => setCreateFormat('classic')} className="mt-1" />
+                  <span>
+                    <span className="fw-semibold">Previous format</span>
+                    <div className="text-muted small">The original monthly layout. Older monthly reports use this.</div>
+                  </span>
+                </label>
+              </div>
+            </div>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShow(false)} disabled={saving}>Cancel</Button>

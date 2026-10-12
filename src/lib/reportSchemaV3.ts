@@ -260,6 +260,32 @@ export const WEEKLY_SECTIONS_V3: SectionDefV3[] = [
 export const SECTION_BY_ID_V3: Record<string, SectionDefV3> =
   Object.fromEntries(WEEKLY_SECTIONS_V3.map(s => [s.id, s]));
 
+// ============================================================================
+//  Report period — monthly reports reuse this exact template (same registry,
+//  same content shape, same `format_version: 'v3'`); only the user-facing
+//  wording changes ("This Week" -> "This Month", "weekly" -> "monthly", ...).
+// ============================================================================
+
+export type ReportPeriod = 'week' | 'month';
+
+/** Re-word a week-phrased string for the given period (case-preserving). */
+export function forPeriod(text: string, period: ReportPeriod): string {
+  if (period === 'week') return text;
+  return text.replace(/week/gi, m => (m[0] === 'W' ? 'Month' : 'month'));
+}
+
+const MONTHLY_SECTIONS_V3: SectionDefV3[] = WEEKLY_SECTIONS_V3.map(s => ({
+  ...s,
+  title: forPeriod(s.title, 'month'),
+  blurb: s.blurb && forPeriod(s.blurb, 'month'),
+  fields: s.fields.map(f => ({ ...f, label: forPeriod(f.label, 'month') })),
+}));
+
+/** The 12 standard sections, worded for the report's period. */
+export function sectionsForPeriod(period: ReportPeriod): SectionDefV3[] {
+  return period === 'month' ? MONTHLY_SECTIONS_V3 : WEEKLY_SECTIONS_V3;
+}
+
 /** Full render order incl. the 'start' and 'insights' anchors used by custom sections. */
 export const WEEKLY_SECTION_ORDER_V3: StandardSectionIdV3[] = [
   'start',
