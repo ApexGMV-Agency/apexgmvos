@@ -767,7 +767,8 @@ create trigger on_auth_user_created
 -- Closes the privilege-escalation hole in the permissive profile UPDATE
 -- policies ("profiles self update" lets anyone edit their own row):
 --   * is_superbob may only be changed by a Super Boss
---   * role may only be changed by a Bob, and a Super Boss's role only by a Super Boss
+--   * role may only be changed by a Bob; making someone a Bob, or moving a Bob
+--     to another role, only by a Super Boss
 -- Service role / SQL editor (auth.uid() is null) is always allowed.
 create or replace function public.profiles_protect_privileges()
 returns trigger language plpgsql security definer set search_path = public as $$
@@ -782,8 +783,8 @@ begin
     if not public.is_bob() then
       raise exception 'Not allowed to change roles';
     end if;
-    if old.is_superbob and not public.is_superbob() then
-      raise exception 'Only a Super Bob can change a Super Bob''s role';
+    if (old.role = 'bob' or new.role = 'bob' or old.is_superbob) and not public.is_superbob() then
+      raise exception 'Only a Super Bob can make someone a Bob or change a Bob''s role';
     end if;
   end if;
 
@@ -2117,10 +2118,13 @@ $$;
 revoke all on function public.set_ads_manager_brands(uuid, uuid[]) from public;
 grant execute on function public.set_ads_manager_brands(uuid, uuid[]) to authenticated;
 
--- ---------- 8.8 Bob: change any non-Bob role ----------
+-- ---------- 8.8 Bob: change roles ----------
 -- Data-safe: reports, comments and notifications keyed by the user's id are
 -- untouched; only role / flags / brand bookkeeping change. APC↔Team Lead
 -- delegate to promote/demote so brand carry-over is identical.
+-- Any Bob may move people between apc / team_lead / ads_manager. Only a Super
+-- Boss may make someone a Bob ('bob') or Super Boss ('superbob'), or move a
+-- regular Bob to another role. A Super Boss's own role is never changed here.
 
 create or replace function public.change_user_role(p_user uuid, p_new_role text)
 returns void language plpgsql security definer set search_path = public as $$
@@ -2134,12 +2138,16 @@ begin
   select role, coalesce(is_superbob, false) into v_old, v_superbob
     from public.profiles where id = p_user;
   if v_old is null then raise exception 'User not found'; end if;
-  if v_old = 'bob' or v_superbob then
-    raise exception 'Bob accounts are managed from the Bobs page';
+
+  if p_new_role not in ('apc', 'team_lead', 'ads_manager', 'bob', 'superbob') then
+    raise exception 'Unsupported role: %', p_new_role;
   end if;
 
-  if p_new_role not in ('apc', 'team_lead', 'ads_manager') then
-    raise exception 'Unsupported role: %', p_new_role;
+  if v_superbob then
+    raise exception 'A Super Boss''s role cannot be changed';
+  end if;
+  if (v_old = 'bob' or p_new_role in ('bob', 'superbob')) and not public.is_superbob() then
+    raise exception 'Only the Super Boss can make someone a Bob or change a Bob''s role';
   end if;
 
   if v_old = p_new_role then return; end if;
@@ -2153,8 +2161,8 @@ begin
     return;
   end if;
 
-  -- Clean up the OLD role's bookkeeping. Leaving 'ads_manager' or 'pending'
-  -- needs nothing manual — profiles_reconcile_ads rebuilds the derived set.
+  -- Clean up the OLD role's bookkeeping. Leaving 'ads_manager', 'pending' or
+  -- 'bob' needs nothing manual — profiles_reconcile_ads rebuilds the derived set.
   if v_old = 'apc' then
     delete from public.apc_brands where apc_id = p_user;
   elsif v_old = 'team_lead' then
@@ -2164,7 +2172,8 @@ begin
   end if;
 
   update public.profiles
-     set role = p_new_role,
+     set role = case when p_new_role = 'superbob' then 'bob' else p_new_role end,
+         is_superbob = (p_new_role = 'superbob'),
          team_lead_id = null,
          can_edit_brands    = case when p_new_role = 'team_lead' then true else can_edit_brands end,
          can_manage_gmv_max = case when p_new_role = 'team_lead' then true else can_manage_gmv_max end
@@ -2176,6 +2185,8 @@ begin
             when 'apc'         then 'You are now an APC (account manager).'
             when 'team_lead'   then 'You are now a Team Lead.'
             when 'ads_manager' then 'You are now an Ads Manager.'
+            when 'bob'         then 'You are now a Bob (admin).'
+            when 'superbob'    then 'You are now a Super Boss.'
           end,
           '/');
 end;

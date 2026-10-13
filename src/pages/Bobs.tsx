@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { fnError } from '../lib/functionError';
 import { useAuth } from '../auth/AuthContext';
 import Avatar from '../components/Avatar';
+import ChangeRoleModal from '../components/ChangeRoleModal';
 
 interface Bob {
   id: string;
@@ -16,9 +17,9 @@ interface Bob {
 }
 
 // Super Bob-only management of Bob (admin) accounts: create, reset passwords,
-// delete. A new Bob has full Bob access everywhere (brands, budget, chats,
-// tasks, paid collab…) — everything except this page. Super Bob accounts can't
-// be deleted or have their password reset here.
+// delete, and change a Bob's role (Super Boss / another role). A new Bob has full Bob access
+// everywhere — everything except this page. Super Bob accounts can't be
+// deleted or have their password reset here.
 export default function Bobs() {
   const { profile, user } = useAuth();
   const isSuperBob = profile?.role === 'bob' && !!profile?.is_superbob;
@@ -36,6 +37,8 @@ export default function Bobs() {
   const [pwBusy, setPwBusy] = useState(false);
   const [pwErr, setPwErr] = useState<string | null>(null);
   const [pwOk, setPwOk] = useState(false);
+
+  const [roleBob, setRoleBob] = useState<Bob | null>(null);
 
   const [delBob, setDelBob] = useState<Bob | null>(null);
   const [delBusy, setDelBusy] = useState(false);
@@ -142,6 +145,11 @@ export default function Bobs() {
                   </div>
                 </div>
                 <div className="ac-row-actions">
+                  {!b.is_superbob && !isMe && (
+                    <button className="ac-icon-btn" onClick={() => setRoleBob(b)} title="Change role">
+                      <i className="bi bi-person-gear" />
+                    </button>
+                  )}
                   {!b.is_superbob && (
                     <button className="ac-icon-btn"
                       onClick={() => { setPwBob(b); setNewPw(''); setPwErr(null); setPwOk(false); }}
@@ -235,6 +243,8 @@ export default function Bobs() {
           </Modal.Footer>
         </Form>
       </Modal>
+
+      <ChangeRoleModal target={roleBob} onHide={() => setRoleBob(null)} onChanged={load} />
 
       <Modal show={!!delBob} onHide={() => !delBusy && setDelBob(null)} centered>
         <Modal.Header closeButton>

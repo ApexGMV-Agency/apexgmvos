@@ -1,14 +1,22 @@
 import { useEffect, useState } from 'react';
 import { Alert, Button, Form, Modal } from 'react-bootstrap';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../auth/AuthContext';
 
 export interface ChangeRoleTarget {
   id: string;
   email: string;
   full_name?: string | null;
   role: string;            // current role — pre-selected in the option list
+  is_superbob?: boolean;
   brand_count?: number;    // for the APC → Team Lead carry-over copy
 }
+
+// Only offered to the Super Boss (change_user_role enforces the same rule).
+const ADMIN_OPTIONS = [
+  { value: 'superbob', label: 'Super Boss', icon: 'bi-star-fill', desc: 'Full admin access, plus managing Bobs and their roles.' },
+  { value: 'bob', label: 'Bob', icon: 'bi-person-badge', desc: 'Full admin access to every brand, client and report — everything except managing Bobs.' },
+];
 
 const ROLE_OPTIONS = [
   { value: 'apc', label: 'APC', icon: 'bi-person-workspace', desc: 'Account manager — works the brands Bob or a Team Lead assigns them.' },
@@ -18,7 +26,7 @@ const ROLE_OPTIONS = [
 
 /**
  * Bob-only "Change role" modal, shared by the APCs / Team Leads / Ads Managers
- * pages. Calls the change_user_role RPC, which is data-safe: authored rows
+ * / Bobs pages. The Super Boss additionally sees Bob + Super Boss options. Calls the change_user_role RPC, which is data-safe: authored rows
  * (reports, comments) are never touched — only role + brand-assignment
  * bookkeeping changes. APC → Team Lead and Team Lead → APC delegate to the
  * promote/demote RPCs so brands carry over exactly as before.
@@ -28,6 +36,8 @@ export default function ChangeRoleModal({ target, onHide, onChanged }: {
   onHide: () => void;
   onChanged: () => Promise<void> | void;
 }) {
+  const { profile } = useAuth();
+  const options = profile?.is_superbob ? [...ADMIN_OPTIONS, ...ROLE_OPTIONS] : ROLE_OPTIONS;
   const [newRole, setNewRole] = useState('apc');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -35,12 +45,15 @@ export default function ChangeRoleModal({ target, onHide, onChanged }: {
   useEffect(() => {
     if (target) {
       // Pre-select what they already are ('pending' etc. fall back to APC).
-      setNewRole(ROLE_OPTIONS.some(o => o.value === target.role) ? target.role : 'apc');
+      const cur = target.is_superbob ? 'superbob' : target.role;
+      setNewRole(options.some(o => o.value === cur) ? cur : 'apc');
       setErr(null);
     }
   }, [target?.id]);
 
-  const from = target?.role;
+  const from = target?.is_superbob ? 'superbob' : target?.role;
+  const fromAdmin = from === 'bob' || from === 'superbob';
+  const toAdmin = newRole === 'bob' || newRole === 'superbob';
   const brandCount = target?.brand_count ?? 0;
   const unchanged = newRole === from;
 
@@ -70,7 +83,7 @@ export default function ChangeRoleModal({ target, onHide, onChanged }: {
       <Modal.Body>
         {err && <Alert variant="danger">{err}</Alert>}
         <div className="border rounded p-2 mb-3">
-          {ROLE_OPTIONS.map(o => (
+          {options.map(o => (
             <Form.Check key={o.value} type="radio" name="new-role" id={`role-${o.value}`} className="mb-2"
               checked={newRole === o.value} onChange={() => setNewRole(o.value)}
               label={<>
@@ -95,12 +108,21 @@ export default function ChangeRoleModal({ target, onHide, onChanged }: {
             </li>
           ) : from === 'team_lead' && newRole === 'apc' ? (
             <li>Their APCs detach to no team (keeping their brands); their own non-delegated brands come back as their APC brands.</li>
-          ) : (
+          ) : !fromAdmin ? (
             <li>Their current brand assignments are removed.</li>
+          ) : null}
+          {toAdmin && !fromAdmin && (
+            <li>They get <strong>full admin access</strong> — only promote people you fully trust.</li>
+          )}
+          {fromAdmin && !toAdmin && (
+            <li>They lose admin access{from === 'superbob' ? ' and Super Boss powers' : ''}.</li>
           )}
           <li><strong>Nothing is deleted:</strong> reports and comments stay on their account.</li>
           {newRole === 'ads_manager' && (
             <li>They are auto-assigned every GMV Max brand (view-only elsewhere).</li>
+          )}
+          {newRole === 'superbob' && (
+            <li>A Super Boss can't be deleted, demoted or have their password reset from the app.</li>
           )}
           {newRole === 'apc' && from !== 'team_lead' && (
             <li>Assign their brands afterwards from the APCs or Brands page.</li>
