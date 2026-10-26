@@ -15,6 +15,8 @@ export default function Sidebar({ collapsed = false }: { collapsed?: boolean }) 
   const isTeamLead = profile?.role === 'team_lead';
   // Ads Manager: APC-like view-only nav (Brands / Resources / Reporting).
   const isAdsManager = profile?.role === 'ads_manager';
+  // Paid Collab Handler: the workspace only — no reporting.
+  const isHandler = profile?.role === 'paid_collab_handler';
 
   return (
     <aside className="ac-sidebar">
@@ -26,7 +28,19 @@ export default function Sidebar({ collapsed = false }: { collapsed?: boolean }) 
         </span>
       </div>
       <nav className="ac-nav">
-        {isApc || isAdsManager ? (
+        {isHandler ? (
+          <>
+            <NavLink to="/paid-collab/dashboard" title="Dashboard">
+              <i className="bi bi-speedometer2" /> <span className="ac-nav-label">Dashboard</span>
+            </NavLink>
+            <NavLink to="/paid-collab" end title="Workspace">
+              <i className="bi bi-tools" /> <span className="ac-nav-label">Workspace</span>
+            </NavLink>
+            <NavLink to="/paid-collab/notes" title="Private Notes">
+              <i className="bi bi-journal-text" /> <span className="ac-nav-label">Private Notes</span>
+            </NavLink>
+          </>
+        ) : isApc || isAdsManager ? (
           <>
             <NavLink to="/brands" title="Brands">
               <i className="bi bi-shop" /> <span className="ac-nav-label">Brands</span>
@@ -64,6 +78,12 @@ export default function Sidebar({ collapsed = false }: { collapsed?: boolean }) 
                 <NavLink to="/teams" title="Teams">
                   <i className="bi bi-diagram-3" /> <span className="ac-nav-label">Teams</span>
                 </NavLink>
+                <NavLink to="/paid-collab" end title="Paid Collab">
+                  <i className="bi bi-camera-video" /> <span className="ac-nav-label">Paid Collab</span>
+                </NavLink>
+                <NavLink to="/paid-collab/dashboard" title="Collab Dashboard">
+                  <i className="bi bi-bar-chart-line" /> <span className="ac-nav-label">Collab Dashboard</span>
+                </NavLink>
                 <NavLink to="/client-access" title="Client Access">
                   <i className="bi bi-link-45deg" /> <span className="ac-nav-label">Client Access</span>
                 </NavLink>
@@ -74,7 +94,7 @@ export default function Sidebar({ collapsed = false }: { collapsed?: boolean }) 
             )}
           </>
         )}
-        {collapsed ? (
+        {isHandler ? null : collapsed ? (
           <NavLink to="/reporting/weekly" title="Reporting">
             <i className="bi bi-bar-chart" />
             {reportingUnread > 0 && <Badge bg="danger" pill className="ms-2 ac-nav-label">{reportingUnread}</Badge>}
@@ -113,7 +133,7 @@ export default function Sidebar({ collapsed = false }: { collapsed?: boolean }) 
             <div className="text-truncate" >
               {profile?.full_name ?? profile?.email}
             </div>
-            <small className="text-muted">Role: {profile?.is_superbob ? 'super boss' : profile?.role ??'—'}</small>
+            <small className="text-muted">Role: {profile?.is_superbob ? 'super boss' : profile?.role?.replace(/_/g, ' ') ?? '—'}</small>
           </div>
           <i className="bi bi-chevron-right ms-auto ac-nav-label" />
         </NavLink>

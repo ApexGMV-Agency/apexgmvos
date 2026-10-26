@@ -10,6 +10,7 @@ const ROLE_LABELS: Record<string, string> = {
   team_lead: 'Team Lead',
   apc: 'Account Manager',
   ads_manager: 'Ads Manager',
+  paid_collab_handler: 'Paid Collab Handler',
   pending: 'Pending',
 };
 

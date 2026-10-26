@@ -25,3 +25,31 @@ export function downloadCsv(filename: string, rows: (string | number | null | un
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
+/** RFC-4180 reader: quoted cells, "" escapes, CRLF/LF, leading BOM stripped.
+ *  Blank lines are dropped. Returns a grid of strings. */
+export function parseCsv(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = '';
+  let quoted = false;
+  const t = text.replace(/^\uFEFF/, '');
+  for (let i = 0; i < t.length; i++) {
+    const ch = t[i];
+    if (quoted) {
+      if (ch === '"' && t[i + 1] === '"') { cell += '"'; i++; }
+      else if (ch === '"') quoted = false;
+      else cell += ch;
+    } else if (ch === '"') quoted = true;
+    else if (ch === ',') { row.push(cell); cell = ''; }
+    else if (ch === '\n' || ch === '\r') {
+      if (ch === '\r' && t[i + 1] === '\n') i++;
+      row.push(cell); cell = '';
+      if (row.some(x => x.trim())) rows.push(row);
+      row = [];
+    } else cell += ch;
+  }
+  row.push(cell);
+  if (row.some(x => x.trim())) rows.push(row);
+  return rows;
+}

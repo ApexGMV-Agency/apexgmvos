@@ -1,0 +1,47 @@
+/* Paid Collab comment thread — self-contained (works in share link + workspace) */
+.pcc{ border:1px solid #e6e8ec; border-radius:14px; background:#f8fafc; overflow:hidden; }
+.pcc-head{ width:100%; display:flex; align-items:center; gap:9px; padding:11px 15px; background:transparent; border:0; cursor:pointer; font-size:13.5px; font-weight:700; color:#334155; text-align:left; }
+.pcc-head:hover{ background:#f1f4f8; }
+.pcc-head-t{ flex:0 1 auto; }
+.pcc-count{ min-width:20px; height:20px; padding:0 7px; border-radius:999px; background:#1259C3; color:#fff; font-size:11px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; }
+.pcc-chev{ margin-left:auto; color:#94a3b8; }
+.pcc-body{ padding:4px 14px 14px; }
+.pcc-empty{ font-size:12.5px; color:#94a3b8; padding:6px 2px 10px; }
+.pcc-list{ display:flex; flex-direction:column; gap:8px; margin-bottom:10px; }
+
+.pcc-node{ }
+.pcc-card{ background:#fff; border:1px solid #e5e7eb; border-radius:11px; padding:10px 12px; transition:background .25s, border-color .25s, box-shadow .25s; }
+.pcc-card.flash{ background:#fef3c7; border-color:#f59e0b; box-shadow:0 0 0 3px rgba(245,158,11,.25); }
+.pcc-card.a-client{ border-left:3px solid #0ea5e9; }
+.pcc-card.a-handler{ border-left:3px solid #198754; }
+.pcc-card.a-bob{ border-left:3px solid #e8862e; }
+.pcc-card.a-apc{ border-left:3px solid #8b5cf6; }
+/* The Promo Tracker thread's own author types (brand_promo_comments). */
+.pcc-card.a-team_lead{ border-left:3px solid #0d9488; }
+.pcc-card.a-ads_manager{ border-left:3px solid #64748b; }
+.pcc-meta{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px; }
+.pcc-author{ font-weight:700; font-size:13px; }
+.pcc-tag{ font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.3px; border-radius:999px; padding:2px 8px; }
+.pcc-tag.a-client{ background:#e0f2fe; color:#0369a1; }
+.pcc-tag.a-handler{ background:#e6f5ec; color:#198754; }
+.pcc-tag.a-bob{ background:#fff1e0; color:#b45309; }
+.pcc-tag.a-apc{ background:#ede7f6; color:#6d28d9; }
+.pcc-tag.a-team_lead{ background:#dbf3f0; color:#0f766e; }
+.pcc-tag.a-ads_manager{ background:#eef1f5; color:#475569; }
+.pcc-time{ font-size:11.5px; color:#94a3b8; }
+.pcc-text{ font-size:13.5px; line-height:1.5; color:#1f2937; white-space:pre-wrap; word-break:break-word; }
+.pcc-reply{ margin-top:6px; background:transparent; border:0; padding:0; color:#1259C3; font-size:12.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:5px; }
+.pcc-reply:hover{ text-decoration:underline; }
+.pcc-children{ margin-top:8px; margin-left:14px; border-left:2px solid #e2e8f0; padding-left:12px; display:flex; flex-direction:column; gap:8px; }
+
+.pcc-form{ display:flex; flex-direction:column; gap:8px; }
+.pcc-replyform{ margin-top:8px; margin-left:14px; }
+.pcc-input{ width:100%; box-sizing:border-box; border:1px solid #d8dce2; border-radius:10px; padding:9px 11px; font-size:13.5px; color:#1f2937; outline:none; background:#fff; transition:border-color .15s, box-shadow .15s; }
+.pcc-input:focus{ border-color:#1259C3; box-shadow:0 0 0 3px rgba(18,89,195,.12); }
+.pcc-area{ resize:vertical; min-height:40px; font-family:inherit; }
+.pcc-actions{ display:flex; justify-content:flex-end; gap:8px; }
+.pcc-btn{ display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 15px; border-radius:999px; border:0; background:#1259C3; color:#fff; font-size:13px; font-weight:700; cursor:pointer; transition:filter .15s; }
+.pcc-btn:hover{ filter:brightness(1.06); }
+.pcc-btn:disabled{ opacity:.55; cursor:not-allowed; }
+.pcc-btn.ghost{ background:#eef1f5; color:#334155; }
+.pcc-err{ background:#fde8e8; color:#b91c1c; border-radius:8px; padding:6px 10px; font-size:12.5px; }

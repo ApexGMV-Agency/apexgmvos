@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import BrandLoader from './components/BrandLoader';
 import Login from './pages/Login';
@@ -28,6 +29,12 @@ import Bobs from './pages/Bobs';
 import Teams from './pages/Teams';
 import SopsPage from './pages/sops/SopsPage';
 import SharedSop from './pages/sops/SharedSop';
+// The Paid Collab workspace (and its two public pages) is large and used by a
+// few roles only, so it loads on demand rather than in the main bundle.
+const HandlerCollabApp = lazy(() => import('./pages/handler-collab/HandlerCollabApp'));
+const SignContract = lazy(() => import('./pages/SignContract'));
+const SharedCreatorDb = lazy(() => import('./pages/handler-collab/SharedCreatorDb'));
+const lazyPage = (node: JSX.Element) => <Suspense fallback={<BrandLoader full />}>{node}</Suspense>;
 import { ProtectedRoute } from './auth/ProtectedRoute';
 import { useAuth } from './auth/AuthContext';
 
@@ -37,6 +44,7 @@ function RoleHome() {
   // through to /dashboard and hits the role guard's denied page.
   if (loading || !profile) return <BrandLoader />;
   if (profile.role === 'apc' || profile.role === 'team_lead' || profile.role === 'ads_manager') return <Navigate to="/brands" replace />;
+  if (profile.role === 'paid_collab_handler') return <Navigate to="/paid-collab" replace />;
   return <Navigate to="/dashboard" replace />;
 }
 
@@ -49,6 +57,9 @@ export default function App() {
       <Route path="/signup" element={<SignUp />} />
       <Route path="/share/:token" element={<SharedReports />} />
       <Route path="/sop/:token" element={<SharedSop />} />
+      {/* Public paid-collab pages: contract e-sign + shared Creators Database. */}
+      <Route path="/sign/:token" element={lazyPage(<SignContract />)} />
+      <Route path="/creators/:code" element={lazyPage(<SharedCreatorDb />)} />
       <Route
         path="/"
         element={
@@ -73,6 +84,11 @@ export default function App() {
         {/* Cross-brand SOP overview — URL only, no sidebar link. */}
         <Route path="sops" element={<ProtectedRoute roles={['bob', 'apc', 'team_lead', 'ads_manager']}><SopsPage /></ProtectedRoute>} />
         <Route path="resources" element={<ProtectedRoute roles={['bob', 'apc', 'team_lead', 'ads_manager']}><Resources /></ProtectedRoute>} />
+        {/* Paid Collab workspace — handlers see their assigned brands, Bob every paid-collab brand. */}
+        <Route path="paid-collab" element={<ProtectedRoute roles={['bob', 'paid_collab_handler']}>{lazyPage(<HandlerCollabApp />)}</ProtectedRoute>} />
+        {/* Solo pages of the same workspace, reached from the sidebar. */}
+        <Route path="paid-collab/dashboard" element={<ProtectedRoute roles={['bob', 'paid_collab_handler']}>{lazyPage(<HandlerCollabApp soloTab="dashboard" />)}</ProtectedRoute>} />
+        <Route path="paid-collab/notes" element={<ProtectedRoute roles={['bob', 'paid_collab_handler']}>{lazyPage(<HandlerCollabApp soloTab="notes" />)}</ProtectedRoute>} />
         <Route path="notifications" element={<NotificationsPage />} />
         <Route path="profile" element={<Profile />} />
         <Route path="reporting/weekly" element={<ProtectedRoute roles={['bob', 'apc', 'team_lead', 'ads_manager']}><WeeklyReports /></ProtectedRoute>} />

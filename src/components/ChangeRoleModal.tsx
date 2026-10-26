@@ -22,6 +22,7 @@ const ROLE_OPTIONS = [
   { value: 'apc', label: 'APC', icon: 'bi-person-workspace', desc: 'Account manager — works the brands Bob or a Team Lead assigns them.' },
   { value: 'team_lead', label: 'Team Lead', icon: 'bi-diagram-3', desc: 'Middle manager — runs their own APCs and the brands you grant them.' },
   { value: 'ads_manager', label: 'Ads Manager', icon: 'bi-badge-ad', desc: 'View-only APC auto-assigned every GMV Max brand. Edits only GMV Max.' },
+  { value: 'paid_collab_handler', label: 'Paid Collab Handler', icon: 'bi-camera-video', desc: 'Runs paid creator deals for the Paid Collab brands you assign. Sees only the Paid Collab workspace.' },
 ];
 
 /**
@@ -123,6 +124,9 @@ export default function ChangeRoleModal({ target, onHide, onChanged }: {
           )}
           {newRole === 'superbob' && (
             <li>A Super Boss can't be deleted, demoted or have their password reset from the app.</li>
+          )}
+          {newRole === 'paid_collab_handler' && (
+            <li>Assign their Paid Collab brands afterwards from Teams → Paid Collab Handlers.</li>
           )}
           {newRole === 'apc' && from !== 'team_lead' && (
             <li>Assign their brands afterwards from the APCs or Brands page.</li>

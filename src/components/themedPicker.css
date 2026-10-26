@@ -1,0 +1,214 @@
+/* ════════════════════════════════════════════════════════════════════
+   THE PAYROLL DATE / MONTH PICKER (`ac-dp-*`) — ThemedPicker.tsx.
+
+   One palette for the trigger and the panel, written out here rather than
+   read from `--pay-*`: the panel is portalled out of `.ac-fin-page`, where
+   those tokens live, so it could not see them. The values ARE the payroll
+   palette (salaryDashboard.css), so the three surfaces match.
+
+   ‼️ #c2570c is the FILL (white text on it clears AA, 4.5:1) and #a4530c the
+   accent INK. The app's own #e8862e appears only as the focus ring and the
+   "today" ring, which carry no text.
+   ════════════════════════════════════════════════════════════════════ */
+
+.ac-dp, .ac-dp-pop, .ac-dp-monthbar {
+  --dp-ink: #0f1728;
+  --dp-text: #374151;
+  --dp-muted: #6b7280;
+  --dp-faint: #a0a6b3;
+  --dp-line: #e5e7eb;
+  --dp-line-2: #f0f1f4;
+  --dp-hover: #f4f5f8;
+  --dp-accent: #c2570c;
+  --dp-accent-hover: #a94a08;
+  --dp-accent-bright: #e8862e;
+  --dp-accent-ink: #a4530c;
+  --dp-accent-soft: #fff6ee;
+  --dp-accent-line: #f6d9bf;
+  --dp-bad: #b42318;
+}
+
+/* ── the trigger ───────────────────────────────────────────────── */
+.ac-dp { position: relative; display: inline-flex; min-width: 0; }
+.ac-dp-trigger {
+  display: inline-flex; align-items: center; gap: 8px; width: 100%; min-width: 0;
+  background: #fff; border: 1px solid var(--dp-line); color: var(--dp-ink);
+  font-family: inherit; text-align: left; cursor: pointer;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+.ac-dp-trigger:hover:not(:disabled) { border-color: #d3d7df; }
+.ac-dp-trigger:focus-visible,
+.ac-dp-trigger.is-open {
+  outline: none; border-color: var(--dp-accent-bright);
+  box-shadow: 0 0 0 3px rgba(232, 134, 46, .16);
+}
+.ac-dp-trigger:disabled { background: #f6f7f9; color: var(--dp-faint); cursor: not-allowed; }
+.ac-dp-trigger.is-invalid { border-color: var(--dp-bad); }
+.ac-dp-icon { color: var(--dp-accent-ink); font-size: .95em; flex: none; }
+.ac-dp-trigger:disabled .ac-dp-icon { color: var(--dp-faint); }
+.ac-dp-text { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ac-dp-trigger.is-empty .ac-dp-text { color: var(--dp-faint); }
+.ac-dp-caret { flex: none; font-size: .7em; color: var(--dp-muted); transition: transform .15s; }
+.ac-dp-trigger.is-open .ac-dp-caret { transform: rotate(180deg); }
+.ac-dp-trigger.has-clear { padding-right: 34px; }
+
+/* The form-field size — a Bootstrap .form-control's height and radius. */
+.ac-dp:has(> .ac-dp-field) { display: flex; width: 100%; }
+.ac-dp-field {
+  height: calc(1.5em + .75rem + 2px); padding: .375rem .75rem;
+  border-radius: 9px; font-size: .875rem;
+}
+/* The toolbar size — sits beside the month segment buttons. */
+.ac-dp-chip {
+  height: 36px; padding: 0 12px; border-radius: 10px;
+  font-size: .8125rem; font-weight: 600;
+}
+
+.ac-dp-clear {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  width: 24px; height: 24px; border-radius: 6px; border: 0; background: transparent;
+  color: var(--dp-muted); font-size: .72rem; display: inline-flex;
+  align-items: center; justify-content: center; cursor: pointer;
+}
+.ac-dp-clear:hover { background: var(--dp-hover); color: var(--dp-ink); }
+.ac-dp-clear:focus-visible { outline: 2px solid var(--dp-accent-bright); outline-offset: 1px; }
+
+/* ── the panel ─────────────────────────────────────────────────── */
+.ac-dp-pop {
+  position: fixed; z-index: 3000; width: 300px; max-width: calc(100vw - 16px);
+  background: #fff; border: 1px solid var(--dp-line); border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(16, 24, 40, .14), 0 2px 6px rgba(16, 24, 40, .06);
+  padding: 12px; color: var(--dp-text); font-size: .8125rem;
+  animation: ac-dp-in .12s ease-out;
+}
+@keyframes ac-dp-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .ac-dp-pop { animation: none; } }
+
+/* Family and size only — `font: inherit` would also reset the weights set on
+   the title, the days and the months, and it out-ranks them (0,1,1). */
+.ac-dp-pop button { font-family: inherit; font-size: inherit; line-height: 1.2; }
+.ac-dp-pop button:focus-visible { outline: 2px solid var(--dp-accent-bright); outline-offset: 1px; }
+
+.ac-dp-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 8px; }
+.ac-dp-nav {
+  width: 32px; height: 32px; border-radius: 8px; border: 0; background: transparent;
+  color: var(--dp-muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.ac-dp-nav:hover:not(:disabled) { background: var(--dp-hover); color: var(--dp-ink); }
+.ac-dp-nav:disabled { opacity: .35; cursor: default; }
+.ac-dp-title {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 0; background: transparent; border-radius: 8px; padding: 6px 10px;
+  font-weight: 700; font-size: .9rem; color: var(--dp-ink); cursor: pointer;
+}
+.ac-dp-title i { font-size: .65rem; color: var(--dp-muted); }
+.ac-dp-title:hover { background: var(--dp-hover); }
+.ac-dp-title.is-static { cursor: default; }
+.ac-dp-title.is-static:hover { background: transparent; }
+
+.ac-dp-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; }
+.ac-dp-wd {
+  text-align: center; font-size: .7rem; font-weight: 600; letter-spacing: .02em;
+  color: var(--dp-muted); padding: 4px 0 6px;
+}
+.ac-dp-wd.is-weekend { color: var(--dp-faint); }
+.ac-dp-day {
+  height: 36px; border: 0; border-radius: 9px; background: transparent;
+  color: var(--dp-ink); font-weight: 500; font-variant-numeric: tabular-nums; cursor: pointer;
+  position: relative;
+}
+.ac-dp-day.is-weekend { color: var(--dp-muted); }
+.ac-dp-day.is-out { color: #c4c8d0; }
+.ac-dp-day:hover:not(:disabled):not(.is-sel) { background: var(--dp-accent-soft); color: var(--dp-accent-ink); }
+.ac-dp-day.is-today:not(.is-sel) { box-shadow: inset 0 0 0 1.5px var(--dp-accent-bright); color: var(--dp-accent-ink); font-weight: 700; }
+.ac-dp-day.is-sel { background: var(--dp-accent); color: #fff; font-weight: 700; }
+.ac-dp-day.is-sel:hover { background: var(--dp-accent-hover); }
+.ac-dp-day:disabled { color: #d6d9df; cursor: not-allowed; text-decoration: line-through; text-decoration-color: #e3e5ea; }
+
+.ac-dp-months { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 2px 0; }
+.ac-dp-mon {
+  height: 42px; border: 1px solid var(--dp-line-2); border-radius: 10px; background: #fff;
+  color: var(--dp-ink); font-weight: 600; cursor: pointer;
+}
+.ac-dp-mon:hover:not(:disabled):not(.is-sel) { background: var(--dp-accent-soft); border-color: var(--dp-accent-line); color: var(--dp-accent-ink); }
+.ac-dp-mon.is-today:not(.is-sel) { border-color: var(--dp-accent-bright); color: var(--dp-accent-ink); }
+.ac-dp-mon.is-sel { background: var(--dp-accent); border-color: var(--dp-accent); color: #fff; }
+.ac-dp-mon:disabled { color: #d6d9df; cursor: not-allowed; background: #fafbfc; }
+
+.ac-dp-foot {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--dp-line-2);
+}
+.ac-dp-link {
+  border: 0; background: transparent; border-radius: 7px; padding: 5px 9px;
+  color: var(--dp-accent-ink); font-weight: 600; cursor: pointer;
+}
+.ac-dp-link:hover:not(:disabled) { background: var(--dp-accent-soft); }
+.ac-dp-link.is-muted { color: var(--dp-muted); }
+.ac-dp-link.is-muted:hover { background: var(--dp-hover); color: var(--dp-ink); }
+.ac-dp-link:disabled { color: var(--dp-faint); cursor: default; }
+
+/* ── TimeField: hour / minute / AM-PM columns ──────────────────── */
+.ac-dp-time {
+  display: grid; grid-template-columns: 1fr 1fr .8fr; gap: 6px;
+  height: 216px;
+}
+.ac-dp-tcol {
+  display: flex; flex-direction: column; gap: 2px; overflow-y: auto;
+  padding: 2px; border-radius: 10px; background: #fafbfc; border: 1px solid var(--dp-line-2);
+  scrollbar-width: thin;
+}
+.ac-dp-tcol.is-ampm { justify-content: flex-start; }
+.ac-dp-topt {
+  flex: none; height: 32px; border: 0; border-radius: 8px; background: transparent;
+  color: var(--dp-ink); font-weight: 600; font-variant-numeric: tabular-nums; cursor: pointer;
+}
+.ac-dp-topt:hover:not(.is-sel) { background: var(--dp-accent-soft); color: var(--dp-accent-ink); }
+.ac-dp-topt.is-sel { background: var(--dp-accent); color: #fff; }
+.ac-dp-topt.is-sel:hover { background: var(--dp-accent-hover); }
+
+/* A month that is not one of the tabs: the picker carries the selection. */
+.ac-dp-trigger.is-current:not(.is-open) {
+  background: var(--dp-accent-soft); border-color: var(--dp-accent-line); color: var(--dp-accent-ink);
+}
+
+/* ── MonthTabs: recent months + the picker, one control ───────── */
+.ac-dp-monthbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; }
+.ac-dp-monthseg {
+  display: inline-flex; gap: 2px; padding: 3px; height: 36px;
+  background: #fff; border: 1px solid var(--dp-line); border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+}
+.ac-dp-monthtab {
+  border: 0; background: transparent; color: var(--dp-muted);
+  font-family: inherit; font-size: .8125rem; font-weight: 600; line-height: 1;
+  padding: 0 12px; border-radius: 7px; white-space: nowrap; cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.ac-dp-monthtab:hover:not(.is-active) { background: var(--dp-accent-soft); color: var(--dp-accent-ink); }
+.ac-dp-monthtab.is-active {
+  background: var(--dp-accent); color: #fff;
+  box-shadow: 0 1px 2px rgba(194, 87, 12, .25);
+}
+.ac-dp-monthtab:focus-visible { outline: 2px solid var(--dp-accent-bright); outline-offset: 1px; }
+.ac-dp-monthbar .ac-dp-chip { box-shadow: 0 1px 2px rgba(16, 24, 40, .04); }
+.ac-dp-short { display: none; }
+
+@media (max-width: 575.98px) {
+  .ac-dp-monthbar { width: 100%; }
+  .ac-dp-monthseg { flex: 1 1 100%; }
+  .ac-dp-monthtab { flex: 1 1 0; padding: 0 6px; }
+  .ac-dp-long { display: none; }
+  .ac-dp-short { display: inline; }
+  .ac-dp-monthbar > .ac-dp { flex: 1 1 100%; }
+}
+
+/* DateTimeField: the date and the time side by side. */
+.ac-dp-dt { display: flex; gap: 6px; align-items: center; min-width: 0; }
+/* ‼️ Each half is an .ac-dp, which `.ac-dp:has(> .ac-dp-field)` gives
+   `width: 100%`. Under `flex: 0 0 auto` that 100% IS the time's basis, so the
+   time filled the whole row and squeezed the date to nothing — and the time is
+   disabled until a date is picked, so the field could not be used at all.
+   Both halves get an explicit width here. */
+.ac-dp-dt > :first-child { flex: 1 1 auto; width: auto; min-width: 0; }
+.ac-dp-dt > :last-child { flex: 0 0 9rem; width: 9rem; min-width: 0; }

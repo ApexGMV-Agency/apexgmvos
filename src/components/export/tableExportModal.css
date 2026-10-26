@@ -1,0 +1,98 @@
+/* Export dialog (TableExportModal) — ported from the reference workspace.
+   Theme tokens only (CLAUDE.md §9). */
+.ac-acx-body { padding: 1.1rem 1.25rem 0.4rem; }
+.ac-acx-sec { margin-bottom: 18px; }
+.ac-acx-head {
+  font-family: var(--ac-font-heading);
+  font-size: .78rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--ac-text-muted);
+  margin-bottom: 8px;
+}
+.ac-acx-headrow {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 10px; flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.ac-acx-headacts { display: flex; align-items: baseline; gap: 7px; font-size: .8rem; }
+.ac-acx-sep { color: var(--ac-line-l); }
+.ac-acx-link {
+  border: 0; background: none; padding: 0;
+  font-size: .8rem; font-weight: 700;
+  /* -ink, not --ac-primary: small accent-coloured TEXT, which the fill accent
+     fails AA at. Same rule as .ac-rcard and .ac-toolframe-open. */
+  color: var(--ac-accent-text);
+}
+.ac-acx-link:hover { text-decoration: underline; }
+
+/* A two-up segmented switch. Equal columns so the label lengths cannot make
+   one option look like the important one. */
+.ac-acx-seg {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  padding: 4px;
+  background: var(--ac-bg-light);
+  border-radius: 12px;
+}
+.ac-acx-segbtn {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  border: 1px solid transparent; border-radius: 9px;
+  background: transparent;
+  padding: 8px 10px;
+  font-size: .85rem; font-weight: 600;
+  color: var(--ac-text-muted);
+  transition: background .15s ease, color .15s ease, box-shadow .15s ease;
+}
+.ac-acx-segbtn:hover { color: var(--ac-text-dark); }
+.ac-acx-segbtn.on {
+  background: var(--ac-surface-raised);
+  border-color: var(--ac-border);
+  color: var(--ac-text-dark);
+  box-shadow: 0 1px 3px rgba(var(--ac-shadow-rgb), calc(.45 * var(--ac-shadow-a)));
+}
+.ac-acx-segbtn:focus-visible { outline: 2px solid var(--ac-primary); outline-offset: 2px; }
+.ac-acx-segnum {
+  font-size: .74rem; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ac-text-muted);
+  background: var(--ac-bg-light);
+  border-radius: var(--ac-radius-pill);
+  padding: 1px 8px;
+}
+.ac-acx-segbtn.on .ac-acx-segnum { color: var(--ac-accent-text); }
+
+.ac-acx-note {
+  margin: 8px 0 0;
+  font-size: .79rem; line-height: 1.55;
+  color: var(--ac-text-muted);
+}
+
+/* auto-fill, not fixed columns: the dialog is `size="lg"` on a desktop and
+   full width on a phone, and the checkbox list should reflow rather than
+   scroll. */
+.ac-acx-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 4px 16px;
+}
+.ac-acx-check { padding: 5px 0 5px 1.7em; margin: 0; }
+.ac-acx-check .form-check-input { margin-top: .28em; }
+.ac-acx-label { display: flex; flex-direction: column; gap: 1px; cursor: pointer; }
+.ac-acx-label > :first-child { font-size: .87rem; }
+.ac-acx-hint { font-size: .72rem; color: var(--ac-text-muted); line-height: 1.35; }
+
+.ac-acx-foot { justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.ac-acx-summary {
+  font-size: .8rem; font-weight: 600;
+  color: var(--ac-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.ac-acx-footbtns { display: flex; gap: 8px; }
+
+@media (max-width: 575.98px) {
+  /* The summary is the dialog's answer to "what am I about to get" — it stays
+     on its own line rather than being squeezed beside the buttons. */
+  .ac-acx-foot { justify-content: stretch; }
+  .ac-acx-summary { width: 100%; }
+  .ac-acx-footbtns { width: 100%; }
+  .ac-acx-footbtns .btn { flex: 1 1 auto; }
+}

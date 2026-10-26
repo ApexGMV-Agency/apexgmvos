@@ -103,7 +103,7 @@ export default function Topbar({ collapsed, onToggleSidebar }: { collapsed: bool
             />
           </Dropdown.Toggle>
           <Dropdown.Menu>
-            <Dropdown.ItemText>Role: <strong>{profile?.is_superbob ? 'super boss' : profile?.role}</strong></Dropdown.ItemText>
+            <Dropdown.ItemText>Role: <strong>{profile?.is_superbob ? 'super boss' : profile?.role?.replace(/_/g, ' ')}</strong></Dropdown.ItemText>
             <Dropdown.Divider />
             <Dropdown.Item as="button" onClick={() => nav('/profile')}>
               <i className="bi bi-person me-2" />My Profile

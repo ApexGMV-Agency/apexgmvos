@@ -6,18 +6,20 @@ import TeamLeads from './TeamLeads';
 import APCs from './APCs';
 import AdsManagers from './AdsManagers';
 import Bobs from './Bobs';
+import PaidCollabHandlers from './PaidCollabHandlers';
 
 // "Teams" — a single Bob/Super Boss hub that consolidates what used to be four
-// separate sidebar links (Team Leads, APCs, Ads Managers, Bobs) into one page
+// separate sidebar links (Team Leads, APCs, Ads Managers, Bobs) — plus Paid Collab Handlers — into one page
 // with top tabs, clearing the sidebar. The Bobs tab only shows to a Super Boss
 // (mirrors the /bobs page self-guard).
 
-type TabKey = 'team-leads' | 'apcs' | 'ads-managers' | 'bobs';
+type TabKey = 'team-leads' | 'apcs' | 'ads-managers' | 'handlers' | 'bobs';
 
 const TABS: { key: TabKey; label: string; icon: string; superOnly?: boolean }[] = [
   { key: 'team-leads',           label: 'Team Leads',           icon: 'bi-diagram-3' },
   { key: 'apcs',                 label: 'APCs',                 icon: 'bi-people' },
   { key: 'ads-managers',         label: 'Ads Managers',         icon: 'bi-badge-ad' },
+  { key: 'handlers',             label: 'Paid Collab Handlers', icon: 'bi-camera-video' },
   { key: 'bobs',                 label: 'Bobs',                 icon: 'bi-person-badge', superOnly: true },
 ];
 
@@ -62,6 +64,7 @@ export default function Teams() {
       {currentTab === 'team-leads'           && <TeamLeads />}
       {currentTab === 'apcs'                 && <APCs />}
       {currentTab === 'ads-managers'         && <AdsManagers />}
+      {currentTab === 'handlers'             && <PaidCollabHandlers />}
       {currentTab === 'bobs'                 && <Bobs />}
     </div>
   );
