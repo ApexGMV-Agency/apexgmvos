@@ -1,4 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+
+// Client/creator-facing pages (share links, e-sign, legal) — never offer the
+// staff app install there.
+const PUBLIC_PREFIXES = ['/share/', '/sop/', '/brief/', '/sign/', '/creators/', '/privacy-policy', '/terms-of-service'];
 
 /**
  * PWA install banner. Appears when the browser fires `beforeinstallprompt`
@@ -6,6 +11,7 @@ import { useEffect, useState } from 'react';
  * inline styles so it works regardless of the app's stylesheet.
  */
 export default function InstallPrompt() {
+  const { pathname } = useLocation();
   const [deferred, setDeferred] = useState<any>(null);
   const [hidden, setHidden] = useState<boolean>(() => {
     try { return localStorage.getItem('ac_pwa_dismissed') === '1'; } catch { return false; }
@@ -25,7 +31,7 @@ export default function InstallPrompt() {
     };
   }, []);
 
-  if (!deferred || hidden) return null;
+  if (!deferred || hidden || PUBLIC_PREFIXES.some(p => pathname.startsWith(p))) return null;
 
   const install = async () => {
     try { deferred.prompt(); await deferred.userChoice; } catch { /* ignore */ }
