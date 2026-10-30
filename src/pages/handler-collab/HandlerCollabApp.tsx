@@ -656,12 +656,14 @@ function Dashboard({ initialBrandId = null, initialMonth = null, soloTab = null 
   const undoRef = useRef(null);
   const undoTimer = useRef(null);
 
-  // auto-heal: fill missing shared info (phone/email/category/etc.) across same-named creators
+  // auto-heal: fill missing shared info (phone/email/category/etc.) across deals
+  // of the SAME creator — keyed by TikTok username, never by name (two people
+  // can share a name, and grouping on it overwrote one with the other).
   const reconcileShared = useCallback(async (list) => {
     if (readOnly) return;   // view-only: merely opening the workspace must write nothing
-    const FIELDS = ['phone', 'email', 'category', 'paypal', 'zelle', 'tiktok_handle'];
+    const FIELDS = ['phone', 'email', 'category', 'paypal', 'zelle'];
     const byName = {};
-    list.forEach(c => { const k = (c.name || '').trim().toLowerCase(); if (!k) return; (byName[k] = byName[k] || []).push(c); });
+    list.forEach(c => { const k = store.creatorGlobalKey(c); if (!k.startsWith('h:')) return; (byName[k] = byName[k] || []).push(c); });
     const updates = [];
     Object.values(byName).forEach(group => {
       if (group.length < 2) return;
@@ -1008,8 +1010,9 @@ function Dashboard({ initialBrandId = null, initialMonth = null, soloTab = null 
   const creatorDirectory = useMemo(() => {
     const map = {};
     creators.forEach(c => {
-      const key = (c.name || '').trim().toLowerCase();
-      if (!key) return;
+      // one entry per PERSON (TikTok username) — same-named creators stay apart
+      const key = store.creatorGlobalKey(c);
+      if (!c.name || key === 'n:') return;
       const score = (c.tiktok_handle ? 1 : 0) + (c.paypal ? 1 : 0) + (c.zelle ? 1 : 0) + (c.phone ? 1 : 0) + (c.email ? 1 : 0);
       const prev = map[key];
       const prevScore = prev ? prev._score : -1;
@@ -1284,10 +1287,12 @@ function Dashboard({ initialBrandId = null, initialMonth = null, soloTab = null 
   // edit, blank now). Those DO propagate: reconcileShared() refills a blank from
   // any same-name sibling on the next load, so a clear kept local to one deal
   // came straight back and a number or email could be replaced but never removed.
-  async function propagateShared(name, shared, exceptId, cleared = new Set()) {
-    const key = (name || '').trim().toLowerCase();
-    if (!key) return;
-    const sibs = creators.filter(c => (c.name || '').trim().toLowerCase() === key && c.id !== exceptId);
+  // Siblings are deals sharing a TikTok username — NOT a name: two different
+  // creators called the same thing used to overwrite each other's details here.
+  async function propagateShared(handles, shared, exceptId, cleared = new Set()) {
+    const mine = store.dealHandles(handles);
+    if (!mine.length) return;
+    const sibs = creators.filter(c => c.id !== exceptId && store.dealHandles(c.tiktok_handle).some(h => mine.includes(h)));
     const jobs = [];
     for (const s of sibs) {
       const patch = {};
@@ -1376,7 +1381,7 @@ function Dashboard({ initialBrandId = null, initialMonth = null, soloTab = null 
     // Awaited on purpose — closing the popup first would let a closed tab leave a
     // sibling deal stale. It now fires its updates in parallel, so it costs one
     // round trip, not one per sibling.
-    await propagateShared(data.name, {
+    await propagateShared(data.tiktok_handle, {
       // How this person is paid follows them across brands and months, which is
       // what the two mirrored columns did before the list existed.
       tiktok_handle: data.tiktok_handle, payouts: data.payouts,
@@ -1543,12 +1548,16 @@ function Dashboard({ initialBrandId = null, initialMonth = null, soloTab = null 
      a duplicate.
      ‼️ The key comes from `identity_key` where the row has one — that is the
      DATABASE's own answer, filled by creator_directory_fill, so matching on it
-     cannot drift from what the unique index will actually say. */
+     cannot drift from what the unique index will actually say.
+     ‼️ EVERY handle a creator lists is also a key (same rule, one handle at a
+     time), so an imported row naming their second account still matches them. */
   const dirKeyOf = (d) => d.identity_key || store.creatorGlobalKey(d);
-  const bankedKeys = useMemo(() => new Set(directory.map(dirKeyOf)), [directory]);
-  const dirIdByKey = useMemo(() => Object.fromEntries(directory.map(d => [dirKeyOf(d), d.id])), [directory]);
+  const handleKeys = (raw) => store.dealHandles(raw).map(h => store.creatorGlobalKey({ tiktok_handle: h }));
+  const dirKeysOf = (d) => [dirKeyOf(d), ...handleKeys(d.tiktok_handle)];
+  const bankedKeys = useMemo(() => new Set(directory.flatMap(dirKeysOf)), [directory]);
+  const dirIdByKey = useMemo(() => Object.fromEntries(directory.flatMap(d => dirKeysOf(d).map(k => [k, d.id]))), [directory]);
   const knownKeys = useMemo(
-    () => new Set(creatorDatabase.filter(e => !e.dir).map(e => e.key)),
+    () => new Set(creatorDatabase.filter(e => !e.dir).flatMap(e => [e.key, ...handleKeys(e.handles.map(h => h.handle).join('\n'))])),
     [creatorDatabase]);
 
   /* Re-read the whole list rather than patching it in: an import writes dozens
@@ -6781,8 +6790,11 @@ function DirectoryCreatorEditor({ editor, categories = [], onClose, onSave }) {
   });
   const set = (k, v) => setF(prev => ({ ...prev, [k]: v }));
 
+  // The TikTok username is the creator's identity, so at least one is required.
+  const hasHandle = store.dealHandles(tiktoks.join('\n')).length > 0;
   async function save() {
     if (!f.name.trim() || saving) return;
+    if (!hasHandle) { setErr('Add the creator\'s TikTok username — it is what identifies them.'); return; }
     setSaving(true); setErr('');
     try {
       await onSave({
@@ -6810,7 +6822,7 @@ function DirectoryCreatorEditor({ editor, categories = [], onClose, onSave }) {
             <input className="pc-input" placeholder="Creator name" value={f.name} autoFocus onChange={e => set('name', e.target.value)} />
           </div>
           <div className="pc-field">
-            <label>TikTok account(s)</label>
+            <label>TikTok account(s) <span style={{ color: 'var(--ac-danger)' }}>*</span></label>
             {tiktoks.map((t, i) => (
               <div className="pc-multirow" key={i}>
                 <input className="pc-input" placeholder="@handle or URL" value={t}
@@ -6845,7 +6857,7 @@ function DirectoryCreatorEditor({ editor, categories = [], onClose, onSave }) {
         </div>
         <div className="pc-modal-actions">
           <button className="pc-btn pc-btn-ghost" onClick={onClose}>Cancel</button>
-          <button className="pc-btn pc-btn-primary" onClick={save} disabled={!f.name.trim() || saving}>{saving ? 'Saving…' : (isAdd ? 'Add' : 'Save')}</button>
+          <button className="pc-btn pc-btn-primary" onClick={save} disabled={!f.name.trim() || !hasHandle || saving}>{saving ? 'Saving…' : (isAdd ? 'Add' : 'Save')}</button>
         </div>
       </div>
     </div>
@@ -9015,7 +9027,9 @@ function CreatorEditor({ editor, month, directory = [], categories = [], brandPr
   const matches = useMemo(() => {
     const q = f.name.trim().toLowerCase();
     if (!q) return [];
-    return directory.filter(d => d.name.toLowerCase().includes(q) && d.name.toLowerCase() !== q).slice(0, 6);
+    // Exact name matches stay listed: a same-named creator may be someone else,
+    // and the username shown beside each one is what tells them apart.
+    return directory.filter(d => d.name.toLowerCase().includes(q) || String(d.tiktok_handle || '').toLowerCase().includes(q)).slice(0, 6);
   }, [f.name, directory]);
   function pick(d) {
     setF(prev => ({ ...prev, name: d.name, phone: d.phone || prev.phone, email: d.email || prev.email }));
@@ -9029,8 +9043,11 @@ function CreatorEditor({ editor, month, directory = [], categories = [], brandPr
     setTiktoks(arr.length ? arr : ['']);
     setShowSug(false);
   }
+  // The TikTok username is the creator's identity, so at least one is required.
+  const hasHandle = store.dealHandles(tiktoks.join('\n')).length > 0;
   async function save() {
     if (!f.name.trim() || saving) return;
+    if (!hasHandle) { setErr('Add the creator\'s TikTok username — it is what identifies them.'); return; }
     const tiktok_handle = tiktoks.map(s => s.trim()).filter(Boolean).join('\n');
     const products = prods.map(p => ({ name: (p.name || '').trim(), url: (p.url || '').trim() })).filter(p => p.name || p.url);
     /* Only the list is sent. `paypal` / `zelle` are mirrors the DB trigger
@@ -9083,7 +9100,7 @@ function CreatorEditor({ editor, month, directory = [], categories = [], brandPr
             )}
           </div>
           <div className="pc-field">
-            <label>TikTok account(s)</label>
+            <label>TikTok account(s) <span style={{ color: 'var(--ac-danger)' }}>*</span></label>
             {tiktoks.map((t, i) => (
               <div className="pc-multirow" key={i}>
                 <input className="pc-input" placeholder="@handle or URL" value={t}
@@ -9186,7 +9203,7 @@ function CreatorEditor({ editor, month, directory = [], categories = [], brandPr
         <div className={`pc-modal-actions${err ? ' has-err' : ''}`}>
           {err && <div className="pc-inline-err pc-actions-err" role="alert">{err}</div>}
           <button className="pc-btn pc-btn-ghost" onClick={close} disabled={saving}>Cancel</button>
-          <button className="pc-btn pc-btn-primary" onClick={save} disabled={!f.name.trim() || saving}>
+          <button className="pc-btn pc-btn-primary" onClick={save} disabled={!f.name.trim() || !hasHandle || saving}>
             {saving && <span className="pc-btn-spin" aria-hidden="true" />}
             {saving ? (isAdd ? 'Adding…' : 'Saving…') : (isAdd ? 'Add' : 'Save')}
           </button>

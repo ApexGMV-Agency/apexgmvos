@@ -401,11 +401,11 @@ export function dealMonth(c: { program_month?: string | null; onboarded_on?: str
 
 /* ── one creator per program ──
    A program is a brand-MONTH (`program_month`), so the same person
-   may not hold two deals on one brand in one month. Identity is the repo-wide
-   rule (TikTok handle, else name) but ANY shared handle counts, so a creator
-   re-added with a second account listed is still caught. Without a handle on
-   either side, the name decides. */
-function dealHandles(h: any): string[] {
+   may not hold two deals on one brand in one month. Identity is the TikTok
+   username ONLY — two different people can share a name — and ANY shared
+   handle counts, so a creator re-added with a second account listed is still
+   caught. Every deal must carry at least one handle (addCreator enforces it). */
+export function dealHandles(h: any): string[] {
   return String(h || '').split(/[\n,]+/).map(s => s.trim()).filter(Boolean).map(x =>
     (x.startsWith('http') ? (x.replace(/\/+$/, '').split('/').pop() || '') : x).replace(/^@+/, '').toLowerCase().trim(),
   ).filter(Boolean);
@@ -425,16 +425,16 @@ export async function assertNotOnProgram(
     .eq('program_month', month);
   if (error) throw error;
   const mine = dealHandles(data.tiktok_handle);
-  const myName = String(data.name || '').trim().toLowerCase();
+  if (!mine.length) return;
+  let shared = '';
   const hit = (rows || []).find(r => {
     if (excludeId && r.id === excludeId) return false;
-    const theirs = dealHandles(r.tiktok_handle);
-    if (mine.length && theirs.length) return mine.some(h => theirs.includes(h));
-    return !!myName && String(r.name || '').trim().toLowerCase() === myName;
+    shared = dealHandles(r.tiktok_handle).find(h => mine.includes(h)) || '';
+    return !!shared;
   });
   if (hit) {
     const label = new Date(y, m - 1, 1).toLocaleString('en-US', { month: 'long', year: 'numeric' });
-    throw new Error(`${hit.name || 'This creator'} is already present in this brand's ${label} program.`);
+    throw new Error(`@${shared} is already present in this brand's ${label} program${hit.name ? ` (as ${hit.name})` : ''}.`);
   }
 }
 
@@ -472,6 +472,7 @@ export async function addCreator(data: Record<string, any>) {
     products: Array.isArray(data.products) ? data.products : [],
   };
   if (!payload.name) throw new Error('Name required');
+  if (!dealHandles(payload.tiktok_handle).length) throw new Error('TikTok username required');
   await assertNotOnProgram(payload);
   const { data: row, error } = await supabase.from('handler_collab_creators').insert(payload).select().single();
   if (error) throw error;
@@ -670,6 +671,7 @@ function directoryPayload(patch: Record<string, any>) {
 export async function addDirectoryCreator(patch: Record<string, any>, authorName = ''): Promise<DirectoryCreator> {
   const payload = directoryPayload(patch);
   if (!payload.name) throw new Error('Name required');
+  if (!dealHandles(payload.tiktok_handle).length) throw new Error('TikTok username required');
   const { data, error } = await supabase
     .from('creator_directory')
     .insert({ ...payload, created_by_name: authorName })
@@ -677,7 +679,7 @@ export async function addDirectoryCreator(patch: Record<string, any>, authorName
     .single();
   // 23505 = another handler already banked this exact creator (unique identity_key).
   if (error) throw new Error(error.code === '23505'
-    ? 'This creator is already in the database.'
+    ? 'A creator with this TikTok username is already in the database.'
     : error.message);
   return data as DirectoryCreator;
 }
@@ -703,7 +705,12 @@ export async function addDirectoryCreatorsBulk(
   for (let start = 0; start < patches.length; start += CHUNK) {
     const slice = patches.slice(start, start + CHUNK);
     const payloads = slice.map(p => ({ ...directoryPayload(p), created_by_name: authorName }));
-    const { data, error } = await supabase.from('creator_directory').insert(payloads).select();
+    // A row without a TikTok username has no identity, so the chunk takes the
+    // row-by-row path, where addDirectoryCreator rejects just that row.
+    const allHaveHandles = payloads.every(p => dealHandles(p.tiktok_handle).length);
+    const { data, error } = allHaveHandles
+      ? await supabase.from('creator_directory').insert(payloads).select()
+      : { data: null, error: { message: 'missing username' } };
     if (!error) {
       inserted.push(...((data || []) as DirectoryCreator[]));
     } else {
@@ -725,6 +732,7 @@ export async function addDirectoryCreatorsBulk(
 export async function updateDirectoryCreator(id: string, patch: Record<string, any>): Promise<DirectoryCreator> {
   const payload = directoryPayload(patch);
   if (!payload.name) throw new Error('Name required');
+  if (!dealHandles(payload.tiktok_handle).length) throw new Error('TikTok username required');
   const { data, error } = await supabase
     .from('creator_directory')
     .update(payload)

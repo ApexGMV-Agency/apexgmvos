@@ -18,11 +18,14 @@
    database itself keys on (mirroring SQL `creator_identity_key()`). A second
    copy of that rule living here is exactly how an import would start calling
    two people one person, or one person two.
+   The identity is the TikTok USERNAME — a name never identifies anyone (two
+   people can share one). It is applied to EVERY handle a row lists, so a
+   creator whose accounts are written in another order is still the same person.
 
    ‼️ STRUCTURE REFUSES, VALUES WARN — the rule `lib/gmvMaxDaily` already
    follows. A file with no recognisable Name column is refused whole; a row
-   with no name, or one naming somebody already read further up the same file,
-   is refused on its own. But "120k followers" or "$150" only WARN and blank
+   with no name or no TikTok username, or one naming somebody already read
+   further up the same file, is refused on its own. But "120k followers" or "$150" only WARN and blank
    the field: a spreadsheet somebody typed by hand must not be able to lock
    them out of banking a creator whose phone number has a note beside it.
 ════════════════════════════════════════════════════════════ */
@@ -239,10 +242,16 @@ export function parseCreatorSheet(
       error: `This file has no “Name” column, so there is nothing to file a creator under. Columns found: ${headers.filter(Boolean).join(', ') || '(none)'}.`,
     };
   }
+  if (colOf.tiktok_handle === undefined) {
+    return {
+      ...blank, headers, matched, ignored,
+      error: `This file has no TikTok username column (e.g. “Usernames”), and the username is what identifies a creator. Columns found: ${headers.filter(Boolean).join(', ') || '(none)'}.`,
+    };
+  }
 
   const at = (row: unknown[], key: string) => (colOf[key] === undefined ? '' : cell(row[colOf[key]]));
   const rows: ParsedCreator[] = [];
-  const seen = new Map<string, number>();   // identity → the line that claimed it
+  const seen = new Map<string, number>();   // handle identity → the line that claimed it
 
   for (let i = hIdx + 1; i < grid.length; i++) {
     const row = grid[i] || [];
@@ -281,23 +290,28 @@ export function parseCreatorSheet(
       continue;
     }
 
-    const key = opts.keyOf({ name, tiktok_handle: data.tiktok_handle });
+    if (!handles.length) {
+      rows.push({ line, key: '', data, status: 'refused', reason: 'No TikTok username in this row', warnings });
+      continue;
+    }
+
+    // One identity per handle; ANY of them already seen or banked is a match.
+    // `key` is the banked one when there is one — the update path looks it up.
+    const keys = handles.map(h => opts.keyOf({ name, tiktok_handle: h }));
+    const key = keys.find(k => existing.has(k)) || keys[0];
     let status: ParsedCreator['status'] = 'new';
     let reason: string | undefined;
 
-    const twin = seen.get(key);
-    if (twin) { status = 'duplicate'; reason = `Same creator as row ${twin}`; }
-    else if (existing.has(key)) { status = 'existing'; reason = 'Already in the database'; }
-    if (!twin) seen.set(key, line);
-
-    // A creator identified only by their NAME is a weaker match than one with
-    // a handle — worth saying, because two different people can share a name.
-    if (!handles.length) warnings.push('No TikTok handle, so this creator is identified by name alone');
+    const twinKey = keys.find(k => seen.has(k));
+    const twin = twinKey ? seen.get(twinKey) : undefined;
+    if (twin) { status = 'duplicate'; reason = `Same TikTok username as row ${twin}`; }
+    else if (existing.has(key)) { status = 'existing'; reason = 'TikTok username already in the database'; }
+    if (!twin) keys.forEach(k => seen.set(k, line));
     /* Derived-only: we have run deals with them but nobody has banked their
        credentials. That is still an INSERT — it is what the "+" on such a row
        does — so it stays `new`, and the warning is there so a list of
        strangers does not quietly include a colleague's existing creator. */
-    if (status === 'new' && known.has(key)) warnings.push('Already worked with us — this banks their credentials');
+    if (status === 'new' && keys.some(k => known.has(k))) warnings.push('Already worked with us — this banks their credentials');
 
     rows.push({ line, key, data, status, reason, warnings });
   }
