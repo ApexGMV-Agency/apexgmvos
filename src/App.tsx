@@ -29,6 +29,7 @@ import Bobs from './pages/Bobs';
 import Teams from './pages/Teams';
 import SopsPage from './pages/sops/SopsPage';
 import SharedSop from './pages/sops/SharedSop';
+import SharedBrief from './pages/briefs/SharedBrief';
 // The Paid Collab workspace (and its two public pages) is large and used by a
 // few roles only, so it loads on demand rather than in the main bundle.
 const HandlerCollabApp = lazy(() => import('./pages/handler-collab/HandlerCollabApp'));
@@ -57,6 +58,7 @@ export default function App() {
       <Route path="/signup" element={<SignUp />} />
       <Route path="/share/:token" element={<SharedReports />} />
       <Route path="/sop/:token" element={<SharedSop />} />
+      <Route path="/brief/:token" element={<SharedBrief />} />
       {/* Public paid-collab pages: contract e-sign + shared Creators Database. */}
       <Route path="/sign/:token" element={lazyPage(<SignContract />)} />
       <Route path="/creators/:code" element={lazyPage(<SharedCreatorDb />)} />

@@ -10,6 +10,7 @@ import BrandGmvMaxTab from './brand/BrandGmvMaxTab';
 import BrandSamplesTab from './brand/BrandSamplesTab';
 import BrandProductsTab from './brand/BrandProductsTab';
 import BrandSopTab from './brand/BrandSopTab';
+import BrandBriefsTab from './brand/BrandBriefsTab';
 import Avatar from '../components/Avatar';
 import RegionChip from '../components/RegionChip';
 import { SCOPE_LABEL, SCOPE_ICON } from '../lib/brandScope';
@@ -29,7 +30,7 @@ interface Brand {
   scope: string[] | null;
 }
 
-type TabKey = 'resources' | 'sop' | 'reporting' | 'approvals' | 'gmv-max' | 'samples' | 'products';
+type TabKey = 'resources' | 'sop' | 'briefs' | 'reporting' | 'approvals' | 'gmv-max' | 'samples' | 'products';
 
 const TABS: { key: TabKey; label: string; icon: string }[] = [
   { key: 'resources',   label: 'Resources',      icon: 'bi-folder2-open' },
@@ -39,6 +40,7 @@ const TABS: { key: TabKey; label: string; icon: string }[] = [
   { key: 'samples',     label: 'Sample Seeding', icon: 'bi-box-seam' },
   { key: 'products',    label: 'Products',       icon: 'bi-tags' },
   { key: 'sop',         label: 'SOP',            icon: 'bi-journal-text' },
+  { key: 'briefs',      label: 'Briefs',         icon: 'bi-file-earmark-richtext' },
 ];
 
 // Status filter for the prev/next walk + brand switcher. Mirrors the Brands list
@@ -569,6 +571,8 @@ export default function BrandDetail() {
 
       {currentTab === 'resources'   && <BrandResourcesTab brandId={brand.id} brandName={brand.name} canEdit={canEditResources} />}
       {currentTab === 'sop'         && <BrandSopTab brandId={brand.id} brandName={brand.name} canEdit={canEditSop} />}
+      {/* Briefs share the SOP access rule (RLS: sop_editor / sop_reader). */}
+      {currentTab === 'briefs'      && <BrandBriefsTab brandId={brand.id} brandName={brand.name} canEdit={canEditSop} />}
       {currentTab === 'reporting'   && <BrandReportingTab brand={brand} isBob={isBob} canEdit={canEditReporting} onShareEnabledChanged={onShareEnabledChanged} />}
       {currentTab === 'approvals'   && <BrandApprovalsTab brandId={brand.id} brandName={brand.name} />}
       {currentTab === 'gmv-max'     && <BrandGmvMaxTab brandId={brand.id} canEdit={canEditGmvMax} currency={brand.currency} />}

@@ -1,0 +1,54 @@
+/* Content briefs — Brand Detail → Briefs tab + public /brief/<token>.
+   The brief itself is Claude's own HTML inside a sandboxed iframe; these rules
+   only style the chrome around it. Frames get a white backdrop because a brief
+   that sets no background of its own is written for light paper. */
+
+.ac-brief-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 70vh; }
+.ac-brief-list {
+  border-right: 1px solid var(--ac-border); padding: 8px; display: flex; flex-direction: column; gap: 4px;
+  max-height: 80vh; overflow-y: auto;
+}
+.ac-brief-item {
+  display: flex; flex-direction: column; gap: 2px; text-align: left; width: 100%;
+  padding: 8px 10px; border: 1px solid transparent; border-radius: 8px;
+  background: transparent; color: var(--ac-text-primary); cursor: pointer;
+}
+.ac-brief-item:hover { background: var(--ac-surface-hover); }
+.ac-brief-item.is-active { background: rgba(var(--ac-accent-rgb), .10); border-color: rgba(var(--ac-accent-rgb), .35); }
+.ac-brief-item-name { font-weight: 600; font-size: 14px; overflow-wrap: anywhere; }
+.ac-brief-item-meta { font-size: 12px; color: var(--ac-text-muted); }
+
+.ac-brief-main { display: flex; flex-direction: column; min-width: 0; }
+.ac-brief-toolbar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 8px 12px; border-bottom: 1px solid var(--ac-border);
+}
+.ac-brief-version { width: auto; max-width: 420px; }
+.ac-brief-more::after { display: none; }
+.ac-brief-share-menu { padding: 12px; width: 340px; max-width: calc(100vw - 32px); }
+.ac-brief-stage { flex: 1; padding: 12px; }
+.ac-brief-frame {
+  display: block; width: 100%; height: 75vh; border: 1px solid var(--ac-border);
+  border-radius: 8px; background: white;
+}
+.ac-brief-frame-full { display: block; width: 100%; height: 100%; border: 0; background: white; }
+.modal-fullscreen .modal-body:has(.ac-brief-frame-full) { overflow: hidden; }
+
+.ac-brief-blank { text-align: center; padding: 48px 16px; color: var(--ac-text-secondary); }
+.ac-brief-blank > .bi { font-size: 40px; color: var(--ac-accent-base); }
+.ac-brief-blank h3 { font-size: 20px; margin: 10px 0 6px; color: var(--ac-text-primary); }
+.ac-brief-blank p { max-width: 520px; margin: 0 auto; }
+
+@media (max-width: 768px) {
+  .ac-brief-layout { grid-template-columns: 1fr; }
+  .ac-brief-list { border-right: 0; border-bottom: 1px solid var(--ac-border); max-height: 220px; }
+  .ac-brief-frame { height: 70vh; }
+}
+
+/* Public page: the brief owns the whole viewport. */
+.ac-brief-public { min-height: 100vh; background: var(--ac-surface-raised); color: var(--ac-text-primary); }
+.ac-brief-public-frame { display: block; width: 100%; height: 100vh; border: 0; background: white; }
+.ac-brief-public-bar {
+  display: flex; align-items: center; gap: 8px; padding: 12px 20px;
+  border-bottom: 1px solid var(--ac-border); font-weight: 800; font-size: 16px;
+}
