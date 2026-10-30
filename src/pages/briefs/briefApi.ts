@@ -94,26 +94,12 @@ const projectRef = () => {
   catch { return ''; }
 };
 
-/** Instructions to paste into Claude (with the Supabase MCP connected). */
-export function claudeBriefPrompt(brandId: string, brandName: string): string {
+/** Just enough for Claude (or any AI with the Supabase MCP) to find the brand. */
+export function brandAccessDetails(brandId: string, brandName: string): string {
   return [
-    `Make a content brief for the brand "${brandName}" and save it into ApexGMVOS.`,
-    ``,
-    `Use the Supabase MCP, project ref ${projectRef()}. Brand id: ${brandId}`,
-    ``,
-    `1. Read the brand's data first:`,
-    `   select public.content_brief_context('${brandId}');`,
-    `   (brand, products + commissions, monthly sample goals, resource links, SOP sections, existing briefs)`,
-    `2. Design the brief as ONE self-contained HTML page — your own structure and style, like an artifact.`,
-    `   Inline all CSS/JS; scripts may load from a CDN; images must be https URLs (no big base64).`,
-    `   It renders in a sandboxed iframe: no access to cookies, storage, or the parent page.`,
-    `3. Save it with dollar-quoting so quotes in the HTML are safe:`,
-    `   select public.save_content_brief('${brandId}', '<brief name>', $brief$<!doctype html>...$brief$);`,
-    ``,
-    `To change an existing brief: read it with select public.content_brief_html('<brief id>');`,
-    `then save the new HTML as a new version:`,
-    `   select public.save_content_brief('${brandId}', null, $brief$...$brief$, '<brief id>', '<what changed>');`,
-    ``,
-    `Brief request: `,
+    `Brand: ${brandName}`,
+    `Brand id: ${brandId}`,
+    `Supabase project: ${projectRef()}`,
+    `Brief functions: public.content_brief_context, public.save_content_brief`,
   ].join('\n');
 }

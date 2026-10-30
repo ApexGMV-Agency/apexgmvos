@@ -3,7 +3,7 @@ import { Alert, Button, Card, Dropdown, Form, InputGroup, Modal, Spinner } from 
 import { copyWithToast } from '../../lib/copyToast';
 import BriefFrame from '../briefs/BriefFrame';
 import {
-  briefShareUrl, claudeBriefPrompt, deleteBrief, listBriefs, listVersions, loadVersionHtml,
+  brandAccessDetails, briefShareUrl, deleteBrief, listBriefs, listVersions, loadVersionHtml,
   renameBrief, resetBriefShareToken, restoreVersion, setBriefShareEnabled,
   type BriefRow, type BriefVersion,
 } from '../briefs/briefApi';
@@ -124,7 +124,7 @@ export default function BrandBriefsTab({ brandId, brandName, canEdit }: {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
-  const copyPrompt = () => copyWithToast(claudeBriefPrompt(brandId, brandName), 'Text');
+  const copyDetails = () => copyWithToast(brandAccessDetails(brandId, brandName), 'Text');
 
   if (loading) return <div className="text-center py-4"><Spinner animation="border" /></div>;
 
@@ -146,8 +146,8 @@ export default function BrandBriefsTab({ brandId, brandName, canEdit }: {
               <i className="bi bi-arrow-clockwise" />
             </Button>
             {canEdit && (
-              <Button size="sm" variant="primary" onClick={copyPrompt}>
-                <i className="bi bi-stars me-1" />Copy Claude prompt
+              <Button size="sm" variant="primary" onClick={copyDetails} title="Brand id + Supabase project, for Claude">
+                <i className="bi bi-clipboard me-1" />Copy brand details
               </Button>
             )}
           </div>
@@ -160,8 +160,8 @@ export default function BrandBriefsTab({ brandId, brandName, canEdit }: {
               <h3>No briefs yet</h3>
               {canEdit ? (
                 <p>
-                  Click <strong>Copy Claude prompt</strong>, paste it into Claude (with the Supabase connector on),
-                  and add what you want, e.g. <em>"launch brief, focus on the serum, bold style"</em>.
+                  Click <strong>Copy brand details</strong>, paste them into Claude (with the Supabase connector on)
+                  and say what you want, e.g. <em>"launch brief, focus on the serum, bold style"</em>.
                   Claude saves it here; hit reload to see it.
                 </p>
               ) : (
