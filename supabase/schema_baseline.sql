@@ -4885,6 +4885,17 @@ create policy "brief versions insert" on public.content_brief_versions
 -- Create a brief (p_brief null) or append a version to one. SECURITY INVOKER:
 -- app users go through the RLS above; the Supabase MCP (postgres) bypasses it.
 -- p_name renames when given. Returns {brief_id, version, share_token}.
+-- Versions can be RENAMED (note = the version's name) but never re-written:
+-- the column-level grant on `note` is applied after §12's blanket grants.
+drop policy if exists "brief versions update" on public.content_brief_versions;
+create policy "brief versions update" on public.content_brief_versions
+  for update using (exists (
+    select 1 from public.content_briefs b
+     where b.id = brief_id and public.sop_editor(b.brand_id)))
+  with check (exists (
+    select 1 from public.content_briefs b
+     where b.id = brief_id and public.sop_editor(b.brand_id)));
+
 create or replace function public.save_content_brief(
   p_brand uuid,
   p_name  text,
@@ -5069,6 +5080,8 @@ revoke all on function public.save_content_brief(uuid, text, text, uuid, text) f
 revoke all on function public.content_brief_html(uuid, int)                   from public, anon;
 revoke all on function public.content_brief_context(uuid)                     from public, anon;
 revoke all on function public.content_brief_reset_share_token(uuid)           from public, anon;
+revoke update on public.content_brief_versions from authenticated, anon;
+grant  update (note) on public.content_brief_versions to authenticated;
 
 -- =========================================================
 -- DONE.

@@ -15,8 +15,10 @@ export interface BriefRow {
   updated_at: string;
 }
 
+/** `note` is the version's name (Claude's save note by default; renameable). */
 export interface BriefVersion {
   id: string;
+  brief_id: string;
   version: number;
   note: string | null;
   created_at: string;
@@ -31,11 +33,19 @@ export async function listBriefs(brandId: string): Promise<BriefRow[]> {
   return (data as BriefRow[]) ?? [];
 }
 
-export async function listVersions(briefId: string): Promise<BriefVersion[]> {
+/** Version metadata (no HTML) for several briefs at once, newest first. */
+export async function listVersions(briefIds: string[]): Promise<BriefVersion[]> {
+  if (briefIds.length === 0) return [];
   const { data, error } = await supabase.from('content_brief_versions')
-    .select('id,version,note,created_at').eq('brief_id', briefId).order('version', { ascending: false });
+    .select('id,brief_id,version,note,created_at').in('brief_id', briefIds).order('version', { ascending: false });
   if (error) throw error;
   return (data as BriefVersion[]) ?? [];
+}
+
+/** Rename a version. Only `note` is updatable (column grant); empty clears it. */
+export async function renameVersion(id: string, name: string): Promise<void> {
+  const { error } = await supabase.from('content_brief_versions').update({ note: name.trim() || null }).eq('id', id);
+  if (error) throw error;
 }
 
 export async function loadVersionHtml(briefId: string, version: number): Promise<string> {

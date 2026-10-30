@@ -30,6 +30,7 @@ import Teams from './pages/Teams';
 import SopsPage from './pages/sops/SopsPage';
 import SharedSop from './pages/sops/SharedSop';
 import SharedBrief from './pages/briefs/SharedBrief';
+import BriefsPage from './pages/briefs/BriefsPage';
 // The Paid Collab workspace (and its two public pages) is large and used by a
 // few roles only, so it loads on demand rather than in the main bundle.
 const HandlerCollabApp = lazy(() => import('./pages/handler-collab/HandlerCollabApp'));
@@ -85,6 +86,8 @@ export default function App() {
         <Route path="client-access" element={<ProtectedRoute roles={['bob']}><ClientAccess /></ProtectedRoute>} />
         {/* Cross-brand SOP overview — URL only, no sidebar link. */}
         <Route path="sops" element={<ProtectedRoute roles={['bob', 'apc', 'team_lead', 'ads_manager']}><SopsPage /></ProtectedRoute>} />
+        {/* Content briefs across all of the caller's brands. */}
+        <Route path="briefs" element={<ProtectedRoute roles={['bob', 'apc', 'team_lead', 'ads_manager']}><BriefsPage /></ProtectedRoute>} />
         <Route path="resources" element={<ProtectedRoute roles={['bob', 'apc', 'team_lead', 'ads_manager']}><Resources /></ProtectedRoute>} />
         {/* Paid Collab workspace — handlers see their assigned brands, Bob every paid-collab brand. */}
         <Route path="paid-collab" element={<ProtectedRoute roles={['bob', 'paid_collab_handler']}>{lazyPage(<HandlerCollabApp />)}</ProtectedRoute>} />

@@ -48,6 +48,9 @@ export default function Sidebar({ collapsed = false }: { collapsed?: boolean }) 
             <NavLink to="/resources" title="Resources">
               <i className="bi bi-folder2" /> <span className="ac-nav-label">Resources</span>
             </NavLink>
+            <NavLink to="/briefs" title="Content Briefs">
+              <i className="bi bi-file-earmark-richtext" /> <span className="ac-nav-label">Content Briefs</span>
+            </NavLink>
           </>
         ) : isTeamLead ? (
           <>
@@ -59,6 +62,9 @@ export default function Sidebar({ collapsed = false }: { collapsed?: boolean }) 
             </NavLink>
             <NavLink to="/resources" title="Resources">
               <i className="bi bi-folder2" /> <span className="ac-nav-label">Resources</span>
+            </NavLink>
+            <NavLink to="/briefs" title="Content Briefs">
+              <i className="bi bi-file-earmark-richtext" /> <span className="ac-nav-label">Content Briefs</span>
             </NavLink>
           </>
         ) : (
@@ -89,6 +95,9 @@ export default function Sidebar({ collapsed = false }: { collapsed?: boolean }) 
                 </NavLink>
                 <NavLink to="/resources" title="Resources">
                   <i className="bi bi-folder2" /> <span className="ac-nav-label">Resources</span>
+                </NavLink>
+                <NavLink to="/briefs" title="Content Briefs">
+                  <i className="bi bi-file-earmark-richtext" /> <span className="ac-nav-label">Content Briefs</span>
                 </NavLink>
               </>
             )}
