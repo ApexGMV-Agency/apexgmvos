@@ -44,7 +44,7 @@ import {
   gmvByMonth, adForMonth, adSum, onProgram, deliveredCount, dealCodes,
   creatorBrandKey, monthLabel, isInternalOnlyStatus,
 } from '../paid-collab/handlerCollabReadonly';
-import { creatorGlobalKey } from './store';
+import { creatorGlobalKey, dealMonth } from './store';
 import { creatorPayouts } from '../../lib/creatorPayouts';
 
 export const ALL_MONTHS = 'all';
@@ -104,7 +104,7 @@ export function brandDataMonths(brandId: string, creators: any[], brandMonths: a
   const s = new Set<string>();
   creators.forEach(c => {
     if (c.brand_id !== brandId) return;
-    const m = monthKey(c.onboarded_on);
+    const m = dealMonth(c);
     if (m) s.add(m);
     Object.keys(gmvByMonth(c)).forEach(k => s.add(k));
   });
@@ -145,7 +145,7 @@ export function buildBrandDataRows(opts: {
   const budget: Num = budgets.length ? round2(budgets.reduce((t, n) => t + n, 0)) : '';
   const allocated = round2(creators
     .filter(c => c.brand_id === brand.id && !isInternalOnlyStatus(c))
-    .filter(c => { const m = monthKey(c.onboarded_on); return all ? true : m === month; })
+    .filter(c => { const m = dealMonth(c); return all ? true : m === month; })
     .reduce((t, c) => t + (num(c.amount) || 0), 0));
   const remaining: Num = budget === '' ? '' : round2(budget - allocated);
 
@@ -178,15 +178,15 @@ export function buildBrandDataRows(opts: {
     const brandDeals = byBrandKey.get(key) || deals;
     const allDeals = byGlobalKey.get(creatorGlobalKey(latest)) || deals;
 
-    const signedMonths = [...new Set(deals.map(d => monthKey(d.onboarded_on)).filter(Boolean))].sort();
-    const brandMonthSet = new Set(brandDeals.map(d => monthKey(d.onboarded_on)).filter(Boolean));
+    const signedMonths = [...new Set(deals.map(d => dealMonth(d)).filter(Boolean))].sort();
+    const brandMonthSet = new Set(brandDeals.map(d => dealMonth(d)).filter(Boolean));
     const firstBrandMonth = [...brandMonthSet].sort()[0] || '';
 
     let role = 'Signed';
     if (!all) {
-      const signedHere = deals.some(d => monthKey(d.onboarded_on) === month);
-      const carried = deals.filter(d => monthKey(d.onboarded_on) !== month);
-      const from = [...new Set(carried.map(d => monthKey(d.onboarded_on)).filter(Boolean))].sort().map(monthLabel);
+      const signedHere = deals.some(d => dealMonth(d) === month);
+      const carried = deals.filter(d => dealMonth(d) !== month);
+      const from = [...new Set(carried.map(d => dealMonth(d)).filter(Boolean))].sort().map(monthLabel);
       const carriedText = carried.length ? `Carried over from ${from.join(', ') || 'an earlier month'}` : '';
       role = signedHere && carried.length ? `Signed this month + c${carriedText.slice(1)}`
         : signedHere ? 'Signed this month' : carriedText;
@@ -194,7 +194,7 @@ export function buildBrandDataRows(opts: {
 
     // A deal's own TERMS (fee, videos agreed/delivered) belong to the month it
     // was SIGNED — a carried-over deal's fee was July's, not August's again.
-    const termDeals = all ? deals : deals.filter(d => monthKey(d.onboarded_on) === month);
+    const termDeals = all ? deals : deals.filter(d => dealMonth(d) === month);
     const amounts = termDeals.map(d => num(d.amount)).filter((n): n is number => n != null);
     const agreed = termDeals.map(d => num(d.videos_count)).filter((n): n is number => n != null);
     const amount: Num = amounts.length ? round2(amounts.reduce((t, n) => t + n, 0)) : '';

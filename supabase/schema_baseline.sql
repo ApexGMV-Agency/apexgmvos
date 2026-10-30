@@ -2665,8 +2665,8 @@ create table if not exists public.handler_collab_brand_months (
     and (shop_ads_commission is null or shop_ads_commission between 0 and 100))
 );
 
--- One row per DEAL: a creator in one brand-month. The month is
--- to_char(coalesce(onboarded_on, created_at), 'YYYY-MM').
+-- One row per DEAL: a creator in one brand-month. The month is program_month
+-- ('YYYY-MM'); onboarded_on is only the day they were onboarded and files nothing.
 create table if not exists public.handler_collab_creators (
   id                         uuid primary key default gen_random_uuid(),
   brand_id                   uuid not null references public.brands(id) on delete cascade,
@@ -2682,6 +2682,9 @@ create table if not exists public.handler_collab_creators (
   category                   text not null default '',
   payment_status             text not null default 'awaiting_confirmation',
   onboarded_on               date,
+  -- The program (brand-month) this deal belongs to. Set by the handler; the
+  -- fill trigger derives it from onboarded_on / created_at when left blank.
+  program_month              text,
   completed_on               date,
   -- [{video, adCode, videoAt, auth, invalid, invalidAt, invalidBy, best, bestAt,
   --   bestBy, extra, drafts:[{n,url,status,reason,at,reviewedAt,reviewedBy}]}]
@@ -2705,6 +2708,17 @@ create table if not exists public.handler_collab_creators (
 );
 create index if not exists hcc_brand_idx     on public.handler_collab_creators(brand_id);
 create index if not exists hcc_onboarded_idx on public.handler_collab_creators(onboarded_on);
+-- Projects created before program_month existed: add + backfill (idempotent).
+alter table public.handler_collab_creators add column if not exists program_month text;
+update public.handler_collab_creators
+   set program_month = to_char(coalesce(onboarded_on, created_at::date), 'YYYY-MM')
+ where program_month is null;
+alter table public.handler_collab_creators alter column program_month set not null;
+do $$ begin
+  alter table public.handler_collab_creators
+    add constraint hcc_program_month_chk check (program_month ~ '^\d{4}-\d{2}$');
+exception when duplicate_object then null; end $$;
+create index if not exists hcc_program_month_idx on public.handler_collab_creators(brand_id, program_month);
 
 create table if not exists public.handler_collab_brand_order (
   handler_id uuid not null references public.profiles(id) on delete cascade,
@@ -3046,7 +3060,9 @@ $$;
 
 -- ---------- B.5 Creator (deal) triggers ----------
 
--- created_by is the caller, never the payload.
+-- created_by is the caller, never the payload. program_month defaults to the
+-- onboarding month only when the caller sends none — it never follows a later
+-- change of onboarded_on.
 create or replace function public.handler_collab_creators_fill()
 returns trigger language plpgsql set search_path = public as $$
 begin
@@ -3056,6 +3072,11 @@ begin
   else
     new.created_by := old.created_by;
     new.created_at := old.created_at;
+  end if;
+  if coalesce(new.program_month, '') = '' then
+    new.program_month := case when tg_op = 'UPDATE' and coalesce(old.program_month, '') <> ''
+                              then old.program_month
+                              else to_char(coalesce(new.onboarded_on, new.created_at::date, current_date), 'YYYY-MM') end;
   end if;
   return new;
 end $$;
@@ -3198,10 +3219,10 @@ declare
 begin
   if tg_op = 'DELETE' then
     v_brand := old.brand_id; v_creator := old.id; v_name := old.name;
-    v_month := to_char(coalesce(old.onboarded_on, old.created_at::date), 'YYYY-MM');
+    v_month := old.program_month;
   else
     v_brand := new.brand_id; v_creator := new.id; v_name := new.name;
-    v_month := to_char(coalesce(new.onboarded_on, new.created_at::date), 'YYYY-MM');
+    v_month := new.program_month;
   end if;
 
   if tg_op = 'INSERT' then
@@ -3571,7 +3592,7 @@ declare
   v_body       text;
   v_flag       boolean := coalesce(p_invalid, false);
 begin
-  select brand_id, video_codes, name, to_char(coalesce(onboarded_on, created_at::date), 'YYYY-MM')
+  select brand_id, video_codes, name, program_month
     into b_id, codes, v_name, v_month
     from public.handler_collab_creators where id = p_creator;
   if b_id is null then raise exception 'creator not found'; end if;
@@ -3938,10 +3959,10 @@ begin
            'name', c.name, 'tiktok_handle', c.tiktok_handle, 'category', c.category,
            'payment_status', c.payment_status, 'amount', c.amount, 'videos_count', c.videos_count,
            'videos_delivered', public.handler_collab_posted_videos(c.video_codes),
-           'monthly', c.monthly, 'onboarded_on', c.onboarded_on, 'created_at', c.created_at,
+           'monthly', c.monthly, 'onboarded_on', c.onboarded_on, 'program_month', c.program_month, 'created_at', c.created_at,
            'phone',  case when r.include_contact then c.phone  else '' end,
            'email',  case when r.include_contact then c.email  else '' end
-         ) order by c.onboarded_on desc nulls last, c.created_at desc), '[]'::jsonb)
+         ) order by c.program_month desc, c.onboarded_on desc nulls last, c.created_at desc), '[]'::jsonb)
     into v_deals
     from public.handler_collab_creators c
     left join public.brands b on b.id = c.brand_id
@@ -4663,12 +4684,12 @@ begin
              select count(*) from jsonb_array_elements(
                case when jsonb_typeof(c.video_codes) = 'array' then c.video_codes else '[]'::jsonb end
              ) v where btrim(coalesce(v ->> 'video', '')) <> ''),
-           'monthly', c.monthly, 'onboarded_on', c.onboarded_on, 'created_at', c.created_at,
+           'monthly', c.monthly, 'onboarded_on', c.onboarded_on, 'program_month', c.program_month, 'created_at', c.created_at,
            'phone',  case when r.include_contact then c.phone  else '' end,
            'email',  case when r.include_contact then c.email  else '' end,
            'paypal', case when r.include_contact then c.paypal else '' end,
            'zelle',  case when r.include_contact then c.zelle  else '' end
-         ) order by c.onboarded_on desc nulls last, c.created_at desc), '[]'::jsonb)
+         ) order by c.program_month desc, c.onboarded_on desc nulls last, c.created_at desc), '[]'::jsonb)
     into v_deals
     from public.handler_collab_creators c
     left join public.brands b on b.id = c.brand_id;
@@ -4703,7 +4724,7 @@ declare
   v_body       text;
   v_flag       boolean := coalesce(p_invalid, false);
 begin
-  select brand_id, video_codes, name, to_char(coalesce(onboarded_on, created_at::date), 'YYYY-MM')
+  select brand_id, video_codes, name, program_month
     into b_id, codes, v_name, v_month
     from public.handler_collab_creators where id = p_creator;
   if b_id is null then raise exception 'creator not found'; end if;

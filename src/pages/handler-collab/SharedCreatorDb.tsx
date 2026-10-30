@@ -78,7 +78,7 @@ export default function SharedCreatorDb() {
         ...c,
         _brandName: c.brand_name || '—',
         _brandCurrency: c.brand_currency || 'USD',
-        _monthKey: monthOf(c.onboarded_on),
+        _monthKey: monthOf(c.program_month || c.onboarded_on || c.created_at),
       }))
       .sort((a, b) => String(b._monthKey).localeCompare(String(a._monthKey))
         || String(b.onboarded_on || '').localeCompare(String(a.onboarded_on || ''))

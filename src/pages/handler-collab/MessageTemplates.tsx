@@ -191,7 +191,7 @@ function UseTemplateModal({ tpl, brandRows, brands = [], creators, month, myName
     const b = brands.find(x => x.id === id);
     return b?.name || '';
   }, [brandRows, brands]);
-  const dealMonth = (c) => String(c.onboarded_on || '').slice(0, 7);
+  const dealMonth = store.dealMonth;
 
   const [fBrand, setFBrand] = useState('');
   const [fMonth, setFMonth] = useState('');

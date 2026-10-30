@@ -138,7 +138,11 @@ export interface HandlerCreator {
   // Soft flag only — the handler finalizes payment_status. Null = not confirmed.
   client_paid_confirmed_at?: string | null;
   client_paid_confirmed_name?: string | null;
+  // The day the creator was onboarded — informational only, files nothing.
   onboarded_on: string | null;
+  // 'YYYY-MM' — the program (brand-month) this deal belongs to. Read it
+  // through dealMonth(), which covers rows loaded before the column existed.
+  program_month: string;
   completed_on: string | null;
   // Link to the signed contract (e.g. Google Drive), pasted by the handler
   // after the creator returns the signed agreement PDF.
@@ -387,8 +391,16 @@ export async function loadBrandMonthLinks(brandId: string): Promise<HandlerBrand
   return (data || []) as HandlerBrandMonth[];
 }
 
+/* The program month a deal is filed under. `program_month` is the source of
+   truth; the fallbacks only cover a row shaped before that column existed. The
+   onboarding date never moves a deal once program_month is set. */
+export function dealMonth(c: { program_month?: string | null; onboarded_on?: string | null; created_at?: string | null } | null | undefined): string {
+  if (!c) return '';
+  return String(c.program_month || c.onboarded_on || c.created_at || '').slice(0, 7);
+}
+
 /* ── one creator per program ──
-   A program is a brand-MONTH (the month of onboarded_on), so the same person
+   A program is a brand-MONTH (`program_month`), so the same person
    may not hold two deals on one brand in one month. Identity is the repo-wide
    rule (TikTok handle, else name) but ANY shared handle counts, so a creator
    re-added with a second account listed is still caught. Without a handle on
@@ -400,19 +412,17 @@ function dealHandles(h: any): string[] {
 }
 
 export async function assertNotOnProgram(
-  data: { brand_id?: string; name?: string; tiktok_handle?: string; onboarded_on?: string | null },
+  data: { brand_id?: string; name?: string; tiktok_handle?: string; program_month?: string | null; onboarded_on?: string | null },
   excludeId?: string,
 ) {
-  const month = data.onboarded_on ? String(data.onboarded_on).slice(0, 7) : '';
+  const month = dealMonth(data);
   if (!data.brand_id || !month) return;
   const [y, m] = month.split('-').map(Number);
-  const next = m === 12 ? `${y + 1}-01-01` : `${y}-${String(m + 1).padStart(2, '0')}-01`;
   const { data: rows, error } = await supabase
     .from('handler_collab_creators')
     .select('id,name,tiktok_handle')
     .eq('brand_id', data.brand_id)
-    .gte('onboarded_on', `${month}-01`)
-    .lt('onboarded_on', next);
+    .eq('program_month', month);
   if (error) throw error;
   const mine = dealHandles(data.tiktok_handle);
   const myName = String(data.name || '').trim().toLowerCase();
@@ -452,6 +462,8 @@ export async function addCreator(data: Record<string, any>) {
     // also when the 7-day follow-up window starts ticking).
     payment_status: data.payment_status || 'awaiting_confirmation',
     onboarded_on: data.onboarded_on || null,
+    // Blank = the trigger files it under the onboarding month.
+    program_month: dealMonth(data) || null,
     contract_url: (data.contract_url || '').trim(),
     // Contract §2 completion window; null = automatic (see contractPdf.ts).
     deliverable_days: data.deliverable_days ? parseInt(data.deliverable_days, 10) || null : null,
@@ -1015,7 +1027,7 @@ export async function loadBestVideos(): Promise<BestVideo[]> {
   const [starred, manual] = await Promise.all([
     supabase
       .from('handler_collab_creators')
-      .select('id, brand_id, name, tiktok_handle, onboarded_on, video_codes, brands(name, logo_url)')
+      .select('id, brand_id, name, tiktok_handle, onboarded_on, program_month, video_codes, brands(name, logo_url)')
       .filter('video_codes', 'cs', '[{"best": true}]'),
     supabase
       .from('best_videos_manual')
@@ -1041,7 +1053,7 @@ export async function loadBestVideos(): Promise<BestVideo[]> {
         brandLogo: brand?.logo_url ?? null,
         creator: c.name || 'Unnamed creator',
         handle: String(c.tiktok_handle || '').split(/[\n,]/)[0].trim(),
-        month: c.onboarded_on ? String(c.onboarded_on).slice(0, 7) : '',
+        month: dealMonth(c),
         video: v.video || '',
         adCode: v.adCode || '',
         auth: !!v.auth,

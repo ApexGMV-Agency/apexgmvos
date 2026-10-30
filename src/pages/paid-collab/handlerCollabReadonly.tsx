@@ -6,6 +6,7 @@ import {
   PieChart, Pie, Cell,
 } from 'recharts';
 import type { HandlerCreator } from '../handler-collab/store';
+import { dealMonth } from '../handler-collab/store';
 import { copyWithToast, payoutKind } from '../../lib/copyToast';
 import { creatorPayouts, payoutTag, payoutTagClass, payoutUrl } from '../../lib/creatorPayouts';
 import type { Payout } from '../../lib/creatorPayouts';
@@ -278,13 +279,13 @@ export function producedIn(c: HandlerCreator, month: string) {
   return gmvForMonth(c, month) > 0 || adForMonth(c, month) > 0;
 }
 export function onProgram(c: HandlerCreator, month: string) {
-  return monthKey(c.onboarded_on) === month || producedIn(c, month);
+  return dealMonth(c) === month || producedIn(c, month);
 }
 /** True for a roster member who was signed into an EARLIER month and is still
     producing in this one — so a row can say so and a reader is not left
     wondering why their fee is missing from Allocated. */
 export function carriedOver(c: HandlerCreator, month: string) {
-  return !!month && monthKey(c.onboarded_on) !== month && producedIn(c, month);
+  return !!month && dealMonth(c) !== month && producedIn(c, month);
 }
 
 /* ── ONE program's figures ───────────────────────────────────────────────────
@@ -304,7 +305,7 @@ export function carriedOver(c: HandlerCreator, month: string) {
    `carried` is how many roster rows are visiting from an earlier month. */
 export function programStats(brandCreators: HandlerCreator[], month: string) {
   const roster = brandCreators.filter(c => onProgram(c, month));
-  const signed = roster.filter(c => monthKey(c.onboarded_on) === month);
+  const signed = roster.filter(c => dealMonth(c) === month);
   let allocated = 0, paid = 0, videos = 0, delivered = 0, pendingCount = 0;
   signed.forEach(c => {
     const amt = Number(c.amount) || 0;
@@ -931,7 +932,7 @@ export function CreatorRowRO({ c, idx, onToggleAuth, onToggleTested, onConfirmPa
      deliberately NOT in this program's Allocated — see `programStats`. Without
      the chip the reader is left with a column that does not add up. */
   const carried = carriedOver(c, month || '');
-  const carriedFrom = carried ? monthLabel(monthKey(c.onboarded_on)) : '';
+  const carriedFrom = carried ? monthLabel(dealMonth(c)) : '';
   const carriedTitle = carried ? `Signed in ${carriedFrom} and still selling in ${monthLabel(month || '')} — their fee counts toward ${carriedFrom}'s budget, not this one` : undefined;
   const dealRows = dealCodes(codes);
   const filled = dealRows.filter(v => isValidUrl(v.video)).length;
@@ -1092,7 +1093,7 @@ export function CreatorProgramsModal({ deals, onClose, staffView, showGmv, onTog
 
   const rows = deals.map(d => ({
     d,
-    month: monthKey(d.onboarded_on),
+    month: dealMonth(d),
     del: deliveredCount(d),
     ag: Number(d.videos_count) || 0,
     gmv: gmvSum(d),
@@ -1132,7 +1133,7 @@ export function CreatorProgramsModal({ deals, onClose, staffView, showGmv, onTog
               <span className="pc-cpm-prog-go" aria-hidden>›</span>
             </button>
           ))}
-          {open && <div className="pc-cpm-progtag">{monthLabel(monthKey(open.onboarded_on))}</div>}
+          {open && <div className="pc-cpm-progtag">{monthLabel(dealMonth(open))}</div>}
         </div>
       )}
 

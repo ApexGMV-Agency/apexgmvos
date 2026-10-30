@@ -924,7 +924,7 @@ function Dashboard({ initialBrandId = null, initialMonth = null, soloTab = null 
   const brandRowsAll = useMemo(() => {
     const agg = {}; // brand_id -> metrics
     creators.forEach(c => {
-      if (monthKey(c.onboarded_on) !== month) return;
+      if (store.dealMonth(c) !== month) return;
       if (!agg[c.brand_id]) agg[c.brand_id] = { creators: 0, allocated: 0, paid: 0, pendingPay: 0, pendingCreators: 0, videos: 0, delivered: 0, present: 0, toReview: 0 };
       const a = agg[c.brand_id];
       // `present` counts every creator this month (incl. the internal-only
@@ -1039,7 +1039,7 @@ function Dashboard({ initialBrandId = null, initialMonth = null, soloTab = null 
     /* `_bm` is the deal's OWN brand-month, not the month the workspace happens
        to be showing — this tab lists every month at once, so a contract opened
        here must quote the rates of the month the deal belongs to. */
-    .map(c => ({ ...c, _brandName: brandById[c.brand_id]?.name || '—', _brandCurrency: brandById[c.brand_id]?.currency || 'USD', _monthKey: monthKey(c.onboarded_on), _bm: bmByKey[`${c.brand_id}|${monthKey(c.onboarded_on)}`] || null }))
+    .map(c => ({ ...c, _brandName: brandById[c.brand_id]?.name || '—', _brandCurrency: brandById[c.brand_id]?.currency || 'USD', _monthKey: store.dealMonth(c), _bm: bmByKey[`${c.brand_id}|${store.dealMonth(c)}`] || null }))
     // month groups newest-first; within a month, most-recently-onboarded on top (then newest record), not alphabetical
     .sort((a, b) => String(b._monthKey).localeCompare(String(a._monthKey))
       || String(b.onboarded_on || '').localeCompare(String(a.onboarded_on || ''))
@@ -1186,7 +1186,7 @@ function Dashboard({ initialBrandId = null, initialMonth = null, soloTab = null 
   const drillCreators = useMemo(() => {
     if (!drillId) return [];
     return creators
-      .filter(c => c.brand_id === drillId && monthKey(c.onboarded_on) === month)
+      .filter(c => c.brand_id === drillId && store.dealMonth(c) === month)
       .sort((a, b) => String(b.onboarded_on || '').localeCompare(String(a.onboarded_on || '')));
   }, [creators, drillId, month]);
 
@@ -1212,7 +1212,7 @@ function Dashboard({ initialBrandId = null, initialMonth = null, soloTab = null 
     const other = hit && hit.find(c => c.id !== selfId);
     if (!other) return null;
     const brand = brandById[other.brand_id]?.name || '';
-    const m = monthKey(other.onboarded_on);
+    const m = store.dealMonth(other);
     return `${other.name || 'another creator'}${brand ? ` · ${brand}` : ''}${m ? ` · ${monthShort(m)}` : ''}`;
   }, [codeOwners, brandById]);
 
@@ -1342,7 +1342,8 @@ function Dashboard({ initialBrandId = null, initialMonth = null, soloTab = null 
         // is how a payment edit silently failed to save.
         payouts: Array.isArray(data.payouts) ? data.payouts : [],
         phone: data.phone, email: data.email, category: data.category,
-        onboarded_on: data.onboarded_on,
+        onboarded_on: data.onboarded_on || null,
+        program_month: data.program_month,
         // contract_url is legacy (manually pasted links, pre e-signing) — the
         // editor no longer touches it, so it is deliberately left untouched here.
         // blank = automatic deadline rule in the contract PDF
@@ -1522,7 +1523,7 @@ function Dashboard({ initialBrandId = null, initialMonth = null, soloTab = null 
     store.loadDirectoryCreators().then(d => setDirectory(prev => keepIfSame(prev, d))).catch(() => { });
     setProgramAdd(null);
     setTab('brands');
-    setMonth(monthKey(row.onboarded_on) || monthKey(payload.onboarded_on) || thisMonthKey());
+    setMonth(store.dealMonth(row) || payload.program_month || thisMonthKey());
     setDrillId(payload.brand_id);
     scrollTop();
   }, [reload]);
@@ -2214,7 +2215,7 @@ function CommentsDrawer({ brand, comments, creators, brandMonths, currentName, i
   const months = useMemo(() => {
     const set = new Set();
     brandMonths.filter(m => m.brand_id === brand.id).forEach(m => set.add(m.month));
-    brandCreators.forEach(c => { const k = monthKey(c.onboarded_on); if (k) set.add(k); });
+    brandCreators.forEach(c => { const k = store.dealMonth(c); if (k) set.add(k); });
     return [...set].sort().reverse();
   }, [brandMonths, brandCreators, brand.id]);
   const weeks = useMemo(() => {
@@ -5949,7 +5950,7 @@ function CreatorDbDetailModal({ e, reacher = null, reacherLoading = false, onClo
 /* Onboard a creator FROM the database onto any brand's program (brand + month),
    without retyping their details — the deal is created with their banked
    credentials. A program is one brand-month, so picking the month is picking
-   the program; `onboarded_on` decides which one the deal lands in. */
+   the program; `onboarded_on` is only the day they joined and files nothing. */
 function AddToProgramModal({ entry, brands = [], brandMonths = [], creators = [], month, onClose, onSave }) {
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState('');
@@ -5958,31 +5959,25 @@ function AddToProgramModal({ entry, brands = [], brandMonths = [], creators = []
     month: month || thisMonthKey(),
     amount: entry.rate != null ? String(entry.rate) : '',
     videos_count: '',
-    onboarded_on: defaultDateForMonth(month || thisMonthKey()),
+    onboarded_on: todayISO(),
     deliverable_days: '',
   });
   const set = (k, v) => setF(prev => ({ ...prev, [k]: v }));
   // products the creator will promote on this deal
   const [prods, setProds] = useState([]);
   const [prodInput, setProdInput] = useState('');
-  // Changing the program month re-dates the onboarding into that month (the
-  // date is what files the deal under a program), unless it already fits.
   function setProgramMonth(m) {
-    if (!m) return;
-    setF(prev => ({
-      ...prev, month: m,
-      onboarded_on: monthKey(prev.onboarded_on) === m ? prev.onboarded_on : defaultDateForMonth(m),
-    }));
+    if (m) set('month', m);
   }
 
   const brandName = brands.find(b => b.id === f.brand_id)?.name || '';
-  const programMonth = monthKey(f.onboarded_on) || f.month;
+  const programMonth = f.month;
   // Does this brand-month already exist as a program (budget/links set)?
   const programExists = brandMonths.some(m => m.brand_id === f.brand_id && m.month === programMonth);
   // Already on this exact program? (same person, same brand + month)
   const duplicate = f.brand_id && creators.some(c =>
     c.brand_id === f.brand_id
-    && monthKey(c.onboarded_on) === programMonth
+    && store.dealMonth(c) === programMonth
     && store.creatorGlobalKey(c) === entry.key);
 
   /* The brand's product catalogue, read where the workspace keeps it: each
@@ -6048,6 +6043,7 @@ function AddToProgramModal({ entry, brands = [], brandMonths = [], creators = []
         paypal: entry.paypal, zelle: entry.zelle,
         amount: f.amount, videos_count: f.videos_count,
         onboarded_on: f.onboarded_on,
+        program_month: programMonth,
         deliverable_days: f.deliverable_days,
         products: prods
           .map(p => ({ name: (p.name || '').trim(), url: (p.url || '').trim() }))
@@ -6094,7 +6090,6 @@ function AddToProgramModal({ entry, brands = [], brandMonths = [], creators = []
               <label>Onboarded on</label>
               <DateField className="w-100" value={f.onboarded_on}
                 onChange={v => set('onboarded_on', v)} />
-              <div className="pc-sig-hint">Files the deal under {monthLabel(programMonth)}.</div>
             </div>
           </div>
           <div className="pc-field2">
@@ -7326,7 +7321,7 @@ function PerfBrandList({ brands, byBrand, mode, setMode, month, onOpen }) {
       // in it — a creator onboarded in July who keeps selling must not vanish from
       // August. Deals outside the month contribute nothing (incl. their l30, which
       // lives per deal and would otherwise be counted once per month they exist).
-      if (monthKey(c.onboarded_on) !== month && !g && !a) return;
+      if (store.dealMonth(c) !== month && !g && !a) return;
       const n = (c.name || '').trim().toLowerCase();
       if (n) names.add(n);
       gmv += g; ad += a; l30 += Number((c.monthly || {}).l30) || 0;
@@ -7424,7 +7419,7 @@ function BrandMatrix({ brand, creators, mode, setMode, month, brandReportWeeks, 
     return Object.values(m).sort((a, b) => a.name.localeCompare(b.name));
   }, [creators]);
   const start = useMemo(() => {
-    const ms = creators.map(c => monthKey(c.onboarded_on)).filter(Boolean).sort();
+    const ms = creators.map(c => store.dealMonth(c)).filter(Boolean).sort();
     return ms[0] || thisMonthKey();
   }, [creators]);
   const months = useMemo(() => monthRange(start, addMonth(thisMonthKey(), -1)), [start]);
@@ -7495,13 +7490,14 @@ function BrandMatrix({ brand, creators, mode, setMode, month, brandReportWeeks, 
     ? ((c.monthly || {}).weeks || {})[key]?.[field]
     : (c.monthly || {})[key]?.[field];
   const commitCell = (c, key, field, v) => isWeekly ? commitWeek(c, key, field, v) : commitMonth(c, key, field, v);
-  // A period is locked (read-only) if it ends before the creator was onboarded —
-  // i.e. only the onboarding period and everything after it is editable.
+  // A period is locked (read-only) if it ends before the deal's program month —
+  // i.e. only the program month and everything after it is editable. The
+  // onboarding date has no say here.
   const isLocked = (c, p) => {
-    const onb = c.onboarded_on;
-    if (!onb) return false;
-    if (isWeekly) return (p.end || addDaysISO(p.key, 6)) < onb;  // whole week before onboarding
-    return p.key < monthKey(onb);                                 // month before onboarding month
+    const pm = store.dealMonth(c);
+    if (!pm) return false;
+    if (isWeekly) return (p.end || addDaysISO(p.key, 6)) < `${pm}-01`;  // whole week before the program month
+    return p.key < pm;                                                   // month before the program month
   };
 
   function commitL30(c, raw) {
@@ -8949,7 +8945,10 @@ function CreatorEditor({ editor, month, directory = [], categories = [], brandPr
     name: c.name || '',
     phone: c.phone || '', email: c.email || '',
     amount: c.amount != null ? String(c.amount || '') : '', videos_count: c.videos_count != null ? String(c.videos_count || '') : '',
-    onboarded_on: c.onboarded_on || defaultDateForMonth(month),
+    // The program this deal is filed under — its own field. The onboarding date
+    // below is only the day they joined (today for a new deal) and moves nothing.
+    program_month: store.dealMonth(c) || month || thisMonthKey(),
+    onboarded_on: isAdd ? (c.onboarded_on || todayISO()) : (c.onboarded_on || ''),
     // Contract §2 completion window (days after sample delivery); blank = auto.
     deliverable_days: c.deliverable_days != null ? String(c.deliverable_days) : '',
   });
@@ -9063,7 +9062,7 @@ function CreatorEditor({ editor, month, directory = [], categories = [], brandPr
     <div className={`pc-overlay${saving ? ' is-busy' : ''}`} onClick={close}>
       <div className="pc-modal pc-modal-scroll" onClick={e => e.stopPropagation()}>
         <h3>{isAdd ? 'Onboard creator' : 'Edit creator'}</h3>
-        <div className="pc-modal-sub">{monthLabel(monthKey(f.onboarded_on) || month)}</div>
+        <div className="pc-modal-sub">{monthLabel(f.program_month || month)}</div>
         <div className="pc-modal-body">
           <div className="pc-field" style={{ position: 'relative' }}>
             <label>Name</label>
@@ -9140,14 +9139,21 @@ function CreatorEditor({ editor, month, directory = [], categories = [], brandPr
             <div className="pc-field"><label>Videos</label><input className="pc-input" type="number" inputMode="numeric" placeholder="5" value={f.videos_count} onChange={e => set('videos_count', e.target.value)} /></div>
           </div>
           <div className="pc-field2">
-            <div className="pc-field"><label>Onboarded on</label><DateField className="w-100" clearable value={f.onboarded_on} onChange={v => set('onboarded_on', v)} /></div>
             <div className="pc-field">
-              <label>Deliverable deadline (days)</label>
-              <input className="pc-input" type="number" inputMode="numeric" min="1"
-                placeholder={`auto — ${(parseInt(f.videos_count, 10) || 0) < 6 ? 10 : 14} days`}
-                value={f.deliverable_days} onChange={e => set('deliverable_days', e.target.value)} />
-              <div className="pc-sig-hint">Contract §2 — days after the sample is delivered. Leave blank for the automatic rule.</div>
+              <label>Program month</label>
+              <MonthField variant="field" className="w-100" value={f.program_month} onChange={v => { if (v) set('program_month', v); }} />
+              {!isAdd && f.program_month !== store.dealMonth(c) && (
+                <div className="pc-sig-hint">Moves this deal to the {monthLabel(f.program_month)} program.</div>
+              )}
             </div>
+            <div className="pc-field"><label>Onboarded on</label><DateField className="w-100" clearable value={f.onboarded_on} onChange={v => set('onboarded_on', v)} /></div>
+          </div>
+          <div className="pc-field">
+            <label>Deliverable deadline (days)</label>
+            <input className="pc-input" type="number" inputMode="numeric" min="1"
+              placeholder={`auto — ${(parseInt(f.videos_count, 10) || 0) < 6 ? 10 : 14} days`}
+              value={f.deliverable_days} onChange={e => set('deliverable_days', e.target.value)} />
+            <div className="pc-sig-hint">Contract §2 — days after the sample is delivered. Leave blank for the automatic rule.</div>
           </div>
           <div className="pc-field2">
             <div className="pc-field"><label>PayPal</label><input className="pc-input" placeholder="email" value={pp} onChange={e => setPp(e.target.value)} /></div>

@@ -141,6 +141,8 @@ export interface SharedDealRow {
   videos_delivered: number;
   monthly: Record<string, any> | null;
   onboarded_on: string | null;
+  // 'YYYY-MM' — the program the deal is filed under (absent on an older RPC).
+  program_month?: string | null;
   created_at: string;
   phone: string;
   email: string;

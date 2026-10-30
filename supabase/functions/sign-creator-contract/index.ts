@@ -69,7 +69,7 @@ serve(async (req) => {
     try {
       const [{ data: brand }, { data: creator }, { data: handlerRows }] = await Promise.all([
         admin.from('brands').select('id,name').eq('id', row.brand_id).maybeSingle(),
-        admin.from('handler_collab_creators').select('id,name,onboarded_on').eq('id', row.creator_id).maybeSingle(),
+        admin.from('handler_collab_creators').select('id,name,onboarded_on,program_month').eq('id', row.creator_id).maybeSingle(),
         admin.from('paid_collab_handler_brands').select('handler_id').eq('brand_id', row.brand_id),
       ]);
       const recipients = new Set<string>();
@@ -79,7 +79,7 @@ serve(async (req) => {
       const creatorLabel = creator?.name || signerName;
       const title = `${creatorLabel} signed the contract`;
       const bodyText = `${signerName} signed the Content Creation Agreement for ${creatorLabel} on ${brand?.name ?? 'a brand'}.`;
-      const month = creator?.onboarded_on ? String(creator.onboarded_on).slice(0, 7) : '';
+      const month = String(creator?.program_month || creator?.onboarded_on || '').slice(0, 7);
       const linkUrl = `/paid-collab?brand=${encodeURIComponent(row.brand_id)}${month ? `&month=${month}` : ''}`;
       const rows = Array.from(recipients).map(uid => ({
         user_id: uid,
